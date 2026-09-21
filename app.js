@@ -1,23 +1,23 @@
-import { initBuerHome } from "./src/app/buer-home.js?v=c889e0ccf7d8d8ad";
+import { initBuerHome } from "./src/app/buer-home.js?v=22dcd02fdf086b07";
 import {
   calculateHumanDesign,
   localToUtcCandidates,
   preloadHumanDesignEngine,
-} from "./human-design-engine.js?v=c889e0ccf7d8d8ad";
-import { fetchPlaceCandidates, inferTimezoneFromAddress } from "./src/services/location-service.js?v=c889e0ccf7d8d8ad";
-import { createHumanDesignProfileSnapshot } from "./src/engine/profile-snapshot.js?v=c889e0ccf7d8d8ad";
-import { DEFAULT_CONSENT, deleteCloudData, recordProductEvent, saveChartToCloud, updateConsent } from "./src/services/backend-service.js?v=c889e0ccf7d8d8ad";
-import { canUseSystemShare, isEmbeddedBrowser, isMobileDevice, sharePageLink } from "./src/services/sharing-service.js?v=c889e0ccf7d8d8ad";
-import { readStoredJson, writeStoredJson } from "./src/services/storage-service.js?v=c889e0ccf7d8d8ad";
-import { createBodygraphRenderer } from "./src/renderer/bodygraph-renderer.js?v=c889e0ccf7d8d8ad";
-import { renderPosterElement } from "./src/renderer/poster-renderer.js?v=c889e0ccf7d8d8ad";
-import { validateBirthSelection } from "./src/app/form-validation.js?v=c889e0ccf7d8d8ad";
-import { canUseRemoteServices, effectiveRemoteConsent, isCapacitorNativeRuntime } from "./src/app/runtime-security.js?v=c889e0ccf7d8d8ad";
-import { getReleaseFeatureAvailability } from "./src/app/release-feature-availability.js?v=c889e0ccf7d8d8ad";
-import { hasSupabaseConfig } from "./src/config/runtime-config.js?v=c889e0ccf7d8d8ad";
-import { createDailyTipPayload, getDailyTip, latestSavedResult, formatDailyTipText } from "./src/app/daily-tip.js?v=c889e0ccf7d8d8ad";
+} from "./human-design-engine.js?v=22dcd02fdf086b07";
+import { fetchPlaceCandidates, inferTimezoneFromAddress } from "./src/services/location-service.js?v=22dcd02fdf086b07";
+import { createHumanDesignProfileSnapshot } from "./src/engine/profile-snapshot.js?v=22dcd02fdf086b07";
+import { DEFAULT_CONSENT, deleteCloudData, recordProductEvent, saveChartToCloud, updateConsent } from "./src/services/backend-service.js?v=22dcd02fdf086b07";
+import { canUseSystemShare, isEmbeddedBrowser, isMobileDevice, sharePageLink } from "./src/services/sharing-service.js?v=22dcd02fdf086b07";
+import { readStoredJson, writeStoredJson } from "./src/services/storage-service.js?v=22dcd02fdf086b07";
+import { createBodygraphRenderer } from "./src/renderer/bodygraph-renderer.js?v=22dcd02fdf086b07";
+import { renderPosterElement } from "./src/renderer/poster-renderer.js?v=22dcd02fdf086b07";
+import { validateBirthSelection } from "./src/app/form-validation.js?v=22dcd02fdf086b07";
+import { canUseRemoteServices, effectiveRemoteConsent, isCapacitorNativeRuntime } from "./src/app/runtime-security.js?v=22dcd02fdf086b07";
+import { getReleaseFeatureAvailability } from "./src/app/release-feature-availability.js?v=22dcd02fdf086b07";
+import { hasSupabaseConfig } from "./src/config/runtime-config.js?v=22dcd02fdf086b07";
+import { createDailyTipPayload, getDailyTip, latestSavedResult, formatDailyTipText } from "./src/app/daily-tip.js?v=22dcd02fdf086b07";
 
-import { createDailyTipPoster } from "./src/renderer/daily-tip-poster.js?v=c889e0ccf7d8d8ad";
+import { createDailyTipPoster } from "./src/renderer/daily-tip-poster.js?v=22dcd02fdf086b07";
 
 const publicAppUrl = "https://human-design.wonderelian.com/";
 preloadHumanDesignEngine().catch((error) => {
@@ -823,7 +823,7 @@ let pendingConfirmation = null;
 let pendingHistoryOptOut = null;
 const paintBodygraph = nativeRuntime ? async () => null : createBodygraphRenderer({
   container: graph,
-  templateUrl: "./assets/bodygraph-template.svg?v=c889e0ccf7d8d8ad",
+  templateUrl: "./assets/bodygraph-template.svg?v=22dcd02fdf086b07",
   centerColors,
   label: "Life Manual BodyGraph",
 });
@@ -1030,7 +1030,6 @@ const formStepCopyKeys = {
 function renderFormStepState({ announce = false } = {}) {
   formPanel.dataset.currentFormStep = String(currentFormStep);
   document.querySelector("#visibleFormStep").textContent = `0${currentFormStep} / 03`;
-  document.querySelector("#dailyTipCard").hidden = currentFormStep !== 1;
   formSteps.forEach((step) => {
     step.hidden = Number(step.dataset.formStep) !== currentFormStep;
   });
