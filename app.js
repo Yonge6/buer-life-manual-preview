@@ -1,0 +1,2343 @@
+import { initBuerHome } from "./src/app/buer-home.js?v=c889e0ccf7d8d8ad";
+import {
+  calculateHumanDesign,
+  localToUtcCandidates,
+  preloadHumanDesignEngine,
+} from "./human-design-engine.js?v=c889e0ccf7d8d8ad";
+import { fetchPlaceCandidates, inferTimezoneFromAddress } from "./src/services/location-service.js?v=c889e0ccf7d8d8ad";
+import { createHumanDesignProfileSnapshot } from "./src/engine/profile-snapshot.js?v=c889e0ccf7d8d8ad";
+import { DEFAULT_CONSENT, deleteCloudData, recordProductEvent, saveChartToCloud, updateConsent } from "./src/services/backend-service.js?v=c889e0ccf7d8d8ad";
+import { canUseSystemShare, isEmbeddedBrowser, isMobileDevice, sharePageLink } from "./src/services/sharing-service.js?v=c889e0ccf7d8d8ad";
+import { readStoredJson, writeStoredJson } from "./src/services/storage-service.js?v=c889e0ccf7d8d8ad";
+import { createBodygraphRenderer } from "./src/renderer/bodygraph-renderer.js?v=c889e0ccf7d8d8ad";
+import { renderPosterElement } from "./src/renderer/poster-renderer.js?v=c889e0ccf7d8d8ad";
+import { validateBirthSelection } from "./src/app/form-validation.js?v=c889e0ccf7d8d8ad";
+import { canUseRemoteServices, effectiveRemoteConsent, isCapacitorNativeRuntime } from "./src/app/runtime-security.js?v=c889e0ccf7d8d8ad";
+import { getReleaseFeatureAvailability } from "./src/app/release-feature-availability.js?v=c889e0ccf7d8d8ad";
+import { hasSupabaseConfig } from "./src/config/runtime-config.js?v=c889e0ccf7d8d8ad";
+import { createDailyTipPayload, getDailyTip, latestSavedResult, formatDailyTipText } from "./src/app/daily-tip.js?v=c889e0ccf7d8d8ad";
+
+import { createDailyTipPoster } from "./src/renderer/daily-tip-poster.js?v=c889e0ccf7d8d8ad";
+
+const publicAppUrl = "https://human-design.wonderelian.com/";
+preloadHumanDesignEngine().catch((error) => {
+  console.warn("Human Design engine warmup deferred:", error);
+});
+const planets = ["Sun", "Earth", "North Node", "South Node", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"];
+const graph = document.querySelector("#bodygraph");
+const fields = {
+  name: document.querySelector("#name"),
+  birthDate: document.querySelector("#birthDate"),
+  birthTime: document.querySelector("#birthTime"),
+  year: document.querySelector("#year"),
+  month: document.querySelector("#month"),
+  day: document.querySelector("#day"),
+  hour: document.querySelector("#hour"),
+  minute: document.querySelector("#minute"),
+  ampm: document.querySelector("#ampm"),
+  location: document.querySelector("#location"),
+  clockOccurrence: document.querySelector("#clockOccurrence"),
+};
+const locationResults = document.querySelector("#locationResults");
+const clockOccurrenceField = document.querySelector("#clockOccurrenceField");
+const status = document.querySelector("#status");
+const localModeNotice = document.querySelector("#localModeNotice");
+const chartForm = document.querySelector("#chartForm");
+const formSteps = [...document.querySelectorAll("[data-form-step]")];
+const formActionSets = [...document.querySelectorAll("[data-form-actions]")];
+const formStepStatus = document.querySelector("#formStepStatus");
+const fieldErrors = {
+  name: document.querySelector("#nameError"),
+  birthDate: document.querySelector("#birthDateError"),
+  birthTime: document.querySelector("#birthTimeError"),
+  location: document.querySelector("#locationError"),
+};
+const birthDisplays = {
+  date: document.querySelector("#birthDateDisplay"),
+  time: document.querySelector("#birthTimeDisplay"),
+};
+const nextToBirthButton = document.querySelector("#nextToBirth");
+const nextToLocationButton = document.querySelector("#nextToLocation");
+const backToNameButton = document.querySelector("#backToName");
+const backToBirthButton = document.querySelector("#backToBirth");
+const resumeHistoryButton = document.querySelector("#resumeHistory");
+const generateButton = document.querySelector("#generateChart");
+const generateLabel = document.querySelector("[data-generate-label]");
+const downloadButton = document.querySelector("#download");
+const shareButton = document.querySelector("#share");
+const shareLabel = document.querySelector("[data-share-label]");
+const editButton = document.querySelector("#editChart");
+const shell = document.querySelector(".shell");
+const formPanel = document.querySelector(".form-panel");
+const chartPanel = document.querySelector("#capture");
+const chartResult = document.querySelector("#chartResult");
+const chartPreview = document.querySelector("#chartPreview");
+const resultSummary = document.querySelector("#resultSummary");
+const resultSummaryFields = {
+  Type: document.querySelector("#summaryType"),
+  Strategy: document.querySelector("#summaryStrategy"),
+  "Inner Authority": document.querySelector("#summaryAuthority"),
+  Profile: document.querySelector("#summaryProfile"),
+  Definition: document.querySelector("#summaryDefinition"),
+  "Incarnation Cross": document.querySelector("#summaryCross"),
+  Sign: document.querySelector("#summarySignature"),
+  "Not Self Theme": document.querySelector("#summaryNotSelf"),
+};
+const resultSummaryReading = document.querySelector("#resultSummaryReading");
+const resultHighlights = document.querySelector("#resultHighlights");
+const coreEnergyStrengthText = document.querySelector("#coreEnergyStrengthText");
+const decisionStrengthText = document.querySelector("#decisionStrengthText");
+const workStyleStrengthText = document.querySelector("#workStyleStrengthText");
+const resultLoadingStatus = document.querySelector("#resultLoadingStatus");
+const chartQr = document.querySelector("#chartQr");
+const privacyToggle = document.querySelector("#privacyMode");
+const detailButton = document.querySelector("#detailReading");
+const detailDialog = document.querySelector("#detailDialog");
+const closeDetailButton = document.querySelector("#closeDetail");
+const shareDetailButton = document.querySelector("#shareDetail");
+const shareDetailLabel = document.querySelector("[data-detail-share-label]");
+const detailContent = document.querySelector("#detailContent");
+const celebrityMatches = document.querySelector("#celebrityMatches");
+const languageButtons = [...document.querySelectorAll("[data-language]")];
+const previewStage = document.querySelector(".preview-stage");
+const openMenuButton = document.querySelector("#openMenu");
+const appDrawer = document.querySelector("#appDrawer");
+const sideDrawer = appDrawer.querySelector(".side-drawer");
+const drawerBackdrop = appDrawer.querySelector(".drawer-backdrop");
+const closeMenuButton = document.querySelector("#closeMenu");
+const drawerBackButton = document.querySelector("#drawerBack");
+const drawerTitle = document.querySelector("#drawerTitle");
+const drawerOrbit = document.querySelector(".drawer-orbit");
+const drawerHome = document.querySelector("#drawerHome");
+const drawerAbout = document.querySelector("#drawerAbout");
+const drawerContact = document.querySelector("#drawerContact");
+const openAboutButton = document.querySelector("#openAbout");
+const openContactButton = document.querySelector("#openContact");
+const openHistoryButton = document.querySelector("#openHistory");
+const openSettingsButton = document.querySelector("#openSettings");
+const historyDialog = document.querySelector("#historyDialog");
+const deleteHistoryDialog = document.querySelector("#deleteHistoryDialog");
+const settingsDialog = document.querySelector("#settingsDialog");
+const historyList = document.querySelector("#historyList");
+const historyEmpty = document.querySelector("#historyEmpty");
+const cancelHistoryDeleteButton = document.querySelector("#cancelHistoryDelete");
+const confirmHistoryDeleteButton = document.querySelector("#confirmHistoryDelete");
+const defaultPrivacyInput = document.querySelector("#defaultPrivacy");
+const saveHistoryInput = document.querySelector("#saveHistory");
+const cloudSaveInput = document.querySelector("#cloudSave");
+const productAnalyticsInput = document.querySelector("#productAnalytics");
+const deleteCloudDataButton = document.querySelector("#deleteCloudData");
+const cloudSaveSetting = document.querySelector("#cloudSaveSetting");
+const productAnalyticsSetting = document.querySelector("#productAnalyticsSetting");
+const privacyNote = document.querySelector(".settings-note");
+const clearHistoryButton = document.querySelector("#clearHistory");
+const confirmationDialog = document.querySelector("#confirmationDialog");
+const confirmationTitle = document.querySelector("#confirmationTitle");
+const confirmationMessage = document.querySelector("#confirmationMessage");
+const cancelConfirmationButton = document.querySelector("#cancelConfirmation");
+const acceptConfirmationButton = document.querySelector("#acceptConfirmation");
+const historyOptOutDialog = document.querySelector("#historyOptOutDialog");
+const cancelHistoryOptOutButton = document.querySelector("#cancelHistoryOptOut");
+const keepHistoryRecordsButton = document.querySelector("#keepHistoryRecords");
+const deleteHistoryRecordsButton = document.querySelector("#deleteHistoryRecords");
+const nativePlugin = globalThis.Capacitor?.Plugins?.PlutoNative
+  || globalThis.Capacitor?.registerPlugin?.("PlutoNative") || null;
+const nativeRuntime = isCapacitorNativeRuntime(globalThis.Capacitor);
+document.documentElement.classList.toggle("native-text-results", nativeRuntime);
+const remoteRuntimeAllowed = canUseRemoteServices({
+  isSecureContext: globalThis.isSecureContext === true,
+  isNativeRuntime: nativeRuntime,
+});
+const releaseFeatures = getReleaseFeatureAvailability({
+  isNativeRuntime: nativeRuntime,
+  hasSupabaseConfig: hasSupabaseConfig(),
+  remoteRuntimeAllowed,
+});
+const remoteServicesAllowed = releaseFeatures.remoteOperationsAllowed;
+
+function currentShareUrl() {
+  if (location.protocol === "http:" || location.protocol === "https:") {
+    return new URL(location.pathname, location.origin).href;
+  }
+  return publicAppUrl;
+}
+
+const copy = {
+  zh: {
+    brand: "不二·人生使用说明书",
+    brandShort: "人生使用说明书",
+    startExploration: "开始新的探索", howCallYou: "怎么称呼你", nameHelp: "我们将用这个名字，陪伴你的探索之旅。", explorationNote: "接下来，我们会了解你的出生信息与地点，以更深入地为你解读。",
+    formEyebrow: "人生使用说明书", formTitle: "认识你自己", stepBasic: "基本信息", stepBirthTime: "出生时间", stepBirthLocation: "出生地点", formStepAnnouncement: "第 {current} 步，共 {total} 步：{label}", namePlaceholder: "请输入你的姓名", tapToChoose: "点击选择", birthDatePlaceholder: "年 / 月 / 日", birthTimePlaceholder: "--:--", nextStep: "继续", previousStep: "上一步", continueToLocation: "继续填写地点", resumeHistory: "已有记录", localModeNotice: "当前为临时 HTTP 连接，仅支持本地计算与生图。云端保存和匿名统计已停用。", disclaimer: "仅用于自我探索与娱乐，不构成科学结论、医疗、心理、法律或财务建议。", viewLegalNotice: "查看法律声明", resultSummaryTitle: "人生使用说明书结果摘要", summaryType: "类型", summaryStrategy: "策略", summaryAuthority: "内在权威", summaryProfile: "人生角色", summaryDefinition: "定义", summaryCross: "轮回交叉", summarySignature: "标志", summaryNotSelf: "非自己主题", name: "姓名", birthDate: "出生日期", birthTime: "出生时间", year: "年", month: "月", day: "日",
+    hour: "时", minute: "分", ampm: "上午/下午", am: "上午", pm: "下午", birthLocation: "出生地点",
+    locationPlaceholder: "城市、区县或地区", locationSuggestions: "出生地点建议", clockOccurrence: "重复时刻",
+    bodygraphLabel: "人生使用说明书图谱",
+    firstOccurrence: "第一次出现", secondOccurrence: "第二次出现", attribution: "可直接输入完整地点，无需选择候选。",
+    generate: "免费获取人生使用说明书", generating: "正在生成，请稍候", yourChart: "你的人生使用说明书", emptyChart: "填写出生资料后生成。", editChart: "重新填写", download: "保存图片", share: "分享", previewAlt: "人生使用说明书", strengthsEyebrow: "优势先看", strengthsTitle: "先记住这三点", coreEnergyStrength: "核心能量", decisionStrength: "决策优势", workStyleStrength: "工作方式", buildingResult: "正在整理你的人生说明书…", posterFailed: "图片暂时未生成，你仍可查看优势与详细解读。",
+    design: "设计", personality: "人格", watermark: "Swiss Ephemeris · 出生前回溯 88° 太阳弧 · True Node", interpretationTitle: "解读", celebrityTitle: "拥有相似基础配置的人物", celebrityBasis: "基于类型、权威、人生角色与定义匹配", celebrityNote: "名人结构参考公开出生资料；相似仅指基础配置，不代表完整图谱、性格、经历或命运相同。", qrLabel: "扫码获取", privacyMode: "隐私模式",
+    searchingPlace: "正在搜索地点…", noPlace: "暂未显示候选，仍可直接点击生成人生使用说明书。", placeUnavailable: "搜索建议暂时未加载，仍可直接点击生成人生使用说明书。",
+    resolvingPlace: "正在确认地点和当地时间…", placeNeedsDetail: "暂时无法确认这个地点，请补充城市、省/州和国家后再试。", enterName: "请输入姓名。",
+    missingTime: "该出生时刻因夏令时向前调整而不存在。", repeatedTime: "这个时刻出现过两次，请选择出生记录对应的那一次。",
+    futureTime: "出生日期和时间不能晚于现在。", calculating: "正在计算行星位置…", calculated: "已使用 Swiss Ephemeris 在本地完成计算。",
+    failed: "计算失败：{message}", preparing: "正在生成图片…", downloaded: "图片已保存。", chooseSaveImage: "请在系统菜单中选择“存储图像”保存到相册。", shared: "分享已完成。", linkCopied: "当前设备不支持分享图片，网站链接已复制。", exportFailed: "图片导出失败：{message}",
+    shareTitle: "我的人生使用说明书", shareText: "这是我的人生使用说明书。", shareReading: "分享", shareReadingText: "免费生成你的人生使用说明书与详细解读。", openingShareShort: "正在打开…", linkCopiedShort: "已复制", sharedShort: "已分享", cancelledShort: "已取消", downloadedShort: "已下载", selectAmPm: "请选择上午或下午。", detailReading: "详细解读", close: "关闭",
+    openMenu: "打开更多功能", closeMenu: "关闭菜单", drawerBack: "返回", drawerTitle: "你的空间", drawerIntroKicker: "真实自己，流动人生", drawerIntroTitle: "把人生说明书留在自己手中", drawerIntroText: "你的出生资料、图谱与历史记录默认保存在这台设备上。", drawerActions: "你的空间", drawerHistoryHint: "重新打开保存在本机的人生说明书", drawerSettingsHint: "管理隐私模式、本地历史与数据", language: "语言", drawerLanguageHint: "切换界面与解读语言", aboutUs: "关于我们", drawerAboutHint: "认识不二 与我们相信的生命观", contactUs: "联系我们", drawerContactHint: "网站、邮箱与社交媒体", drawerLinksTitle: "帮助与说明", drawerFooter: "认识自己，不是为了证明自己。",
+    worksTitle: "沿途所作", worksIntro: "观世界，识自己，也学习看见美。", workWonderElian: "WonderElian", workWonderElianTagline: "让复杂的想法变得清晰、好看而有人情味", workWonderElianDescription: "WonderElian 是永歌 Elian 的个人创作空间。这里记录作品，也记录关于设计、AI、产品，以及如何慢慢成为自己的思考与探索。", workYixiu: "一休冥想", workYixiuTagline: "让声音带你回到当下", workYixiuDescription: "十四种真实自然录音，为休息、专注与冥想留一处空间。", workXiazi: "虾子曰", workXiaziTagline: "昨日世界", workXiaziDescription: "每天用全球热点与双语海报，把复杂世界讲清楚。", workWendao: "三慢问道", workWendaoTagline: "慢读原典", workWendaoDescription: "在古老文字与当下生活之间，留一处慢慢阅读的空间。", workStyleAtlas: "艺术风格图鉴", workStyleAtlasTagline: "学习看懂一种美", workStyleAtlasDescription: "沿着艺术与设计的脉络，找到自己的观看方式。",
+    aboutKicker: "真实自己，流动人生", aboutHeading: "生命不是用来证明自己的。", aboutParagraphOne: "不二·人生使用说明书是一件面向自我探索的独立作品。我们把复杂的出生图谱整理成清晰、可保存的双语阅读体验，帮助你从另一个角度观察自己的节奏、选择与关系。", aboutParagraphTwo: "我们相信，认识自己、接纳自己、成为自己、活出自己，是一条持续展开的路。真实面对自己与世界，善待自己、他人与生命，并在创造和欣赏中活出生命之美。", aboutDisclaimer: "人类图仅作为自我观察与对话的视角，不是科学结论，也不替你作决定。", lifePhilosophyKicker: "我们的生命观", lifePhilosophyTitle: "生命不是用来证明自己的，而是用来认识、接纳、成为并活出自己。", lifePhilosophyIntro: "真正的成长，不是把自己改造成某个标准答案，而是在变化中越来越诚实地看见自己，越来越从容地选择自己的活法。", lifePathLabel: "核心路径", lifePathKnow: "认识自己", lifePathAccept: "接纳自己", lifePathBecome: "成为自己", lifePathLive: "活出自己", lifePrinciplePause: "一休", lifePrinciplePauseText: "先照顾身体，安顿情绪，再继续前行。", lifePrincipleWhole: "不二", lifePrincipleWholeText: "接纳高峰与低谷，拥抱完整而非完美。", lifePrincipleSlow: "三慢", lifePrincipleSlowText: "慢下来、慢慢来、慢慢成为，尊重生命的节奏。", lifePrincipleWater: "如水", lifePrincipleWaterText: "向内扎根，向外流动；顺应变化，不失本心。", lifePhilosophyQuote: "向内认识自己，向外如水而行。", lifePhilosophyVision: "我们愿陪伴彼此走过低谷与高峰，探索身心健康的工作与生活方式；真实面对自己与世界，善待自己、他人与生命，并在创造和欣赏中活出生命之美。", contactKicker: "保持联系", contactHeading: "一起把作品做得更好。", contactIntro: "欢迎分享你的使用感受、问题与建议。", emailLabel: "邮箱", redLabel: "小红书", douyinLabel: "抖音", openProfile: "打开主页",
+    history: "历史记录", settings: "隐私设置", localOnly: "仅保存在此设备", historyEmpty: "还没有保存的人生使用说明书。", openHistory: "打开", deleteHistory: "删除", confirmDeleteTitle: "删除这条记录？", confirmDeleteHint: "删除后无法恢复。", cancel: "取消", confirmDelete: "确认删除", openSource: "源代码",
+    defaultPrivacy: "隐私模式", defaultPrivacyHint: "生成图片时隐藏姓名、日期、时间和地点；默认关闭。", saveHistory: "保存本地历史记录", saveHistoryHint: "默认开启，仅保存在本设备；关闭时可选择保留或删除已有记录。", cloudSave: "将新生成的说明书保存到云端", cloudSaveHint: "关闭时不上传姓名、出生资料或图谱；默认关闭。", productAnalytics: "帮助我们改进不二", productAnalyticsHint: "仅发送允许的匿名操作事件，不包含出生资料或完整图谱；默认关闭。", deleteCloudData: "删除云端图谱与个人资料", deleteCloudConfirm: "这会删除当前匿名身份保存的姓名、出生资料和人类图记录。本地历史不会删除。已经记录的匿名使用事件会移除用户标识，并最多保留180天用于汇总统计。", deleteCloudTitle: "删除云端资料？", cloudDeleted: "云端图谱与个人资料已删除；匿名事件已去标识，本地历史保留。", clearHistory: "清空历史记录", clearHistoryTitle: "清空全部本地历史？", clearHistoryConfirm: "本设备保存的人生使用说明书会被永久删除，且无法恢复。", disableHistoryTitle: "关闭本地历史记录？", disableHistoryConfirm: "关闭后，今后生成的说明书不会加入本地历史。你可以保留已有记录，也可以同时全部删除。", keepHistoryRecords: "关闭但保留记录", deleteHistoryRecords: "关闭并删除全部记录", pleaseConfirm: "请确认", confirmAction: "确认", privacyPolicy: "隐私政策", support: "帮助与支持", legalNotice: "法律声明", privacyNote: "隐私模式、云端保存和匿名统计默认关闭；本地历史默认开启并仅保存在本设备。关闭本地历史时可选择保留或删除已有记录；删除云端资料不会删除本地历史。", nativeLocalOnlyPrivacyNote: "说明书和每日提示仅保存在此设备。关闭本地历史后，首页与小组件不再使用已保存的结果。", historyCleared: "历史记录已清空。", selectDate: "请选择完整的出生日期。", invalidDate: "请输入有效的出生日期。", selectTime: "请选择完整的出生时间。", invalidTime: "请输入有效的出生时间。", enterLocation: "请输入出生地点。",
+  },
+  en: {
+    brand: "Buer Life Manual",
+    brandShort: "Life Manual",
+    startExploration: "Start a new exploration", howCallYou: "What should we call you?", nameHelp: "A name to accompany your journey of discovery.", explorationNote: "Next, we’ll ask when and where you were born to create your personal reading.",
+    formEyebrow: "Life Manual", formTitle: "Know Yourself", stepBasic: "Basics", stepBirthTime: "Birth time", stepBirthLocation: "Birth place", formStepAnnouncement: "Step {current} of {total}: {label}", namePlaceholder: "Enter your name", tapToChoose: "Tap to choose", birthDatePlaceholder: "YYYY / MM / DD", birthTimePlaceholder: "--:--", nextStep: "Continue", previousStep: "Back", continueToLocation: "Continue to birth place", resumeHistory: "Saved manuals", localModeNotice: "This temporary HTTP connection supports local calculation and image generation only. Cloud saving and analytics are disabled.", disclaimer: "For personal reflection and entertainment only. Not scientific, medical, psychological, legal, or financial advice.", viewLegalNotice: "View Legal Notice", resultSummaryTitle: "Life Manual Result Summary", summaryType: "Type", summaryStrategy: "Strategy", summaryAuthority: "Inner Authority", summaryProfile: "Profile", summaryDefinition: "Definition", summaryCross: "Incarnation Cross", summarySignature: "Signature", summaryNotSelf: "Not-Self Theme", name: "Name", birthDate: "Birth date", birthTime: "Birth time", year: "Year", month: "Month", day: "Day",
+    hour: "Hour", minute: "Minute", ampm: "AM/PM", am: "AM", pm: "PM", birthLocation: "Birth location",
+    locationPlaceholder: "City, district or region", locationSuggestions: "Birth location suggestions", clockOccurrence: "Clock occurrence",
+    bodygraphLabel: "Life Manual bodygraph",
+    firstOccurrence: "First occurrence", secondOccurrence: "Second occurrence", attribution: "Enter the full place directly; selecting a suggestion is optional.",
+    generate: "Get Your Life Manual Free", generating: "Creating your manual…", yourChart: "Your Life Manual", emptyChart: "Enter details to generate.", editChart: "Edit Details", download: "Save Image", share: "Share", previewAlt: "Personal life manual", strengthsEyebrow: "Start with your strengths", strengthsTitle: "Three things to remember", coreEnergyStrength: "Core energy", decisionStrength: "Decision strength", workStyleStrength: "Work style", buildingResult: "Organizing your Life Manual…", posterFailed: "The image is not ready, but your strengths and full reading are available.",
+    design: "Design", personality: "Personality", watermark: "Swiss Ephemeris · 88° pre-birth solar-arc · True Node", interpretationTitle: "Reading", celebrityTitle: "People with Similar Core Configurations", celebrityBasis: "Matched by type, authority, profile, and definition", celebrityNote: "Celebrity structures use public birth records; similarity means core configuration, not a complete chart, personality, experience, or destiny.", qrLabel: "Scan to get", privacyMode: "Privacy mode",
+    searchingPlace: "Searching locations…", noPlace: "No suggestions yet. You can still generate the chart directly.", placeUnavailable: "Suggestions did not load. You can still generate the chart directly.",
+    resolvingPlace: "Confirming the place and its local time…", placeNeedsDetail: "We could not confirm this place. Add the city, state or region, and country, then try again.", enterName: "Enter a name.",
+    missingTime: "This local birth time did not exist because the clocks moved forward.", repeatedTime: "This clock time occurred twice. Choose which occurrence is on the birth record.",
+    futureTime: "Birth date and time cannot be in the future.", calculating: "Calculating planetary positions…", calculated: "Chart calculated locally with Swiss Ephemeris.",
+    failed: "Failed: {message}", preparing: "Preparing image…", downloaded: "Image saved.", chooseSaveImage: "Choose Save Image in the system menu to add it to Photos.", shared: "Shared.", linkCopied: "Image sharing is unavailable on this device. The site link was copied.", exportFailed: "Image export failed: {message}",
+    shareTitle: "My Life Manual", shareText: "Here is my personal life manual.", shareReading: "Share", shareReadingText: "Create your free Life Manual and detailed reading.", openingShareShort: "Opening…", linkCopiedShort: "Copied", sharedShort: "Shared", cancelledShort: "Cancelled", downloadedShort: "Downloaded", selectAmPm: "Choose AM or PM.", detailReading: "Detailed Reading", close: "Close",
+    openMenu: "Open more", closeMenu: "Close menu", drawerBack: "Back", drawerTitle: "Your space", drawerIntroKicker: "True to yourself. Flow with life.", drawerIntroTitle: "Keep your Life Manual in your hands", drawerIntroText: "Your birth details, chart, and history stay on this device by default.", drawerActions: "Your space", drawerHistoryHint: "Reopen Life Manuals saved on this device", drawerSettingsHint: "Manage privacy mode, local history, and data", language: "Language", drawerLanguageHint: "Switch the interface and reading language", aboutUs: "About us", drawerAboutHint: "Meet Buer and the philosophy behind it", contactUs: "Contact", drawerContactHint: "Website, email, and social channels", drawerLinksTitle: "Help and information", drawerFooter: "Knowing yourself is not about proving yourself.",
+    worksTitle: "Works along the way", worksIntro: "See the world, know yourself, and learn to see beauty.", workWonderElian: "WonderElian", workWonderElianTagline: "Make complex ideas clear, beautiful, and human", workWonderElianDescription: "An independent creative world from Wuhan, connecting visual culture, wellbeing, and real life through design, AI, and digital products.", workYixiu: "Yixiu Meditation", workYixiuTagline: "Let sound return you to now", workYixiuDescription: "Fourteen real nature recordings create space to rest, focus, and meditate.", workXiazi: "Xiazi Says", workXiaziTagline: "Yesterday's World", workXiaziDescription: "Global stories and bilingual posters make a complex world easier to see.", workWendao: "Wendao", workWendaoTagline: "Read the classics slowly", workWendaoDescription: "A quiet space between ancient words and life as it is lived today.", workStyleAtlas: "Style Atlas", workStyleAtlasTagline: "Learn to see a style", workStyleAtlasDescription: "Follow the lineages of art and design and discover your own way of looking.",
+    aboutKicker: "True to yourself. Flow with life.", aboutHeading: "Life is not for proving yourself.", aboutParagraphOne: "Buer Life Manual is an independent work for self-exploration. It turns a complex birth chart into a clear, bilingual reading you can keep, offering another lens on your rhythms, choices, and relationships.", aboutParagraphTwo: "We believe knowing, accepting, becoming, and living as yourself is an unfolding path: face yourself and the world truthfully, treat self, others, and life with kindness, and live the beauty of life through creation and appreciation.", aboutDisclaimer: "Human Design is offered as a lens for reflection and conversation, not a scientific conclusion or a substitute for your decisions.", lifePhilosophyKicker: "Our philosophy of life", lifePhilosophyTitle: "Life is not for proving yourself. It is for knowing, accepting, becoming, and living as yourself.", lifePhilosophyIntro: "Growth is not the work of turning yourself into a standard answer. It is learning to see yourself more honestly through change, and to choose your way of living with greater ease.", lifePathLabel: "Core path", lifePathKnow: "Know yourself", lifePathAccept: "Accept yourself", lifePathBecome: "Become yourself", lifePathLive: "Live as yourself", lifePrinciplePause: "Pause", lifePrinciplePauseText: "Care for the body, settle emotion, then continue.", lifePrincipleWhole: "Wholeness", lifePrincipleWholeText: "Accept peaks and valleys; choose wholeness over perfection.", lifePrincipleSlow: "Go slowly", lifePrincipleSlowText: "Slow down, take your time, and respect the rhythm of becoming.", lifePrincipleWater: "Be Water", lifePrincipleWaterText: "Root inwardly, move outwardly; adapt without losing your center.", lifePhilosophyQuote: "Know yourself within; move through the world like water.", lifePhilosophyVision: "We hope to accompany one another through valleys and peaks, exploring healthier ways to work and live: facing self and world truthfully, treating life with kindness, and creating and appreciating beauty.", contactKicker: "Stay in touch", contactHeading: "Help us make the work better.", contactIntro: "Share your experience, questions, and suggestions with us.", emailLabel: "Email", redLabel: "RED", douyinLabel: "Douyin", openProfile: "Open profile",
+    history: "History", settings: "Privacy", localOnly: "Stored only on this device", historyEmpty: "No saved Life Manuals yet.", openHistory: "Open", deleteHistory: "Delete", confirmDeleteTitle: "Delete this record?", confirmDeleteHint: "This action cannot be undone.", cancel: "Cancel", confirmDelete: "Delete", openSource: "Open Source",
+    defaultPrivacy: "Privacy mode", defaultPrivacyHint: "Hide name, date, time, and location in generated images. Off by default.", saveHistory: "Save local history", saveHistoryHint: "On by default and stored only on this device. When turning it off, choose whether to keep or delete existing records.", cloudSave: "Save new Life Manuals to the cloud", cloudSaveHint: "When off, names, birth details, and charts are not uploaded. Off by default.", productAnalytics: "Help us improve Buer", productAnalyticsHint: "Send only allowlisted anonymous actions, never birth details or a full chart. Off by default.", deleteCloudData: "Delete Cloud Charts and Personal Data", deleteCloudConfirm: "This deletes the name, birth details, and Human Design records saved for the current anonymous identity. Local history is not deleted. Previously recorded anonymous usage events are deidentified and retained for no more than 180 days for aggregate statistics.", deleteCloudTitle: "Delete cloud data?", cloudDeleted: "Cloud charts and personal data deleted. Events were deidentified; local history remains.", clearHistory: "Clear history", clearHistoryTitle: "Clear all local history?", clearHistoryConfirm: "Every Life Manual saved on this device will be permanently deleted. This cannot be undone.", disableHistoryTitle: "Turn off local history?", disableHistoryConfirm: "New Life Manuals will no longer be added to local history. You can keep existing records or delete them all.", keepHistoryRecords: "Turn Off & Keep Records", deleteHistoryRecords: "Turn Off & Delete All", pleaseConfirm: "Please confirm", confirmAction: "Confirm", privacyPolicy: "Privacy Policy", support: "Help & Support", legalNotice: "Legal Notice", privacyNote: "Privacy mode, cloud saving, and anonymous analytics are off by default. Local history is on by default and stored only on this device. When turning local history off, choose whether to keep or delete existing records; deleting cloud data does not delete local history.", nativeLocalOnlyPrivacyNote: "Life Manuals and daily tips stay on this device. Turning off local history stops saved results appearing on home and widgets.", historyCleared: "History cleared.", selectDate: "Choose a complete birth date.", invalidDate: "Enter a valid birth date.", selectTime: "Choose a complete birth time.", invalidTime: "Enter a valid birth time.", enterLocation: "Enter a birth location.",
+  },
+};
+
+const planetNames = {
+  Sun: "太阳", Earth: "地球", "North Node": "北交点", "South Node": "南交点", Moon: "月亮", Mercury: "水星",
+  Venus: "金星", Mars: "火星", Jupiter: "木星", Saturn: "土星", Uranus: "天王星", Neptune: "海王星", Pluto: "冥王星",
+};
+const propertyNames = {
+  Type: "类型", Strategy: "策略", "Inner Authority": "内在权威", Profile: "人生角色", Definition: "定义",
+  "Incarnation Cross": "轮回交叉", "Not Self Theme": "非自己主题", Digestion: "消化", Sense: "认知感官", Environment: "环境",
+};
+const valueNames = {
+  Generator: "生产者", "Manifesting Generator": "显示生产者", Manifestor: "显现者", Projector: "投射者", Reflector: "反映者",
+  "To Respond": "等待回应", "To Inform": "告知", "Wait for the Invitation": "等待邀请", "Wait a Lunar Cycle": "等待一个月亮周期",
+  "Emotional - Solar Plexus": "情绪权威 · 太阳神经丛", Sacral: "荐骨权威", Splenic: "脾脏权威", "Ego Manifested": "意志显现权威",
+  "Ego Projected": "意志投射权威", "Self-Projected": "自我投射权威", Lunar: "月亮权威", "Mental - Environment": "环境权威",
+  "No Definition": "无定义", "Single Definition": "一分人", "Split Definition": "二分人", "Triple Split Definition": "三分人", "Quadruple Split Definition": "四分人",
+  Frustration: "挫败", Anger: "愤怒", Bitterness: "苦涩", Disappointment: "失望", Satisfaction: "满足感", Peace: "平和", Success: "成功", Surprise: "惊喜",
+  "Consecutive Appetite": "连续食欲", "Alternating Appetite": "交替食欲", "Open Taste": "开放味觉", "Closed Taste": "封闭味觉",
+  "Hot Thirst": "热渴", "Cold Thirst": "冷渴", "Calm Touch": "平静触觉", "Nervous Touch": "紧张触觉", "High Sound": "高声音", "Low Sound": "低声音",
+  "Direct Light": "直接光", "Indirect Light": "间接光", Smell: "嗅觉", Taste: "味觉", "Outer Vision": "外在视觉", "Inner Vision": "内在视觉",
+  Feeling: "感觉", Touch: "触觉", Caves: "洞穴", Markets: "市场", Kitchens: "厨房", Mountains: "山脉", Valleys: "山谷", Shores: "海岸", "Natural Shores": "自然海岸", "Artificial Shores": "人工海岸",
+};
+const profileRoles = { Investigator: "研究者", Martyr: "体验者", Opportunist: "机会主义者", Hermit: "隐士", Heretic: "异端者", "Role Model": "榜样" };
+const strategyGuidance = {
+  "To Respond": "等待身体对眼前的人和事产生明确回应",
+  "To Inform": "行动前先告知可能受影响的人",
+  "Wait for the Invitation": "等待自己被看见，再接受真正合适的邀请",
+  "Wait a Lunar Cycle": "给自己一个完整的月亮周期看清答案",
+};
+const authorityGuidance = {
+  "Emotional - Solar Plexus": "不必当场答应，等情绪波浪平稳后再确认",
+  Sacral: "留意身体当下自然出现的“愿意”或“不愿意”",
+  Splenic: "相信当下安静、短暂却清楚的直觉",
+  "Ego Manifested": "先确认自己是否真心想要，并愿意为它投入",
+  "Ego Projected": "在正确的邀请中，听听自己真正想要什么",
+  "Self-Projected": "把选择说出来，从自己的声音里听见方向",
+  Lunar: "不急着定论，让不同时刻的感受帮你看清全貌",
+  "Mental - Environment": "去到让自己舒服的环境，在值得信任的人面前说出想法",
+};
+const definitionGuidance = {
+  "No Definition": "你会明显感受环境和他人的影响，给决定多一点时间很重要",
+  "Single Definition": "你的内在运作较连贯，独处时也容易把事情想明白",
+  "Split Definition": "你的不同部分常在交流和连接中被串起来，合适的互动会带来启发",
+  "Triple Split Definition": "你需要在不同关系与场景间流动，思路才更容易慢慢整合",
+  "Quadruple Split Definition": "你有多个相对独立的处理区块，给自己充足时间会更从容",
+};
+const typeStrengthsZh = {
+  Generator: "你的核心优势是稳定、可持续的生命力，以及在真正有回应的事情上持续练习并形成专业深度的能力",
+  "Manifesting Generator": "你的核心优势是多线整合、快速试验与边做边优化，能用较短路径把想法推向结果",
+  Manifestor: "你的核心优势是发起、开路与创造行动势能，能够让原本停滞的事情开始运转",
+  Projector: "你的核心优势是看见人、资源与系统如何更有效运作，并用精准观察帮助他人少走弯路",
+  Reflector: "你的核心优势是敏锐读取群体与环境的真实状态，发现别人已经习惯而忽略的变化",
+};
+const typeStrengthsEn = {
+  Generator: "Your core strength is sustainable life-force energy and the ability to build mastery through consistent engagement with work your body genuinely responds to",
+  "Manifesting Generator": "Your core strength is integrating multiple tracks, testing quickly, and improving as you move, often finding a shorter path from idea to result",
+  Manifestor: "Your core strength is initiating movement, opening new paths, and giving stalled situations the momentum to begin",
+  Projector: "Your core strength is seeing how people, resources, and systems can work more effectively, then guiding attention toward the highest-leverage adjustment",
+  Reflector: "Your core strength is sensing the true condition of a group or environment and noticing changes that others may have normalized",
+};
+const authorityStrengthsZh = {
+  "Emotional - Solar Plexus": "你的优势是能从不同情绪位置看见事情的完整度，等波浪平稳后通常更容易作出经得起时间的决定",
+  Sacral: "你的优势是身体会对眼前选项给出直接反馈，能帮助你快速识别什么值得持续投入",
+  Splenic: "你的优势是对风险、时机与当下状态有快速而细腻的直觉辨识",
+  "Ego Manifested": "你的优势是清楚感受自己真正想争取什么，并把意愿转化成有力量的行动",
+  "Ego Projected": "你的优势是辨认什么承诺真正值得投入意志力，并在正确关系中发挥影响力",
+  "Self-Projected": "你的优势是通过说出想法听见真实方向，声音常能帮你把身份与选择对齐",
+  Lunar: "你的优势是拥有多角度观察力，让时间与不同环境帮助你形成更完整的判断",
+  "Mental - Environment": "你的优势是借由合适环境与高质量对话整理思路，能够从交流中听见自己的清晰",
+};
+const authorityStrengthsEn = {
+  "Emotional - Solar Plexus": "Your strength is seeing a decision from several emotional positions; once the wave settles, your choices can carry more depth and durability",
+  Sacral: "Your strength is direct bodily feedback to what is in front of you, helping you recognize where sustained energy is genuinely available",
+  Splenic: "Your strength is fast, subtle recognition of timing, risk, and what is healthy in the present moment",
+  "Ego Manifested": "Your strength is knowing what you truly want and converting authentic will into decisive action",
+  "Ego Projected": "Your strength is recognizing which commitments deserve your willpower and where your influence is genuinely invited",
+  "Self-Projected": "Your strength is hearing direction through your own voice, using expression to align identity and choice",
+  Lunar: "Your strength is multi-angle awareness, allowing time and changing environments to reveal a more complete decision",
+  "Mental - Environment": "Your strength is clarifying thought through the right environment and high-quality dialogue",
+};
+const definitionStrengthsZh = {
+  "No Definition": "你拥有很强的环境感受力与适应性，能够映照不同人群的状态",
+  "Single Definition": "你的内在连接较完整，常能独立整合信息并形成连续行动",
+  "Split Definition": "你的优势会在高质量连接中被激活，对话与协作常能带来关键启发",
+  "Triple Split Definition": "你擅长从不同人群与场景中吸收信息，再把多个视角整合成更全面的理解",
+  "Quadruple Split Definition": "你拥有多个稳定而专注的内部处理区域，适合给复杂问题足够时间逐层成熟",
+};
+const definitionStrengthsEn = {
+  "No Definition": "You bring strong environmental sensitivity and adaptability, often reflecting the condition of a group with unusual clarity",
+  "Single Definition": "Your internal connections are relatively self-contained, supporting independent integration and continuous action",
+  "Split Definition": "Your strengths often activate through high-quality connection; conversation and collaboration can unlock key insight",
+  "Triple Split Definition": "You can gather information across different people and settings, then synthesize several perspectives into a fuller view",
+  "Quadruple Split Definition": "You have several stable internal processing areas and benefit from letting complex questions mature layer by layer",
+};
+const profileLineGuidance = {
+  1: "1号线需要先研究和建立安全的基础",
+  2: "2号线需要独处来恢复天然才能，也常由别人看见你的长处",
+  3: "3号线通过亲身试错得到最可靠的经验",
+  4: "4号线的机会往往来自稳定的人际网络与信任",
+  5: "5号线容易承接他人期待，说清边界会保护你的影响力",
+  6: "6号线会在人生不同阶段中沉淀经验，最终以身作则地影响别人",
+};
+const profileGuidanceZh = {
+  "1/3": "你擅长先研究清楚，再通过真实试验检验答案；优势是能把理论变成经得起现实验证的方法",
+  "1/4": "你会先建立扎实基础，再通过稳定关系分享价值；优势是专业深度与信任影响力可以彼此放大",
+  "2/4": "你拥有需要独处滋养的自然才能，也容易通过熟悉的人际网络被看见；优势是不用过度推销，也能在信任中获得机会",
+  "2/5": "你既有自然天赋，也容易被期待提供解决方案；优势是能把看似轻松的能力转化为别人真正用得上的方法",
+  "3/5": "你擅长通过试验快速识别什么有效，再把经验提炼成可复制的解决方案；优势是适应力、恢复力和实战判断",
+  "3/6": "你会从亲身经验中积累智慧，并逐渐形成更长远的观察；优势是既理解现实复杂度，也能看见更成熟的方向",
+  "4/6": "你的影响力来自关系信任与长期示范；优势是能连接合适的人，并用稳定行动让别人看见一种可行的生活方式",
+  "4/1": "你拥有相对稳定的内在基础，并通过熟悉网络发挥影响力；优势是立场清楚、关系可靠，适合长期建设",
+  "5/1": "你倾向先深入调查、建立可靠基础，再向他人提供实际可行的解决方案。别人容易期待你解决问题，因此需要管理承诺与外界投射，避免承担并不属于你的责任",
+  "5/2": "你结合了自然才能与解决复杂问题的影响力；优势是能在被正确看见时，用简洁方式回应现实需要，同时保留必要的独处与边界",
+  "6/2": "你拥有自然才能，也会随着人生经验逐渐形成榜样式影响力；优势是既能在独处中沉淀能力，也能用更成熟的视角启发别人",
+  "6/3": "你通过真实经历理解世界，并把经验沉淀成长期智慧；优势是面对变化有恢复力，最终能以真实而非完美的方式影响他人",
+};
+const profileGuidanceEn = {
+  "1/3": "You investigate before testing ideas in real life; your strength is turning theory into methods that can survive practical reality",
+  "1/4": "You build a solid foundation and share value through trusted relationships; depth and relational influence reinforce one another",
+  "2/4": "Your natural talents are restored in solitude and often recognized through familiar networks; trusted relationships can bring opportunity without constant self-promotion",
+  "2/5": "You combine natural talent with the projection of being a practical problem-solver; your strength is turning what feels intuitive into something genuinely useful",
+  "3/5": "You learn quickly through experimentation and can translate lived experience into scalable solutions; adaptability and practical judgment are central strengths",
+  "3/6": "You accumulate wisdom through direct experience and gradually develop a longer view; your strength is understanding real complexity while seeing a more mature direction",
+  "4/6": "Your influence grows through trusted relationships and long-term example; you connect the right people and make possibility visible through consistent action",
+  "4/1": "You bring a relatively stable inner foundation and influence through familiar networks; clarity, reliability, and long-term building are key strengths",
+  "5/1": "You tend to investigate deeply, build a reliable foundation, and then offer practical solutions. Others may project the role of problem-solver onto you, so clear promises and boundaries matter",
+  "5/2": "You combine natural talent with strong problem-solving influence; when correctly recognized, you can answer real needs simply while protecting essential solitude and boundaries",
+  "6/2": "You combine natural talent with an influence that matures into role-model wisdom; solitude refines your gifts, while perspective helps those gifts inspire others",
+  "6/3": "You understand life through direct experience and gradually distill it into durable wisdom; resilience and honest example become important strengths",
+};
+const typeReassuranceZh = {
+  Generator: "你不需要证明自己永远有力气。没有回应时的疲惫，不代表你懒惰或不够自律；它往往只是身体在提醒你，这件事并不值得继续消耗。真正适合你的方向，会让投入本身逐渐变成能量来源。",
+  "Manifesting Generator": "你不需要因为兴趣变化、路径转弯或同时推进多件事而责怪自己。你并不是三心二意，而是通过行动快速辨认真正有效的路径。允许自己修正，比为了证明一致而困在旧选择里更诚实。",
+  Manifestor: "你不需要先获得所有人的理解，才有资格开始。你对自主空间的需要并不等于难相处；当你愿意在行动前让重要的人知道方向，既能保留自由，也能减少不必要的误解与阻力。",
+  Projector: "你不需要用持续忙碌证明价值。你的珍贵之处往往不是做得比所有人更多，而是比别人更早看见问题的关键。被正确看见与邀请，会让你的洞察落在真正愿意接住它的人身上。",
+  Reflector: "你不需要急着给自己一个固定答案。对不同人和环境产生不同感受，并不代表你没有自我；这种流动性正是你读取世界的方式。合适的环境会让你越来越轻松地辨认什么属于自己。",
+};
+const typeWorkZh = {
+  Generator: "你适合在有真实回应的领域长期打磨，把重复变成手感，把兴趣变成专业。比起不断追逐新鲜感，你更容易在持续投入中形成难以替代的深度。",
+  "Manifesting Generator": "你适合需要整合、多线程推进和快速迭代的工作。你常能发现别人没想到的捷径，但真正的优势不是单纯求快，而是在快速行动后愿意回头校准，让结果越来越准确。",
+  Manifestor: "你适合发起项目、定义新方向、推动从零到一。需要高度自主、能够决定节奏的空间，会比被过度管理的环境更能释放你的创造力。",
+  Projector: "你适合诊断、顾问、策略、管理、设计与人才发展等需要看见系统规律的工作。你的价值常体现在一个关键判断，能够替团队节省大量试错和无效消耗。",
+  Reflector: "你适合观察群体、文化、趋势与环境质量。研究、评估、策展、社群与组织观察等工作，能让你的敏感度成为集体的镜子，而不是个人的负担。",
+};
+const typePracticalGuidanceZh = {
+  Generator: {
+    work: "收到新任务时，先别只看职位、薪酬或别人是否期待你答应。把任务想成一个具体动作，观察身体是更想靠近，还是已经开始发沉。真正有回应的工作，忙过以后往往仍有踏实的满足感。",
+    life: "安排运动、学习或周末活动时，尽量从眼前真实可选的事情里挑，不必凭头脑设计一个‘应该喜欢的人生’。连续几天都只剩挫败和硬撑，可以把它当成重新选择的提醒。",
+    action: "今天遇到一个请求时，先问自己一个能用‘愿意／不愿意’回答的问题，再决定是否承诺。",
+  },
+  "Manifesting Generator": {
+    work: "适合把大项目拆成短实验：先做一版、看反馈、再调整。临时发现更短路径并不是问题，但换方向前要告诉受影响的同事，避免速度变成返工或沟通成本。",
+    life: "兴趣多、节奏快并不等于三分钟热度。可以同时探索，但别一次答应所有邀约；留下可以退出和修正的空间，比强迫自己把每条路都走到底更可持续。",
+    action: "为正在推进的事设一个小检查点：继续、调整或停止，只选当前身体最有回应的一项。",
+  },
+  Manifestor: {
+    work: "当你想启动项目、调整流程或改变分工时，先用一句话告诉会被影响的人：你准备做什么、为什么、接下来需要什么。告知不是请示，而是减少阻力，让你的发起真正落地。",
+    life: "你需要自主和不被打断的空间。与其忍到生气后突然抽离，不如提前说清楚自己的安排、边界和可联系时间，让亲近的人知道这不是拒绝关系。",
+    action: "下一次准备直接行动前，先给相关的人发一条简短告知，再观察事情是否更顺。",
+  },
+  Projector: {
+    work: "开会时不必抢着证明自己看得最清楚。先确认对方是否真的想听，再把洞察说成一个关键问题或一项高杠杆建议。被认可的判断，往往比替团队包办所有执行更有价值。",
+    life: "朋友来倾诉时，可以先问‘你想让我听你说，还是一起想办法？’这会帮你分清陪伴与指导，也避免好意变成不被需要的建议或长期救火。",
+    action: "今天先少给一个未经邀请的答案，多问一次‘你希望我怎么支持你？’",
+  },
+  Reflector: {
+    work: "评估新团队、合作或工作机会时，不要只看岗位说明。分几次进入那个环境，观察自己在不同人群中是放松、清醒，还是持续紧绷；环境感受本身就是重要信息。",
+    life: "重大决定可以多放一段时间，并在不同日期、地点和人面前谈一谈。感受变化并不代表反复无常，而是在分辨哪些是环境带来的、哪些会稳定留下。",
+    action: "为一个重要选择做环境记录：在哪里、和谁在一起、身体是什么感受，先收集而不急着定论。",
+  },
+};
+const typePracticalGuidanceEn = {
+  Generator: {
+    work: "When a new task arrives, look beyond title, pay, or other people's expectations. Picture the actual work and notice whether your body leans in or already feels heavy. Work you genuinely respond to can be demanding and still leave a grounded sense of satisfaction.",
+    life: "Choose exercise, learning, and weekend plans from real options in front of you instead of designing a life you think you should enjoy. Several days of frustration and forcing are useful reasons to reassess.",
+    action: "For one request today, turn it into a concrete yes-or-no question and notice your body's response before committing.",
+  },
+  "Manifesting Generator": {
+    work: "Break a large project into short experiments: make a first version, gather feedback, and adjust. Finding a faster route is useful, but tell affected teammates before changing direction so speed does not create avoidable rework.",
+    life: "Many interests and a fast pace do not automatically mean you are inconsistent. Explore more than one path, but leave room to revise or exit instead of promising to finish everything you begin.",
+    action: "Set one checkpoint for current work and choose only one next move: continue, adjust, or stop.",
+  },
+  Manifestor: {
+    work: "Before starting a project, changing a process, or shifting responsibilities, tell the people affected what you are doing, why, and what you need next. Informing is not asking permission; it reduces resistance around your initiative.",
+    life: "You may need autonomy and uninterrupted space. Rather than withdrawing after anger builds, name your plans, boundaries, and available time early so people close to you do not mistake space for rejection.",
+    action: "Before your next independent move, send one concise update to the people it affects and see whether the path becomes smoother.",
+  },
+  Projector: {
+    work: "In a meeting, you do not need to prove that you see the issue first. Check whether your view is wanted, then offer one key question or one high-leverage adjustment. Recognized judgment is often more valuable than taking over all the execution.",
+    life: "When a friend brings a problem, ask whether they want listening or help finding a solution. This separates companionship from guidance and keeps care from turning into unwanted advice or permanent rescue work.",
+    action: "Offer one fewer uninvited answer today and ask once, ‘How would you like me to support you?’",
+  },
+  Reflector: {
+    work: "When considering a team, partnership, or job offer, evaluate more than the role description. Visit the environment more than once and notice whether different people leave you settled and clear or consistently tense.",
+    life: "Give major decisions time and discuss them on different days, in different places, and with different people. Changing feelings are data that help separate the environment's influence from what remains true for you.",
+    action: "For one important choice, record where you were, who was present, and how your body felt. Collect the pattern before reaching a conclusion.",
+  },
+};
+const authorityPracticalGuidanceZh = {
+  "Emotional - Solar Plexus": "遇到跳槽、合作、买大件或关系承诺，先回复‘我需要想一晚’，不要在兴奋最高点或情绪最低点拍板；隔天仍愿意，再确认。",
+  Sacral: "把模糊问题改成具体选项，例如‘我愿不愿意接这个项目？’‘周三还是周五更想见面？’先听身体的愿意或不愿意，再补充理由。",
+  Splenic: "进入新场所、见一个人或听到一个方案时，先记下最初那一秒的安全感或不适感；不要用之后反复出现的担心冒充最初的直觉。",
+  "Ego Manifested": "把承诺大声说一遍：‘我真的想要这件事，也愿意付出这些代价吗？’如果只剩证明给别人看，就先缩小承诺。",
+  "Ego Projected": "面对邀请或请求，先确认对方是否真正认可你的投入，也确认这件事是不是你真心想承担，而不是因为被需要就答应。",
+  "Self-Projected": "给自己录一段两分钟语音，分别说出接受与拒绝这个选择后的生活；重听时留意哪一种声音更自然、更像你。",
+  Lunar: "对搬家、长期关系或职业转向等大决定，跨不同日期反复观察，至少经历多个情绪和环境变化，不要因外界催促压缩自己的判断过程。",
+  "Mental - Environment": "到一个让你舒服的地方，把选择讲给不会替你下结论的人听；重点不是采纳建议，而是从自己的表达里听见清晰。",
+};
+const authorityPracticalGuidanceEn = {
+  "Emotional - Solar Plexus": "For a job change, partnership, major purchase, or relationship commitment, say ‘I need a night to think.’ Avoid deciding at the emotional high or low; confirm when the choice still feels sound later.",
+  Sacral: "Turn a vague decision into concrete options: ‘Do I want this project?’ or ‘Would Wednesday or Friday feel better?’ Notice the body's yes or no before adding reasons.",
+  Splenic: "When entering a place, meeting someone, or hearing a proposal, note the first quiet second of safety or unease. Do not confuse later repetitive worry with that initial signal.",
+  "Ego Manifested": "Say the promise aloud: ‘Do I truly want this, and am I willing to pay its real cost?’ If the energy is mainly about proving something, reduce the commitment.",
+  "Ego Projected": "Before accepting a request, check whether your contribution is genuinely recognized and whether you truly want the responsibility, rather than agreeing simply because you are needed.",
+  "Self-Projected": "Record a two-minute voice note describing life after saying yes and after saying no. Listen back for which version of your voice sounds more natural and more like you.",
+  Lunar: "For moves, long-term relationships, or career changes, revisit the decision across different days and settings. Do not compress your process because someone else wants an immediate answer.",
+  "Mental - Environment": "Go somewhere your body can settle and talk the choice through with someone who will not decide for you. The point is to hear clarity in your own words, not to collect instructions.",
+};
+const authorityCareZh = {
+  "Emotional - Solar Plexus": "晚一点回答不是拖延，而是尊重自己的完整感受。高点时不必急着承诺，低点时也不必急着否定；真正适合你的答案，通常经得起情绪变化。",
+  Sacral: "你未必总能立刻解释为什么愿意或不愿意，这并不代表答案不可靠。身体往往比语言更早知道方向，先尊重那份真实，再慢慢补上理由。",
+  Splenic: "你的直觉通常很轻、很快，而且只说一次。它不像焦虑那样反复轰炸，也未必能提供完整逻辑；给自己更多安静，才更容易听见这份细微但准确的保护。",
+  "Ego Manifested": "你不需要对每件事都证明意志力。真正值得承诺的事情，会让你发自内心地想要；选择少而重要的目标，反而能让你的意志产生更大影响。",
+  "Ego Projected": "你的承诺需要发生在正确的关系和认可中。不是每一个请求都值得你动用意志力；被真正看见之后作出的选择，更容易让你既有力量，也不失去自己。",
+  "Self-Projected": "当你把选择说出来时，留意自己的声音是变得开阔、笃定，还是越来越收缩。你不需要从别人那里得到标准答案，真正的方向常藏在你说话时呈现出来的自己里。",
+  Lunar: "需要更长时间并不意味着你优柔寡断。你的清晰来自多个时刻、多个环境与多种感受的共同验证；允许答案成熟，是你对重大选择最负责任的方式。",
+  "Mental - Environment": "你不是靠独自在头脑里反复推演获得清晰。来到舒服的环境，在不替你作决定的人面前把想法说出来，常能帮助你听见真正属于自己的方向。",
+};
+const profileCareZh = {
+  "1/3": "你会希望先弄懂再行动，却又必须在现实中验证。走过弯路并不推翻你的准备，它会让你的知识长出真正可靠的根。",
+  "1/4": "你对基础和关系都很认真。无需为了扩大影响力而勉强经营所有关系，少数稳定、互相信任的连接更能承载你的价值。",
+  "2/4": "你既需要被人看见，也需要拥有不被打扰的空间。独处不是逃避，而是让天然能力恢复清晰；真正适合你的机会常从信任关系中自然出现。",
+  "2/5": "别人可能在你还没准备好时就期待你给出答案。你可以先退回自己的空间确认能力和意愿，再决定是否回应；被需要不等于必须负责。",
+  "3/5": "你的经验常比标准答案更真实。试错不是失败，而是你识别可行方案的方式；但你也不必替所有人承担实验后的期待，分享经验时保留边界同样重要。",
+  "3/6": "有些阶段可能让你觉得人生反复推倒重来。其实每一次经历都在扩充你的判断，时间会把零散体验变成一种更宽厚、更可信的智慧。",
+  "4/6": "你重视信任，也会观察一个人是否值得长期同行。你的影响力不需要喧闹，它会在稳定关系和持续示范中慢慢累积。",
+  "4/1": "你的内在立场较稳定，不必为了取悦所有人频繁改变。真正适合的关系会尊重你的基础，并让你的坚定成为可靠而不是僵硬。",
+  "5/1": "你可能经常被当成能够解决问题的人，甚至承接超出能力范围的期待。被误解不代表你不够好；先研究、说清边界、只承诺真正能完成的事，会保护你的信誉与善意。",
+  "5/2": "你既容易被期待，也需要独处保存天然能力。不是每一次呼唤都必须回应；当问题真正适合你、对方也愿意配合时，你的解决能力才最有力量。",
+  "6/2": "你需要撤退、观察和沉淀，也可能在某些阶段对外界期待感到疲惫。暂时不站出来并不代表没有价值；你的成熟影响力，往往来自那些安静整合自己的时间。",
+  "6/3": "你既经历现实碰撞，也会逐渐站到更远的位置看人生。无需把自己包装成从不出错的人，你真正能带给别人的，是经历过之后仍然诚实、柔软并愿意继续前进。",
+};
+const environmentGuidanceZh = {
+  "Artificial Shores": "人工海岸不只指海边，更包括城市与郊区、商业与住宅、室内与室外，以及不同人群或行业交汇的过渡地带",
+  "Natural Shores": "自然海岸不只指海边，也包括自然形成的边界、林地与空地、水域与陆地等过渡地带",
+};
+const environmentGuidanceEn = {
+  "Artificial Shores": "Artificial Shores includes designed transition zones: city and suburb, commercial and residential areas, indoors and outdoors, or places where different groups and fields meet",
+  "Natural Shores": "Natural Shores includes organically formed edges between land and water, woodland and open ground, or other natural transition zones",
+};
+const gateThemesZh = {
+  1: "原创表达", 2: "感知方向", 3: "在混乱中开创新秩序", 4: "把疑问形成答案", 5: "建立稳定节奏", 6: "辨认关系边界", 7: "引导共同方向", 8: "以个人风格作出贡献",
+  9: "聚焦细节", 10: "忠于真实自我", 11: "产生丰富构想", 12: "选择正确时机表达", 13: "倾听并保存经验", 14: "驾驭资源与能力", 15: "包容差异与极端", 16: "把热情练成技能",
+  17: "形成有结构的观点", 18: "发现问题并推动改善", 19: "敏锐感知需要", 20: "在当下清楚行动", 21: "管理资源与边界", 22: "以情绪风度影响氛围", 23: "把复杂洞见说简单", 24: "反复思考后提炼理解",
+  25: "以开放之心接纳", 26: "影响、说服与整合经验", 27: "照料与滋养", 28: "为真正有意义的事坚持", 29: "对正确体验全心投入", 30: "辨认欲望并经历情感", 31: "在被认可时发挥领导力", 32: "判断什么值得延续",
+  33: "退后复盘并保存故事", 34: "运用纯粹生命力", 35: "通过经历推动变化", 36: "在未知与危机中成长", 37: "建立互惠的社群关系", 38: "为价值与目标而战", 39: "激发被压住的生命精神", 40: "独立承担并懂得休息",
+  41: "启动新的想象周期", 42: "把成长周期完成", 43: "产生突破性洞见", 44: "识别过去留下的模式", 45: "汇聚并分配资源", 46: "在身体经验中发现幸运", 47: "从困惑中提炼意义", 48: "用深度解决问题",
+  49: "依据原则推动改变", 50: "守护共同价值", 51: "以勇气唤醒自己和他人", 52: "在静止中保持专注", 53: "发起新的成长周期", 54: "把野心转化成进步动力", 55: "寻找内在精神丰盛", 56: "用故事带来启发",
+  57: "捕捉当下直觉", 58: "以喜悦推动改善", 59: "打破隔阂并建立亲密", 60: "接纳限制并等待突变", 61: "探索内在真理", 62: "精确命名与表达细节", 63: "用怀疑检验可靠性", 64: "从混乱图像中整合意义",
+};
+const gateThemesEn = {
+  1: "original self-expression", 2: "sensing direction", 3: "creating order from chaos", 4: "forming workable answers", 5: "steady natural rhythms", 6: "relationship boundaries", 7: "guiding shared direction", 8: "contribution through personal style",
+  9: "focused attention", 10: "authentic self-conduct", 11: "generating ideas", 12: "well-timed expression", 13: "listening and preserving experience", 14: "power skills and resources", 15: "embracing human extremes", 16: "turning enthusiasm into skill",
+  17: "structured opinions", 18: "correction and improvement", 19: "sensitivity to needs", 20: "clear action in the now", 21: "resource control and boundaries", 22: "emotional grace", 23: "making insight understandable", 24: "returning to an idea until it resolves",
+  25: "open-hearted acceptance", 26: "influence and persuasion", 27: "care and nourishment", 28: "struggle for meaning", 29: "wholehearted commitment", 30: "desire and emotional experience", 31: "recognized leadership", 32: "instinct for continuity",
+  33: "privacy and reflection", 34: "pure life-force power", 35: "growth through experience", 36: "learning through the unknown", 37: "reciprocal community", 38: "fighting for purpose", 39: "provoking spirit", 40: "independent work and rest",
+  41: "initiating a new imaginative cycle", 42: "completing cycles of growth", 43: "breakthrough insight", 44: "recognizing past patterns", 45: "gathering and distributing resources", 46: "wisdom through the body", 47: "finding meaning in confusion", 48: "depth and practical solutions",
+  49: "principled change", 50: "protecting shared values", 51: "awakening courage", 52: "stillness and concentration", 53: "starting new cycles", 54: "transforming ambition", 55: "inner abundance and spirit", 56: "stimulation through stories",
+  57: "present-moment intuition", 58: "joyful improvement", 59: "breaking barriers to intimacy", 60: "accepting limits until change arrives", 61: "inner truth and mystery", 62: "precise naming and detail", 63: "testing through doubt", 64: "integrating meaning from confusion",
+};
+const celebrities = [
+  { name: "Elon Musk", nameZh: "埃隆·马斯克", type: "Manifesting Generator", profile: "3/5", authority: "Sacral" },
+  { name: "Nicole Kidman", nameZh: "妮可·基德曼", type: "Manifesting Generator", profile: "1/3", authority: "Sacral", definition: "Single Definition" },
+  { name: "Bruno Mars", nameZh: "布鲁诺·马尔斯", type: "Manifesting Generator", profile: "1/3", authority: "Sacral", definition: "Single Definition" },
+  { name: "Bruce Lee", nameZh: "李小龙", type: "Manifesting Generator", profile: "6/2", authority: "Emotional - Solar Plexus" },
+  { name: "Arnold Schwarzenegger", nameZh: "阿诺德·施瓦辛格", type: "Manifesting Generator", profile: "5/1", authority: "Sacral", definition: "Single Definition" },
+  { name: "Michael Jordan", nameZh: "迈克尔·乔丹", type: "Manifesting Generator", profile: "5/1", authority: "Emotional - Solar Plexus", definition: "Split Definition" },
+  { name: "Martin Luther King Jr.", nameZh: "马丁·路德·金", type: "Manifesting Generator", profile: "5/1", authority: "Sacral", definition: "Single Definition" },
+  { name: "Beyoncé", nameZh: "碧昂丝", type: "Generator", profile: "1/3", authority: "Sacral", definition: "Split Definition" },
+  { name: "Stephen Hawking", nameZh: "斯蒂芬·霍金", type: "Generator", profile: "3/5", authority: "Sacral" },
+  { name: "Warren Buffett", nameZh: "沃伦·巴菲特", type: "Generator", profile: "2/4", authority: "Emotional - Solar Plexus" },
+  { name: "Steve Jobs", nameZh: "史蒂夫·乔布斯", type: "Generator", profile: "6/3", authority: "Emotional - Solar Plexus", definition: "Split Definition" },
+  { name: "Oprah Winfrey", nameZh: "奥普拉·温弗瑞", type: "Generator", profile: "2/4", authority: "Emotional - Solar Plexus", definition: "Triple Split Definition" },
+  { name: "Bert Convy", nameZh: "伯特·康维", type: "Generator", profile: "5/1", authority: "Sacral", definition: "Split Definition" },
+  { name: "Claude Bernard", nameZh: "克洛德·贝尔纳", type: "Generator", profile: "5/1", authority: "Sacral", definition: "Split Definition" },
+  { name: "Taylor Swift", nameZh: "泰勒·斯威夫特", type: "Projector", profile: "5/1", authority: "Splenic", definition: "Single Definition" },
+  { name: "Leonardo DiCaprio", nameZh: "莱昂纳多·迪卡普里奥", type: "Projector", profile: "6/2", authority: "Emotional - Solar Plexus" },
+  { name: "Freddie Mercury", nameZh: "弗雷迪·默丘里", type: "Projector", profile: "1/4", authority: "Splenic", definition: "Split Definition" },
+  { name: "Magnus Carlsen", nameZh: "马格努斯·卡尔森", type: "Projector", profile: "2/5", authority: "Emotional - Solar Plexus" },
+  { name: "Robert Oppenheimer", nameZh: "罗伯特·奥本海默", type: "Manifestor", profile: "6/3", authority: "Emotional - Solar Plexus" },
+  { name: "Phyllis A. Whitney", nameZh: "菲莉丝·惠特尼", type: "Manifestor", profile: "4/1", authority: "Splenic", definition: "Single Definition" },
+  { name: "Lupita Tovar", nameZh: "卢皮塔·托瓦尔", type: "Manifestor", profile: "2/4", authority: "Emotional - Solar Plexus", definition: "Single Definition" },
+  { name: "Sandra Bullock", nameZh: "桑德拉·布洛克", type: "Reflector", profile: "2/4", authority: "Lunar", definition: "No Definition" },
+  { name: "Kim Gordon", nameZh: "金·戈登", type: "Reflector", profile: "1/3", authority: "Lunar", definition: "No Definition" },
+  { name: "Uri Geller", nameZh: "尤里·盖勒", type: "Reflector", profile: "6/2", authority: "Lunar", definition: "No Definition" },
+];
+const historyStorageKey = "pluto-chart-history-v1";
+const settingsStorageKey = "pluto-app-settings-v1";
+const defaultSettings = { privacyByDefault: false, keepHistory: true, ...DEFAULT_CONSENT };
+
+const storedSettings = readStoredJson(settingsStorageKey, {});
+const hasStoredKeepHistory = Object.prototype.hasOwnProperty.call(storedSettings, "keepHistory");
+let appSettings = { ...defaultSettings, ...storedSettings };
+let historyEntries = readStoredJson(historyStorageKey, []);
+if (!Array.isArray(historyEntries)) historyEntries = [];
+historyEntries = historyEntries.filter((entry) => (
+  typeof entry?.id === "string"
+  && entry.data?.Properties
+  && entry.data?.Meta
+));
+// Migrate only users whose older settings never recorded an explicit history preference.
+if (historyEntries.length && !hasStoredKeepHistory) {
+  appSettings.keepHistory = true;
+  writeStoredJson(settingsStorageKey, appSettings);
+}
+let language = localStorage.getItem("pluto-language") || (navigator.language?.toLowerCase().startsWith("zh") ? "zh" : "en");
+let statusState;
+let generationBusy = false;
+let resultLoadingKey = "buildingResult";
+const fieldErrorStates = {};
+
+function t(key, values = {}) {
+  return Object.entries(values).reduce((text, [name, value]) => text.replace(`{${name}}`, value), copy[language][key] || key);
+}
+
+function setStatus(key, values = {}) {
+  statusState = key ? { key, values } : null;
+  status.textContent = key ? t(key, values) : "";
+}
+
+function setFieldError(fieldName, key) {
+  const field = fields[fieldName];
+  const error = fieldErrors[fieldName];
+  if (!field || !error) return;
+  fieldErrorStates[fieldName] = key || null;
+  error.textContent = key ? t(key) : "";
+  if (key) field.setAttribute("aria-invalid", "true");
+  else field.removeAttribute("aria-invalid");
+}
+
+function setGenerationBusy(isBusy) {
+  generationBusy = isBusy;
+  generateButton.disabled = isBusy;
+  generateButton.classList.toggle("is-busy", isBusy);
+  generateButton.setAttribute("aria-busy", String(isBusy));
+  chartForm.setAttribute("aria-busy", String(isBusy));
+  generateLabel.textContent = t(isBusy ? "generating" : "generate");
+}
+
+function setResultLoadingMessage(key = "buildingResult") {
+  resultLoadingKey = key;
+  const label = resultLoadingStatus.querySelector("span:last-child");
+  label.dataset.i18n = key;
+  label.textContent = t(key);
+}
+
+function translatedValue(key, value) {
+  if (language !== "zh") return value;
+  if (key === "Profile") {
+    return value.replace(/(Investigator|Martyr|Opportunist|Hermit|Heretic|Role Model)/g, (role) => profileRoles[role]);
+  }
+  if (key === "Incarnation Cross") {
+    return value
+      .replace(/^Right Angle Cross of /, "右角度交叉 · ")
+      .replace(/^Left Angle Cross of /, "左角度交叉 · ")
+      .replace(/^Juxtaposition Cross of /, "并列交叉 · ");
+  }
+  return valueNames[value] || value;
+}
+
+function interpretation(data) {
+  const properties = data.Properties;
+  const consciousSun = data.Personality.Sun.Gate;
+  const consciousEarth = data.Personality.Earth.Gate;
+  if (language === "en") {
+    const typeStrength = typeStrengthsEn[properties.Type];
+    const authorityStrength = authorityStrengthsEn[properties["Inner Authority"]];
+    const practical = typePracticalGuidanceEn[properties.Type];
+    const decision = authorityPracticalGuidanceEn[properties["Inner Authority"]];
+    return `YOUR STRENGTHS — THE MAIN POINT\n1. Core energy: ${typeStrength}.\n2. Visible talent: people are likely to notice your ${gateThemesEn[consciousSun]}, grounded by ${gateThemesEn[consciousEarth]}.\n3. Decision strength: ${authorityStrength}.\n\nWork example: ${practical.work}\n\nDaily-life example: ${practical.life}\n\nTry this when deciding: ${decision} This is a reflection experiment, not a rule or scientific conclusion. Keep what makes daily life clearer and more sustainable.`;
+  }
+  const typeStrength = typeStrengthsZh[properties.Type];
+  const authorityStrength = authorityStrengthsZh[properties["Inner Authority"]];
+  const practical = typePracticalGuidanceZh[properties.Type];
+  const decision = authorityPracticalGuidanceZh[properties["Inner Authority"]];
+  return `你的优势｜先看重点\n1. 核心能量优势：${typeStrength}。\n2. 别人容易看见的优势：${gateThemesZh[consciousSun]}，并能通过${gateThemesZh[consciousEarth]}把它落到现实。\n3. 做决定时的优势：${authorityStrength}。\n\n工作场景：${practical.work}\n\n生活场景：${practical.life}\n\n做决定时可以这样试：${decision} 这是一种自我观察练习，不是必须遵守的规则或科学定论；只保留那些确实让日常生活更清楚、更可持续的部分。`;
+}
+
+function detailedReadingSections(data) {
+  const properties = data.Properties;
+  const [firstLine, secondLine] = (properties.Profile.match(/^(\d)\/(\d)/) || []).slice(1).map(Number);
+  const consciousSun = data.Personality.Sun.Gate;
+  const consciousEarth = data.Personality.Earth.Gate;
+  const designSun = data.Design.Sun.Gate;
+  const designEarth = data.Design.Earth.Gate;
+  const profileCodeValue = profileCode(properties.Profile);
+  const environmentGuidance = language === "zh" ? environmentGuidanceZh[properties.Environment] : environmentGuidanceEn[properties.Environment];
+  if (language === "en") {
+    const practical = typePracticalGuidanceEn[properties.Type];
+    const decisionPractice = authorityPracticalGuidanceEn[properties["Inner Authority"]];
+    return [
+      { title: "Your three core strengths", text: `1. Core energy\n${typeStrengthsEn[properties.Type]}.\n\n2. Visible talent\nPeople are likely to notice your ${gateThemesEn[consciousSun]}. Your ${gateThemesEn[consciousEarth]} helps turn that talent into something steady and useful.\n\n3. Decision strength\n${authorityStrengthsEn[properties["Inner Authority"]]}.\n\nThese are the qualities to notice first. They are not promises of success or fixed labels; they are strengths you can recognize, test, and develop in ordinary life.` },
+      { title: "First, what you do not need to prove", text: `You do not need to become a louder, faster, or more conventional version of yourself in order to be valuable. ${typeStrengthsEn[properties.Type]}.\n\nWhen your natural rhythm differs from the people around you, it can be tempting to interpret that difference as a flaw. This reading invites another possibility: the difference may be the exact condition that allows your strengths to emerge. The goal is not to perform your design perfectly, but to notice where life feels more honest, sustainable, and alive.` },
+      { title: "How this energy shows up in an ordinary workday", text: `Your type is ${properties.Type}, and your strategy is ${properties.Strategy.toLowerCase()}. In plain language, strategy is a way to notice which commitments use your energy well and which ones keep creating resistance.\n\nWork example: ${practical.work}\n\nTry this: ${practical.action}` },
+      { title: "The gifts people can see", text: `Your conscious Sun is Gate ${consciousSun}, highlighting a visible gift for ${gateThemesEn[consciousSun]}. Gate ${consciousEarth} grounds that gift through ${gateThemesEn[consciousEarth]}, helping it become useful in real situations rather than remaining only potential.\n\nProfile line ${firstLine} shapes how you consciously develop this talent. The deepest value is not a single trait, but the combination: what you notice, how you stabilize it, and how you translate it into something another person can actually receive.` },
+      { title: "The strengths working underneath", text: `Your design Sun and Earth bring ${gateThemesEn[designSun]} and ${gateThemesEn[designEarth]} into the background of your life. These qualities may be easier for other people to notice than for you to name. They often appear in spontaneous choices, body language, recurring instincts, and the role you naturally take when something real is happening.\n\nYou do not need to force these traits into performance. They become more trustworthy when you create enough space for the body to respond before the mind begins managing the outcome.` },
+      { title: "Your life theme and contribution", text: `Your incarnation cross is ${properties["Incarnation Cross"]}. In practical terms, ${gateThemesEn[consciousSun]}, ${gateThemesEn[consciousEarth]}, ${gateThemesEn[designSun]}, and ${gateThemesEn[designEarth]} may repeatedly meet in your work, relationships, and creations.\n\nThis is not a fixed occupation or a destiny you must chase. It is a pattern of contribution that becomes clearer as you live more honestly. If you notice what can be improved quickly, that discernment is a gift. Timing, tone, and receptivity help the same insight land as support instead of criticism.` },
+      { title: "A practical way to make one real decision", text: `Your authority is ${properties["Inner Authority"]}. ${authorityStrengthsEn[properties["Inner Authority"]]}. Give this signal more weight than urgency, social pressure, or the need to produce an immediate explanation.\n\nReal-life example: ${decisionPractice}\n\nThe goal is not perfect certainty. It is a choice you can support without repeatedly talking yourself back into it afterward.` },
+      { title: "Profile, expectations, and being understood", text: `${profileGuidanceEn[profileCodeValue] || `Your ${properties.Profile} profile combines two distinct ways of learning and being seen`}.\n\nOther people may recognize a role in you before you have consciously chosen it. That recognition can open doors, but it can also create expectations. Clear boundaries are not a rejection of connection. They allow your generosity, skill, and influence to remain genuine rather than becoming an obligation built from someone else's projection.` },
+      { title: "How to use this in relationships and home life", text: `Daily-life example: ${practical.life}\n\nIn close relationships, care does not require endless availability. Notice who lets your body soften, your voice become clearer, and your natural pace remain intact. A thoughtful ‘not yet’ or an honest ‘no’ often protects connection better than a quick yes offered from fear.` },
+      { title: "Your contribution at work", text: `${definitionStrengthsEn[properties.Definition]}. Your ${properties.Definition.toLowerCase()} describes how internal clarity tends to connect and move.\n\nYour visible themes of ${gateThemesEn[consciousSun]} and ${gateThemesEn[consciousEarth]} may be especially useful in meetings, projects, or collaborations. Instead of asking only which job sounds impressive, notice which problems you willingly return to and which finished work leaves you clearer rather than depleted.` },
+      { title: "Body, cognition, and the places that support you", text: `${properties.Digestion}, Cognition: ${properties.Sense}, and ${properties.Environment} offer practical ways to support your nervous system. ${environmentGuidance || "Experiment gently with which surroundings help your body settle"}.\n\nCognition points to a sensory channel that may register useful information before the mind can explain it. Treat these variables as invitations to experiment, not strict lifestyle rules. Keep the conditions that bring steadier attention, easier breathing, clearer perception, and a quieter need to force yourself.` },
+      { title: "When you drift away from yourself", text: `${properties.Sign} is the signature that often appears when your strengths are being used in the right context. ${properties["Not Self Theme"]} is not a weakness, punishment, or verdict. It is an early signal that your energy may be serving pressure instead of truth.\n\nWhen it repeats, respond with curiosity rather than self-criticism. Ask what you agreed to before your inner authority was ready, where you are trying to prove value, and what your body has been quietly saying. Recalibration is not going backward; it is a mature use of self-trust.` },
+      { title: "A small experiment for the next seven days", text: `Try this: before one meaningful decision each day, pause long enough to notice your authority before explaining the choice. Keep three short notes: what gave you energy, what reduced it, and what brought a sense of ${properties.Sign.toLowerCase()}.\n\nTreat the reading as a reflection tool, not a scientific conclusion or a verdict about who you are. Test one idea in ordinary life, keep what genuinely helps, and leave the rest.` },
+    ];
+  }
+  const type = translatedValue("Type", properties.Type);
+  const strategy = strategyGuidance[properties.Strategy] || translatedValue("Strategy", properties.Strategy);
+  const authorityName = translatedValue("Inner Authority", properties["Inner Authority"]);
+  const authority = authorityGuidance[properties["Inner Authority"]] || `依照${authorityName}做选择`;
+  const profile = translatedValue("Profile", properties.Profile);
+  const profileGuidance = [profileLineGuidance[firstLine], profileLineGuidance[secondLine]].filter(Boolean).join("；");
+  const definition = definitionGuidance[properties.Definition] || `你的${translatedValue("Definition", properties.Definition)}描述了内在信息的连接方式`;
+  const cross = translatedValue("Incarnation Cross", properties["Incarnation Cross"]);
+  const theme = translatedValue("Not Self Theme", properties["Not Self Theme"]);
+  const sign = translatedValue("Sign", properties.Sign);
+  const typeReassurance = typeReassuranceZh[properties.Type] || "";
+  const typeWork = typeWorkZh[properties.Type] || "";
+  const practical = typePracticalGuidanceZh[properties.Type];
+  const decisionPractice = authorityPracticalGuidanceZh[properties["Inner Authority"]];
+  const authorityCare = authorityCareZh[properties["Inner Authority"]] || "";
+  const profileCare = profileCareZh[profileCodeValue] || "";
+  return [
+    { title: "先看重点：你的三项核心优势", text: `1. 核心能量优势\n${typeStrengthsZh[properties.Type]}。\n\n2. 别人最容易看见的优势\n你天然容易展现${gateThemesZh[consciousSun]}，并通过${gateThemesZh[consciousEarth]}让这份能力变得稳定、实际、能被别人感受到。\n\n3. 做决定时的优势\n${authorityStrengthsZh[properties["Inner Authority"]]}。\n\n这三项是整份解读最值得先记住的部分。它们不是成功保证或固定标签，而是可以在日常工作与生活里持续辨认、练习和放大的优势。` },
+    { title: "先说最重要的：你不需要变成别人", text: `${typeReassurance}\n\n这份图不是要你把自己修理成一个更标准的人，而是帮助你看见：很多曾经被误解成缺点的地方，可能只是你的运作方式与周围人的期待不同。你不需要完美执行任何规则。只要开始分辨哪些选择让自己更真实、稳定、有生命力，就已经在慢慢回到自己的位置。` },
+    { title: "放进日常工作里，你可以这样理解", text: `你是${type}。你的策略是${strategy}。用大白话说，它是在帮你分辨：哪些任务值得投入，哪些承诺只是因为不好意思拒绝。\n\n工作场景：${practical.work}\n\n可以这样试：${practical.action}` },
+    { title: "别人最容易看见的天赋", text: `你的人格太阳落在${consciousSun}号闸门，最容易被别人看见的天赋是${gateThemesZh[consciousSun]}；${consciousEarth}号闸门的${gateThemesZh[consciousEarth]}，则帮助这份天赋在现实中站稳。\n\n${firstLine}号线影响你主动发展能力的方式。你的价值并不只是“拥有某种天赋”，而是能把看到的、理解的和坚持的东西，逐渐变成别人真正感受得到的帮助。很多时候，你可能已经在自然使用这份能力，只是因为它对你太熟悉，反而低估了它的分量。` },
+    { title: "你未必意识到的潜在力量", text: `设计太阳与地球带来${gateThemesZh[designSun]}和${gateThemesZh[designEarth]}。这部分更像身体自带的推动力，不一定是你刻意经营的形象，却常在真实场景、临场选择、压力反应和他人对你的评价里出现。\n\n${secondLine}号线也影响别人自然感受到的你。你不需要把这些特质包装成表演；越允许身体先反应、越少急着管理别人怎么看，它们越容易以稳定而可信的方式出现。` },
+    { title: "你的生命主题与独特贡献", text: `你的轮回交叉是${cross}。用大白话说，${gateThemesZh[consciousSun]}、${gateThemesZh[consciousEarth]}、${gateThemesZh[designSun]}和${gateThemesZh[designEarth]}，可能反复出现在工作、关系与创作中。\n\n它不指定职业，也不是一项必须完成的命运任务。它更像一个逐渐浮现的主题：当你不再勉强成为别人期待的样子，这些能力会自然组合成你的贡献方式。你可能很快看见哪里可以优化，这种辨识力本身非常珍贵；配合合适的时机、语气和对方的接受度，会更容易从“看见问题”走向真正的帮助与影响。` },
+    { title: "遇到真实选择时，具体怎么做", text: `你的内在权威是${authorityName}。${authorityStrengthsZh[properties["Inner Authority"]]}。实际使用时，可以${authority}。\n\n现实例子：${decisionPractice}\n\n${authorityCare}不必追求百分之百确定，更实用的标准是：做完决定后，你是否还需要每天反复说服自己留下。` },
+    { title: "人生角色：你如何成长，也如何被看见", text: `你的人生角色是${profile}。${profileGuidanceZh[profileCodeValue] || profileGuidance}。\n\n${profileCare}两条线一条更像你主动学习、建立能力的方式，另一条常是别人自然感受到的你。你的影响力不需要来自迎合所有人，而是来自对能力、边界与承诺的诚实。越清楚自己能提供什么、暂时不能承担什么，你的善意和专业越不容易被消耗。` },
+    { title: "放进生活和关系里，你可以这样观察", text: `生活场景：${practical.life}\n\n亲近不等于随时配合。可以观察：哪些人让你的身体更放松、说话更自然；又有哪些关系让你总在提前答应、过度解释或害怕拒绝。一个经过内在确认的“愿意”，通常比出于害怕给出的“可以”更有温度，也更长久。` },
+    { title: "你的优势在工作里怎么落地", text: `${typeWork}\n\n你在工作中尤其可以发挥${gateThemesZh[consciousSun]}与${gateThemesZh[consciousEarth]}。把它放进具体场景，可以问：开会时我最容易看见什么？同事通常因为什么来找我？哪类问题会让我愿意反复琢磨？这些反复出现的线索，往往比“什么职业最适合我”更接近你的真实优势。` },
+    { title: "你的整合方式与自然节奏", text: `${definitionStrengthsZh[properties.Definition]}。${definition}。\n\n观察自己是在独处时更容易理清，还是在对话、协作、移动或换环境后出现关键连接。你不必强迫自己套用别人的效率模板。真正稳定的节奏，应该让你可以反复使用，而不是每次完成任务都需要很久才能恢复。尊重自己的整合方式，会同时提升判断质量与创造力。` },
+    { title: "身体、认知与环境在默默支持你", text: `你的消化是${translatedValue("Digestion", properties.Digestion)}，认知感官是${translatedValue("Sense", properties.Sense)}，适合的环境是${translatedValue("Environment", properties.Environment)}。${environmentGuidance || "这些线索指向什么空间更容易让神经系统放松"}。\n\n这些并不是必须严格执行的生活规定，而是邀请你重新相信身体。可以小范围测试光线、声音、空间、人群密度和信息输入方式，观察什么条件会让呼吸更深、注意力更稳、内心不再那么急。身体放松时，你的优势通常更容易被调用。` },
+    { title: "当你偏离自己时，请先不要责怪自己", text: `你的正向信号是${sign}，它常提示优势正在正确场景中运作。${theme}则不是缺点、惩罚或失败，而是一盏很有价值的预警灯：可能你正在用头脑强推，承接不属于自己的期待，或把能力放在一个无法回应你的环境里。\n\n当${theme}反复出现，不需要立刻否定整段人生。先问自己：我是不是在内在权威准备好之前就答应了？是不是为了证明价值而持续消耗？身体最初的声音是什么？愿意重新选择，不代表退步，而是你开始认真站在自己这一边。` },
+    { title: "未来七天，只做一个小实验", text: `可以这样试：每天只挑一个有分量的选择，在回答前多停一会儿，先留意内在权威，再听头脑解释。简单记录三件事：什么让你更有能量，什么让你明显收缩，什么时刻带来了${sign}。\n\n也可以练习一句清楚的边界，例如“我需要晚一点回复”“这件事我暂时不能承诺”或“我愿意，但希望用自己的节奏完成”。把这份解读当成自我观察工具，不把它当成科学定论或身份判决；在真实生活里小范围测试，有帮助的留下，不适合的放下。` },
+  ];
+}
+
+function renderDetailedReading(data) {
+  const readingSections = detailedReadingSections(data).map(({ title, text }) => {
+    const section = document.createElement("section");
+    const heading = document.createElement("h3");
+    const paragraph = document.createElement("p");
+    heading.textContent = title;
+    paragraph.textContent = text;
+    section.append(heading, paragraph);
+    return section;
+  });
+  const celebritySection = document.createElement("section");
+  const celebrityHeading = document.createElement("h3");
+  const celebrityList = document.createElement("div");
+  celebritySection.className = "detail-celebrities";
+  celebrityHeading.textContent = language === "zh" ? "相似基础配置人物：详细说明" : "Similar core configurations: in detail";
+  celebrityList.className = "detail-celebrity-list";
+  celebrityList.replaceChildren(...getCelebrityMatches(data).map((celebrity) => {
+    const item = document.createElement("article");
+    const heading = document.createElement("h4");
+    const paragraph = document.createElement("p");
+    heading.textContent = language === "zh" ? celebrity.nameZh : celebrity.name;
+    paragraph.textContent = celebrityDetailedReason(data.Properties, celebrity);
+    item.append(heading, paragraph);
+    return item;
+  }));
+  celebritySection.append(celebrityHeading, celebrityList);
+  detailContent.replaceChildren(...readingSections, celebritySection);
+}
+
+function profileCode(value) {
+  return value.match(/^(\d\/\d)/)?.[1] || value;
+}
+
+function celebrityScore(properties, celebrity) {
+  const userProfile = profileCode(properties.Profile);
+  const userLines = userProfile.split("/");
+  const celebrityLines = celebrity.profile.split("/");
+  let score = celebrity.type === properties.Type ? 60 : 0;
+  if (celebrity.authority === properties["Inner Authority"]) score += 22;
+  if (celebrity.profile === userProfile) score += 14;
+  else score += celebrityLines.filter((line) => userLines.includes(line)).length * 4;
+  if (celebrity.definition && celebrity.definition === properties.Definition) score += 8;
+  return score;
+}
+
+function celebrityReason(properties, celebrity) {
+  const userProfile = profileCode(properties.Profile);
+  const sharedLines = celebrity.profile.split("/").filter((line) => userProfile.split("/").includes(line));
+  const sameAuthority = celebrity.authority === properties["Inner Authority"];
+  const sameDefinition = celebrity.definition === properties.Definition;
+  if (language === "en") {
+    const reasons = [`the same ${properties.Type} energy type`];
+    if (sameAuthority) reasons.push(`the same ${properties["Inner Authority"]} authority`);
+    if (celebrity.profile === userProfile) reasons.push(`the same ${userProfile} profile`);
+    else if (sharedLines.length) reasons.push(`profile line ${sharedLines.join(" and ")}`);
+    if (sameDefinition) reasons.push(`the same ${properties.Definition.toLowerCase()}`);
+    return `You share ${reasons.join(", ")}.`;
+  }
+  const reasons = [`同为${translatedValue("Type", properties.Type)}`];
+  if (sameAuthority) reasons.push(`同为${translatedValue("Inner Authority", properties["Inner Authority"])}`);
+  if (celebrity.profile === userProfile) reasons.push(`同为${userProfile}人生角色`);
+  else if (sharedLines.length) reasons.push(`共享${sharedLines.join("、")}号线特质`);
+  if (sameDefinition) reasons.push(`同为${translatedValue("Definition", properties.Definition)}`);
+  return `${reasons.join("，")}。`;
+}
+
+function getCelebrityMatches(data) {
+  return celebrities
+    .map((celebrity) => ({ ...celebrity, score: celebrityScore(data.Properties, celebrity) }))
+    .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name))
+    .slice(0, 2);
+}
+
+function celebrityDetailedReason(properties, celebrity) {
+  const userProfile = profileCode(properties.Profile);
+  const sharedLines = celebrity.profile.split("/").filter((line) => userProfile.split("/").includes(line));
+  const sameAuthority = celebrity.authority === properties["Inner Authority"];
+  const sameProfile = celebrity.profile === userProfile;
+  const sameDefinition = celebrity.definition === properties.Definition;
+  if (language === "en") {
+    const authorityText = sameAuthority
+      ? `You also share ${properties["Inner Authority"]} authority, so the most reliable decision signal follows a similar inner mechanism.`
+      : `Your authorities differ, so the timing and inner signal used for decisions should not be copied from their path.`;
+    const profileText = sameProfile
+      ? `The exact ${userProfile} profile match suggests a similar tension between how you consciously meet life and how others naturally perceive you.`
+      : sharedLines.length
+        ? `You share profile line ${sharedLines.join(" and ")}, while the other line changes how that quality is learned and expressed.`
+        : `Your profiles differ, so the learning style and social role are not the same.`;
+    const definitionText = sameDefinition ? ` Both charts also have ${properties.Definition.toLowerCase()}, adding a similar pattern of internal processing.` : "";
+    return `The strongest connection is the shared ${properties.Type} energy type, which points to a similar foundation for using energy and creating momentum. ${authorityText} ${profileText}${definitionText} The useful comparison is the shared strength pattern: how capacity, decisions, and influence may be directed. It is structural inspiration, not a prediction that your personality or life will resemble theirs.`;
+  }
+  const type = translatedValue("Type", properties.Type);
+  const authorityText = sameAuthority
+    ? `你们也拥有相同的${translatedValue("Inner Authority", properties["Inner Authority"])}，说明做重要决定时，可靠信号来自相似的内在机制。`
+    : "你们的内在权威不同，所以不能照搬对方做决定的时机与方式。";
+  const profileText = sameProfile
+    ? `完全相同的${userProfile}人生角色，意味着你们在主动面对世界和被别人看见的方式上有相近张力。`
+    : sharedLines.length
+      ? `你们共享${sharedLines.join("、")}号线特质，但另一条线不同，会改变这种特质的学习路径与外在表达。`
+      : "你们的人生角色不同，因此学习方式与关系位置并不相同。";
+  const definitionText = sameDefinition ? `你们也同为${translatedValue("Definition", properties.Definition)}，内在信息的整合节奏更接近。` : "";
+  return `最强的共同点是同为${type}，因此能量启动与行动策略有相似底层逻辑，也可能共享某些把优势转化为成果的方式。${authorityText}${profileText}${definitionText}真正值得参考的是相似配置如何支持能力、判断与影响力，而不是模仿对方的人生选择。这只是结构对照，不代表你的性格、经历或人生结果会复制对方。`;
+}
+
+function renderCelebrityMatches(data) {
+  celebrityMatches.replaceChildren(...getCelebrityMatches(data).map((celebrity, index) => {
+    const item = document.createElement("article");
+    const number = document.createElement("span");
+    const content = document.createElement("div");
+    const heading = document.createElement("h3");
+    const reason = document.createElement("p");
+    item.className = "celebrity-card";
+    number.className = "celebrity-rank";
+    number.textContent = String(index + 1).padStart(2, "0");
+    heading.textContent = language === "zh" ? celebrity.nameZh : celebrity.name;
+    reason.textContent = celebrityReason(data.Properties, celebrity);
+    content.append(heading, reason);
+    item.append(number, content);
+    return item;
+  }));
+}
+
+function formattedBirth(data) {
+  if (language === "en" || !data.Meta?.BirthIso) return `${data.Properties.BirthDateLocal} in ${data.Properties.Location}`;
+  const date = new Intl.DateTimeFormat("zh-CN", {
+    timeZone: data.Meta.Timezone, year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+  }).format(new Date(data.Meta.BirthIso));
+  return `${date} · ${data.Properties.Location}`;
+}
+
+function privateBirthLine() {
+  return language === "zh" ? "****年**月**日 **:** · ********" : "****-**-** **:** · ********";
+}
+
+const centerColors = {
+  "head-center": "#a8a27c",
+  "ajna-center": "#777168",
+  "throat-center": "#b58b63",
+  "g-center": "#ddbf70",
+  "heart-center": "#c8afbd",
+  "sacral-center": "#b8756e",
+  "splenic-center": "#ad8764",
+  "solar-plexus-center": "#a995b6",
+  "root-center": "#c29d6b",
+};
+
+let lastData;
+let posterBlob;
+let posterUrl;
+let posterRenderVersion = 0;
+let currentFormStep = 1;
+let placeMatches = [];
+let placeLabels = [];
+let activePlaceIndex = -1;
+let placeTimer;
+let placeRequest;
+let placeQueryVersion = 0;
+const placeCache = new Map();
+let selectedPlace = null;
+let pendingHistoryDeleteId = null;
+let pendingConfirmation = null;
+let pendingHistoryOptOut = null;
+const paintBodygraph = nativeRuntime ? async () => null : createBodygraphRenderer({
+  container: graph,
+  templateUrl: "./assets/bodygraph-template.svg?v=c889e0ccf7d8d8ad",
+  centerColors,
+  label: "Life Manual BodyGraph",
+});
+
+function persistSettings() {
+  writeStoredJson(settingsStorageKey, appSettings);
+  refreshDailyTip();
+}
+
+function persistHistory() {
+  writeStoredJson(historyStorageKey, historyEntries);
+  refreshDailyTip();
+}
+
+let widgetSyncQueue = Promise.resolve();
+let lastWidgetPayload;
+function refreshDailyTip() {
+  const entry = latestSavedResult(historyEntries, appSettings.keepHistory);
+  const payload = createDailyTipPayload(entry?.data, language);
+  const tip = getDailyTip(payload);
+  const card = document.querySelector("#dailyTipCard");
+  card.dataset.state = tip ? "ready" : "empty";
+  document.querySelector("#shareDailyTip").hidden = !tip;
+  document.querySelector("#shareDailyTip").textContent = language === "zh" ? "分享图片" : "Share image";
+  document.querySelector("#dailyTipTitle").textContent = language === "zh" ? "今日提示" : "A thought for today";
+  const date = new Date();
+  const dateElement = document.querySelector("#dailyTipDate");
+  dateElement.textContent = `${String(date.getMonth()+1).padStart(2,"0")}.${String(date.getDate()).padStart(2,"0")}`;
+  document.querySelector("#dailyTipDateSecondary").textContent = new Intl.DateTimeFormat(language === "zh" ? "zh-CN" : "en", {weekday:"long"}).format(date);
+  dateElement.dateTime = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  document.querySelector("#dailyTipText").textContent = (tip ? formatDailyTipText(tip, language) : tip) || (language === "zh"
+    ? "生成你的第一份说明书，获得属于你的每日生活提示。"
+    : "Create your first Life Manual for a daily suggestion shaped by your result.");
+  document.querySelector("#dailyTipSource").textContent = tip
+    ? (language === "zh" ? "来自你最近一次的解读" : "From your latest Life Manual")
+    : (language === "zh" ? "从了解自己开始，让每一天更自在。" : "A little self-knowledge for a more grounded day.");
+  document.querySelector("#dailyTipAction").textContent = tip
+    ? (language === "zh" ? "查看我的解读" : "Read my Life Manual")
+    : (language === "zh" ? "开始认识自己" : "Get to know yourself");
+  if (nativeRuntime && nativePlugin?.updateDailyWidget) {
+    const serialized = JSON.stringify(payload);
+    if (serialized !== lastWidgetPayload) {
+      lastWidgetPayload = serialized;
+      widgetSyncQueue = widgetSyncQueue.then(() => nativePlugin.updateDailyWidget({ payload }))
+        .catch(error => { lastWidgetPayload = undefined; console.warn("Daily widget update deferred", error); });
+    }
+  }
+}
+
+async function openDailyTipResult() {
+  const entry = latestSavedResult(historyEntries, appSettings.keepHistory);
+  if (entry) await openHistoryEntry(entry);
+  else {
+    showFormView();
+    fields.name.focus();
+  }
+}
+document.querySelector("#dailyTipAction").addEventListener("click", () => {
+  openDailyTipResult().catch(error => setStatus("failed", { message: error.message }));
+});
+async function consumeWidgetLink() {
+  if (!nativeRuntime || !nativePlugin?.consumeWidgetLink) return;
+  const result = await nativePlugin.consumeWidgetLink();
+  if (result?.openDailyTip) await openDailyTipResult();
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) return;
+  refreshDailyTip();
+  consumeWidgetLink().catch(error => console.warn("Widget link deferred", error));
+});
+// Re-evaluate calendar dates while an app/browser stays open across midnight.
+window.setInterval(() => { if (!document.hidden) refreshDailyTip(); }, 60000);
+
+function settleConfirmation(accepted) {
+  const resolve = pendingConfirmation;
+  pendingConfirmation = null;
+  if (confirmationDialog.open) confirmationDialog.close();
+  resolve?.(accepted);
+}
+
+function requestConfirmation({ titleKey, messageKey, confirmKey = "confirmAction" }) {
+  if (pendingConfirmation) settleConfirmation(false);
+  confirmationTitle.textContent = t(titleKey);
+  confirmationMessage.textContent = t(messageKey);
+  acceptConfirmationButton.textContent = t(confirmKey);
+  confirmationDialog.showModal();
+  window.setTimeout(() => cancelConfirmationButton.focus(), 0);
+  return new Promise((resolve) => { pendingConfirmation = resolve; });
+}
+
+function settleHistoryOptOut(choice) {
+  const resolve = pendingHistoryOptOut;
+  pendingHistoryOptOut = null;
+  if (historyOptOutDialog.open) historyOptOutDialog.close();
+  resolve?.(choice);
+}
+
+function requestHistoryOptOut() {
+  if (pendingHistoryOptOut) settleHistoryOptOut("cancel");
+  historyOptOutDialog.showModal();
+  window.setTimeout(() => cancelHistoryOptOutButton.focus(), 0);
+  return new Promise((resolve) => { pendingHistoryOptOut = resolve; });
+}
+
+function currentConsent() {
+  return effectiveRemoteConsent(appSettings, remoteServicesAllowed);
+}
+
+function updateRemoteServiceControls() {
+  localModeNotice.hidden = remoteRuntimeAllowed;
+  cloudSaveSetting.hidden = !releaseFeatures.remoteSettingsVisible;
+  productAnalyticsSetting.hidden = !releaseFeatures.remoteSettingsVisible;
+  deleteCloudDataButton.hidden = !releaseFeatures.remoteSettingsVisible;
+  cloudSaveInput.checked = remoteServicesAllowed && appSettings.cloudSave === true;
+  productAnalyticsInput.checked = remoteServicesAllowed && appSettings.productAnalytics === true;
+  cloudSaveInput.disabled = !remoteServicesAllowed;
+  productAnalyticsInput.disabled = !remoteServicesAllowed;
+  deleteCloudDataButton.disabled = !remoteServicesAllowed;
+  privacyNote.dataset.i18n = releaseFeatures.nativeRemoteFeaturesUnavailable
+    ? "nativeLocalOnlyPrivacyNote"
+    : "privacyNote";
+}
+
+function trackEvent(eventName, properties = {}) {
+  if (!remoteServicesAllowed) return;
+  recordProductEvent(eventName, properties, currentConsent()).catch((error) => {
+    console.warn("Anonymous product event was not sent.", error);
+  });
+}
+
+function trackChartCompletionInGoogleAnalytics(snapshot) {
+  if (!remoteServicesAllowed || appSettings.productAnalytics !== true || typeof window.gtag !== "function") return;
+  window.gtag("event", "chart_completion", {
+    site_id: "site-human-design",
+    schema_version: snapshot.schemaVersion,
+    engine_version: snapshot.engineVersion,
+  });
+}
+
+function saveChartHistory(data, input) {
+  if (!appSettings.keepHistory) return;
+  const id = `${data.Meta?.BirthIso || ""}|${data.Properties.Name}|${data.Properties.Location}`;
+  historyEntries = [
+    { id, createdAt: Date.now(), data, input },
+    ...historyEntries.filter((entry) => entry.id !== id),
+  ].slice(0, 10);
+  persistHistory();
+  renderHistory();
+}
+
+function renderHistory() {
+  historyList.replaceChildren();
+  historyEmpty.hidden = historyEntries.length > 0;
+  clearHistoryButton.disabled = historyEntries.length === 0;
+
+  historyEntries.forEach((entry) => {
+    const card = document.createElement("article");
+    card.className = "history-card";
+
+    const details = document.createElement("div");
+    const name = document.createElement("h3");
+    name.textContent = entry.data?.Properties?.Name || "-";
+    const birth = document.createElement("p");
+    birth.textContent = entry.data ? formattedBirth(entry.data) : "";
+    const type = document.createElement("p");
+    const properties = entry.data?.Properties || {};
+    type.textContent = [
+      properties.Type ? translatedValue("Type", properties.Type) : "",
+      properties.Profile ? translatedValue("Profile", properties.Profile) : "",
+    ].filter(Boolean).join(" · ");
+    details.append(name, birth, type);
+
+    const actions = document.createElement("div");
+    actions.className = "history-card-actions";
+    const open = document.createElement("button");
+    open.type = "button";
+    open.className = "history-open";
+    open.dataset.historyOpen = entry.id;
+    open.textContent = t("openHistory");
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "history-delete";
+    remove.dataset.historyDelete = entry.id;
+    remove.setAttribute("aria-label", t("deleteHistory"));
+    remove.title = t("deleteHistory");
+    remove.textContent = t("deleteHistory");
+    actions.append(open, remove);
+    card.append(details, actions);
+    historyList.append(card);
+  });
+}
+
+function setMediaState(element, state) {
+  element.dataset.mediaState = state;
+  element.setAttribute("aria-busy", String(state === "loading"));
+}
+
+const formStepCopyKeys = {
+  1: "stepBasic",
+  2: "stepBirthTime",
+  3: "stepBirthLocation",
+};
+
+function renderFormStepState({ announce = false } = {}) {
+  formPanel.dataset.currentFormStep = String(currentFormStep);
+  document.querySelector("#visibleFormStep").textContent = `0${currentFormStep} / 03`;
+  document.querySelector("#dailyTipCard").hidden = currentFormStep !== 1;
+  formSteps.forEach((step) => {
+    step.hidden = Number(step.dataset.formStep) !== currentFormStep;
+  });
+  formActionSets.forEach((actions) => {
+    actions.hidden = Number(actions.dataset.formActions) !== currentFormStep;
+  });
+  if (announce) {
+    formStepStatus.textContent = t("formStepAnnouncement", {
+      current: currentFormStep,
+      total: 3,
+      label: t(formStepCopyKeys[currentFormStep]),
+    });
+  }
+}
+
+function setFormStep(nextStep, { focus = true, announce = true } = {}) {
+  currentFormStep = Math.min(3, Math.max(1, Number(nextStep) || 1));
+  if (currentFormStep !== 3) closePlaceResults();
+  renderFormStepState({ announce });
+  if (!focus) return;
+  const focusTarget = {
+    1: fields.name,
+    2: fields.birthDate,
+    3: fields.location,
+  }[currentFormStep];
+  window.setTimeout(() => focusTarget?.focus({ preventScroll: true }), 0);
+  formPanel.scrollIntoView({ block: "start", behavior: "auto" });
+}
+
+function validateNameStep() {
+  const name = fields.name.value.trim();
+  if (name) {
+    setFieldError("name", null);
+    return true;
+  }
+  setFieldError("name", "enterName");
+  fields.name.focus();
+  return false;
+}
+
+function currentBirthValidation() {
+  syncBirthPartsFromNativeControls();
+  return validateBirthSelection({
+    year: fields.year.value,
+    month: fields.month.value,
+    day: fields.day.value,
+    hour: fields.hour.value,
+    minute: fields.minute.value,
+    ampm: fields.ampm.value,
+  });
+}
+
+function hydrateForm(input) {
+  if (!input) return;
+  fields.name.value = input.name || "";
+  const year = String(input.year || "").padStart(4, "0");
+  const month = String(input.month || "").padStart(2, "0");
+  const day = String(input.day || "").padStart(2, "0");
+  fields.birthDate.value = input.year && input.month && input.day ? `${year}-${month}-${day}` : "";
+  const hour12 = Number(input.hour);
+  const hour24 = Number.isInteger(hour12) && hour12 >= 1 && hour12 <= 12
+    ? (hour12 % 12) + (input.ampm === "pm" ? 12 : 0)
+    : Number.NaN;
+  fields.birthTime.value = Number.isInteger(hour24) && input.minute !== undefined && input.minute !== ""
+    ? `${String(hour24).padStart(2, "0")}:${String(input.minute).padStart(2, "0")}`
+    : "";
+  syncBirthPartsFromNativeControls();
+  fields.location.value = input.location || input.place?.label || "";
+  selectedPlace = input.place || null;
+}
+
+async function openHistoryEntry(entry) {
+  if (!entry?.data) return;
+  closeDrawer({ restoreFocus: false });
+  clearPoster();
+  hydrateForm(entry.input);
+  privacyToggle.checked = appSettings.privacyByDefault;
+  lastData = entry.data;
+  setStatus("preparing");
+  showChartView();
+  await render(lastData);
+  try {
+    await createPosterImage();
+    setStatus("calculated");
+  } catch (error) {
+    console.error(error);
+    setResultLoadingMessage("posterFailed");
+    setMediaState(previewStage, "error");
+  }
+}
+
+function isNativeApp() {
+  return Boolean(nativePlugin && globalThis.Capacitor?.isNativePlatform?.());
+}
+
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(",")[1] || "");
+    reader.onerror = () => reject(reader.error || new Error("The image could not be read."));
+    reader.readAsDataURL(blob);
+  });
+}
+
+function flashShareLabel(label, key, resetKey) {
+  label.textContent = t(key);
+  window.setTimeout(() => {
+    label.textContent = t(resetKey);
+  }, 1800);
+}
+
+async function shareLink(text) {
+  return sharePageLink({
+    url: currentShareUrl(),
+    title: t("shareTitle"),
+    text,
+    nativePlugin,
+    native: isNativeApp(),
+  });
+}
+
+function syncBirthPartsFromNativeControls() {
+  const [year = "", month = "", day = ""] = fields.birthDate.value.split("-");
+  fields.year.value = year;
+  fields.month.value = month;
+  fields.day.value = day;
+
+  const [hour24Text = "", minute = ""] = fields.birthTime.value.split(":");
+  const hour24 = Number(hour24Text);
+  if (hour24Text !== "" && Number.isInteger(hour24) && hour24 >= 0 && hour24 <= 23) {
+    fields.hour.value = String((hour24 % 12) || 12).padStart(2, "0");
+    fields.minute.value = minute;
+    fields.ampm.value = hour24 >= 12 ? "pm" : "am";
+  } else {
+    fields.hour.value = "";
+    fields.minute.value = "";
+    fields.ampm.value = "";
+  }
+  syncBirthControlDisplays();
+}
+
+function syncBirthControlDisplays() {
+  const [year = "", month = "", day = ""] = fields.birthDate.value.split("-");
+  const hasDate = Boolean(year && month && day);
+  birthDisplays.date.textContent = hasDate
+    ? (language === "zh" ? `${year} / ${month} / ${day}` : `${month} / ${day} / ${year}`)
+    : t("birthDatePlaceholder");
+  birthDisplays.time.textContent = fields.birthTime.value || t("birthTimePlaceholder");
+  birthDisplays.date.classList.toggle("is-placeholder", !hasDate);
+  birthDisplays.time.classList.toggle("is-placeholder", !fields.birthTime.value);
+}
+
+function initializeBirthControls() {
+  const today = new Date();
+  fields.birthDate.max = [
+    today.getFullYear(),
+    String(today.getMonth() + 1).padStart(2, "0"),
+    String(today.getDate()).padStart(2, "0"),
+  ].join("-");
+  syncBirthPartsFromNativeControls();
+}
+
+function placeLabel(properties) {
+  const parts = [properties.name, properties.district, properties.city, properties.county, properties.state, properties.country];
+  return parts.filter((part, index) => part && parts.indexOf(part) === index).join(", ");
+}
+
+function resultLabel(place, query) {
+  const fallback = placeLabel(place.properties);
+  if (place.properties.countrycode !== "CN" || !/[\u3400-\u9fff]/.test(query)) return fallback;
+  return query.trim().replace(/[\s,，、/]+/g, ", ");
+}
+
+function closePlaceResults() {
+  locationResults.hidden = true;
+  fields.location.setAttribute("aria-expanded", "false");
+  fields.location.removeAttribute("aria-activedescendant");
+  activePlaceIndex = -1;
+}
+
+function highlightPlace(index) {
+  const options = [...locationResults.children];
+  if (!options.length) return;
+  activePlaceIndex = (index + options.length) % options.length;
+  options.forEach((option, optionIndex) => {
+    const isActive = optionIndex === activePlaceIndex;
+    option.classList.toggle("active", isActive);
+    option.setAttribute("aria-selected", String(isActive));
+  });
+  fields.location.setAttribute("aria-activedescendant", options[activePlaceIndex].id);
+  options[activePlaceIndex].scrollIntoView({ block: "nearest" });
+}
+
+function resetClockOccurrence() {
+  clockOccurrenceField.hidden = true;
+  fields.clockOccurrence.value = "earlier";
+}
+
+function isValidTimezone(timezone) {
+  try {
+    new Intl.DateTimeFormat("en", { timeZone: timezone }).format();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function selectPlace(index) {
+  const place = placeMatches[index];
+  if (!place) return;
+  const [longitude, latitude] = place.geometry.coordinates;
+  if (![longitude, latitude].every(Number.isFinite)) return;
+  const label = placeLabels[index] || placeLabel(place.properties);
+  const timezone = inferTimezoneFromAddress(label)
+    || (place.properties.countrycode === "CN" ? "Asia/Shanghai" : window.tzlookup(latitude, longitude));
+  if (!isValidTimezone(timezone)) return;
+  fields.location.value = label;
+  selectedPlace = { label, coordinates: [longitude, latitude], timezone };
+  fields.location.removeAttribute("aria-invalid");
+  placeRequest?.abort();
+  resetClockOccurrence();
+  closePlaceResults();
+}
+
+function renderPlaceResults(features, query) {
+  const labels = new Set();
+  placeMatches = features.filter((place) => {
+    const label = resultLabel(place, query);
+    if (!label || labels.has(label)) return false;
+    labels.add(label);
+    return true;
+  });
+  placeLabels = placeMatches.map((place) => resultLabel(place, query));
+  locationResults.replaceChildren(...placeMatches.map((place, index) => {
+    const option = document.createElement("li");
+    option.id = `location-option-${index}`;
+    option.role = "option";
+    option.tabIndex = -1;
+    const label = placeLabels[index];
+    const [primary, ...context] = label.split(", ");
+    const name = document.createElement("strong");
+    const detail = document.createElement("span");
+    name.textContent = primary;
+    detail.textContent = context.join(" · ");
+    option.append(name, detail);
+    option.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      selectPlace(index);
+    });
+    return option;
+  }));
+  locationResults.hidden = placeMatches.length === 0;
+  fields.location.setAttribute("aria-expanded", String(placeMatches.length > 0));
+  activePlaceIndex = -1;
+  if (placeMatches.length) {
+    setStatus(null);
+    highlightPlace(0);
+  } else {
+    setStatus("noPlace");
+  }
+}
+
+async function searchPlaces(query, queryVersion) {
+  const cacheKey = `${language}:${query}`;
+  if (placeCache.has(cacheKey)) {
+    renderPlaceResults(placeCache.get(cacheKey), query);
+    return;
+  }
+  placeRequest?.abort();
+  const request = new AbortController();
+  placeRequest = request;
+  let timedOut = false;
+  const timeout = window.setTimeout(() => {
+    timedOut = true;
+    request.abort();
+  }, 12000);
+  try {
+    const features = await fetchPlaceCandidates(query, { language, signal: request.signal });
+    if (queryVersion !== placeQueryVersion || fields.location.value.trim() !== query) return;
+    placeCache.set(cacheKey, features);
+    renderPlaceResults(features, query);
+  } catch (error) {
+    if ((error.name !== "AbortError" || timedOut) && queryVersion === placeQueryVersion) {
+      closePlaceResults();
+      setStatus("placeUnavailable");
+    }
+  } finally {
+    window.clearTimeout(timeout);
+  }
+}
+
+function cancelPlaceSearch() {
+  placeQueryVersion += 1;
+  placeRequest?.abort();
+  closePlaceResults();
+}
+
+fields.location.addEventListener("input", () => {
+  window.clearTimeout(placeTimer);
+  placeRequest?.abort();
+  placeQueryVersion += 1;
+  selectedPlace = null;
+  placeMatches = [];
+  placeLabels = [];
+  locationResults.replaceChildren();
+  closePlaceResults();
+  resetClockOccurrence();
+  fields.location.removeAttribute("aria-invalid");
+  setStatus(null);
+  const query = fields.location.value.trim();
+  if (query.length < 2) {
+    closePlaceResults();
+    return;
+  }
+  setStatus("searchingPlace");
+  const queryVersion = placeQueryVersion;
+  placeTimer = window.setTimeout(() => searchPlaces(query, queryVersion), 360);
+});
+
+fields.location.addEventListener("keydown", (event) => {
+  if (event.isComposing) return;
+  if (locationResults.hidden) return;
+  if (event.key === "ArrowDown") {
+    event.preventDefault();
+    highlightPlace(activePlaceIndex + 1);
+  } else if (event.key === "ArrowUp") {
+    event.preventDefault();
+    highlightPlace(activePlaceIndex - 1);
+  } else if (event.key === "Enter" && placeMatches.length > 0) {
+    event.preventDefault();
+    selectPlace(activePlaceIndex >= 0 ? activePlaceIndex : 0);
+  } else if (event.key === "Escape") {
+    cancelPlaceSearch();
+  }
+});
+
+fields.location.addEventListener("blur", () => window.setTimeout(closePlaceResults, 180));
+
+function selectionFromPlace(place, label) {
+  const [longitude, latitude] = place.geometry.coordinates;
+  if (![longitude, latitude].every(Number.isFinite)) return null;
+  const timezone = inferTimezoneFromAddress(label)
+    || (place.properties.countrycode === "CN" ? "Asia/Shanghai" : window.tzlookup(latitude, longitude));
+  if (!isValidTimezone(timezone)) return null;
+  return { label, coordinates: [longitude, latitude], timezone };
+}
+
+async function resolveTypedPlace(query) {
+  const inferredTimezone = inferTimezoneFromAddress(query);
+  if (inferredTimezone) return { label: query, coordinates: null, timezone: inferredTimezone };
+
+  setStatus("resolvingPlace");
+  fields.location.setAttribute("aria-busy", "true");
+  window.clearTimeout(placeTimer);
+  placeQueryVersion += 1;
+  closePlaceResults();
+  placeRequest?.abort();
+  const request = new AbortController();
+  placeRequest = request;
+  try {
+    const cached = placeCache.get(`${language}:${query}`);
+    const matches = cached?.length ? cached : await fetchPlaceCandidates(query, {
+      language,
+      signal: request.signal,
+      fallbackDelay: 0,
+    });
+    const resolved = matches.map((place) => selectionFromPlace(place, query)).find(Boolean);
+    if (resolved) {
+      selectedPlace = resolved;
+      fields.location.removeAttribute("aria-invalid");
+      return resolved;
+    }
+  } catch (error) {
+    if (error.name === "AbortError") return null;
+  } finally {
+    fields.location.removeAttribute("aria-busy");
+  }
+
+  fields.location.setAttribute("aria-invalid", "true");
+  fields.location.focus();
+  setStatus("placeNeedsDetail");
+  return null;
+}
+
+async function decodeImage(image) {
+  if (image.decode) await image.decode();
+  else if (!image.complete) await new Promise((resolve, reject) => {
+    image.addEventListener("load", resolve, { once: true });
+    image.addEventListener("error", reject, { once: true });
+  });
+}
+
+async function loadExportAssets() {
+  const background = new Image();
+  background.src = "./assets/pluto-chart-mobile-v1.png";
+  await Promise.all([decodeImage(background), decodeImage(chartQr)]);
+}
+
+function row(name, item) {
+  const iconClass = `wb-${name.replaceAll(" ", "-")}`;
+  const label = language === "zh" ? planetNames[name] : name;
+  return `<li><span><i class="${iconClass}" aria-hidden="true"></i><em>${label}</em></span><b>${item.Gate}.${item.Line}</b></li>`;
+}
+
+function updateAccessibleResultSummary(data) {
+  if (!data?.Properties) {
+    Object.values(resultSummaryFields).forEach((field) => { field.textContent = ""; });
+    resultSummaryReading.textContent = "";
+    chartPreview.alt = t("previewAlt");
+    return;
+  }
+  const properties = data.Properties;
+  Object.entries(resultSummaryFields).forEach(([key, field]) => {
+    field.textContent = translatedValue(key, properties[key] || "");
+  });
+  resultSummaryReading.textContent = interpretation(data).split(/\n\s*\n/, 1)[0];
+  const type = translatedValue("Type", properties.Type);
+  const authority = translatedValue("Inner Authority", properties["Inner Authority"]);
+  const profile = properties.Profile.split(":", 1)[0];
+  chartPreview.alt = language === "zh"
+    ? `不二·人生使用说明书：${type}，${authority}，${profile} 人生角色`
+    : `Buer Life Manual: ${type}, ${authority}, Profile ${profile}`;
+}
+
+function renderResultHighlights(data) {
+  if (!data?.Properties) {
+    resultHighlights.hidden = true;
+    coreEnergyStrengthText.textContent = "";
+    decisionStrengthText.textContent = "";
+    workStyleStrengthText.textContent = "";
+    return;
+  }
+  const properties = data.Properties;
+  const typeStrengths = language === "zh" ? typeStrengthsZh : typeStrengthsEn;
+  const authorityStrengths = language === "zh" ? authorityStrengthsZh : authorityStrengthsEn;
+  const practicalGuidance = language === "zh" ? typePracticalGuidanceZh : typePracticalGuidanceEn;
+  coreEnergyStrengthText.textContent = typeStrengths[properties.Type] || translatedValue("Type", properties.Type);
+  decisionStrengthText.textContent = authorityStrengths[properties["Inner Authority"]]
+    || translatedValue("Inner Authority", properties["Inner Authority"]);
+  workStyleStrengthText.textContent = practicalGuidance[properties.Type]?.work || "";
+  resultHighlights.hidden = false;
+}
+
+async function render(data) {
+  renderDetailedReading(data);
+  updateAccessibleResultSummary(data);
+  renderResultHighlights(data);
+  if (nativeRuntime) return;
+  document.querySelector("#personName").textContent = privacyToggle.checked ? "***" : data.Properties.Name;
+  document.querySelector("#birthLine").textContent = privacyToggle.checked ? privateBirthLine() : formattedBirth(data);
+  document.querySelector("#designList").innerHTML = planets.map((planet) => row(planet, data.Design[planet])).join("");
+  document.querySelector("#personalityList").innerHTML = planets.map((planet) => row(planet, data.Personality[planet])).join("");
+  const keys = ["Type", "Strategy", "Inner Authority", "Profile", "Definition", "Incarnation Cross", "Not Self Theme", "Digestion", "Sense", "Environment"];
+  document.querySelector("#properties").innerHTML = keys.map((key) => {
+    const label = language === "zh" ? propertyNames[key] : (key === "Sense" ? "Cognition" : key);
+    return `<div class="property"><b>${label}</b><span>${translatedValue(key, data.Properties[key])}</span></div>`;
+  }).join("");
+  document.querySelector("#interpretationText").textContent = interpretation(data);
+  renderCelebrityMatches(data);
+  renderDetailedReading(data);
+  updateAccessibleResultSummary(data);
+  renderResultHighlights(data);
+}
+
+function clearPoster() {
+  posterRenderVersion += 1;
+  posterBlob = undefined;
+  if (posterUrl) URL.revokeObjectURL(posterUrl);
+  posterUrl = undefined;
+  chartPreview.removeAttribute("src");
+  setResultLoadingMessage("buildingResult");
+  setMediaState(previewStage, "loading");
+  chartResult.removeAttribute("aria-busy");
+  downloadButton.disabled = true;
+  shareButton.disabled = true;
+  privacyToggle.disabled = false;
+  languageButtons.forEach((button) => { button.disabled = false; });
+}
+
+async function createPosterImage() {
+  if (nativeRuntime) {
+    chartResult.removeAttribute("aria-busy");
+    return;
+  }
+  const renderVersion = ++posterRenderVersion;
+  setResultLoadingMessage("buildingResult");
+  setMediaState(previewStage, "loading");
+  chartResult.setAttribute("aria-busy", "true");
+  downloadButton.disabled = true;
+  shareButton.disabled = true;
+  privacyToggle.disabled = true;
+  languageButtons.forEach((button) => { button.disabled = true; });
+  try {
+    await Promise.all([paintBodygraph(lastData), document.fonts.ready, loadExportAssets()]);
+    const nextBlob = await renderPosterElement(chartPanel);
+    if (renderVersion !== posterRenderVersion) return;
+    if (posterUrl) URL.revokeObjectURL(posterUrl);
+    posterBlob = nextBlob;
+    posterUrl = URL.createObjectURL(nextBlob);
+    chartPreview.src = posterUrl;
+    if (chartPreview.decode) await chartPreview.decode();
+    if (renderVersion !== posterRenderVersion) return;
+    setMediaState(previewStage, "ready");
+    downloadButton.disabled = false;
+    shareButton.disabled = false;
+  } catch (error) {
+    if (renderVersion === posterRenderVersion) setMediaState(previewStage, "error");
+    throw error;
+  } finally {
+    if (renderVersion === posterRenderVersion) {
+      chartResult.removeAttribute("aria-busy");
+      privacyToggle.disabled = false;
+      languageButtons.forEach((button) => { button.disabled = false; });
+    }
+  }
+}
+
+function showFormView() {
+  document.body.dataset.workspace = "manual";
+  if (detailDialog.open) detailDialog.close();
+  setStatus(null);
+  closePlaceResults();
+  chartResult.hidden = true;
+  formPanel.hidden = false;
+  shell.classList.remove("result-view");
+  shell.classList.add("form-view");
+  setFormStep(1, { focus: false, announce: false });
+  window.scrollTo({ top: 0, behavior: "auto" });
+}
+
+function showChartView() {
+  document.body.dataset.workspace = "manual";
+  formPanel.hidden = true;
+  chartResult.hidden = false;
+  shell.classList.remove("form-view");
+  shell.classList.add("result-view");
+  window.scrollTo({ top: 0, behavior: "auto" });
+  window.setTimeout(() => resultSummary.focus({ preventScroll: true }), 0);
+}
+
+function applyLanguage(nextLanguage, rerender = true) {
+  language = nextLanguage === "en" ? "en" : "zh";
+  localStorage.setItem("pluto-language", language);
+  document.documentElement.lang = language === "zh" ? "zh-CN" : "en";
+  document.title = language === "zh"
+    ? "不二·人生使用说明书"
+    : "Buer · Life Manual";
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    element.textContent = t(element.dataset.i18n);
+  });
+  document.querySelectorAll("[data-i18n-alt]").forEach((element) => {
+    element.alt = t(element.dataset.i18nAlt);
+  });
+  document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
+    const label = t(element.dataset.i18nAriaLabel);
+    element.setAttribute("aria-label", label);
+    element.title = label;
+  });
+  fields.location.placeholder = t("locationPlaceholder");
+  fields.name.placeholder = t("namePlaceholder");
+  syncBirthControlDisplays();
+  locationResults.setAttribute("aria-label", t("locationSuggestions"));
+  graph.setAttribute("aria-label", t("bodygraphLabel"));
+  graph.querySelector("svg")?.setAttribute("aria-label", t("bodygraphLabel"));
+  renderFormStepState({ announce: Boolean(formStepStatus.textContent.trim()) });
+  Object.entries(fieldErrors).forEach(([fieldName, error]) => {
+    if (fieldErrorStates[fieldName]) error.textContent = t(fieldErrorStates[fieldName]);
+  });
+  setGenerationBusy(generationBusy);
+  setResultLoadingMessage(resultLoadingKey);
+  languageButtons.forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.language === language)));
+  if (statusState) status.textContent = t(statusState.key, statusState.values);
+  renderHistory();
+  refreshDailyTip();
+  document.dispatchEvent(new Event("buer:language"));
+  if (rerender && lastData) {
+    render(lastData)
+      .then(createPosterImage)
+      .catch((error) => { setStatus("exportFailed", { message: error.message }); });
+  }
+}
+
+let drawerRestoreFocus = null;
+let drawerView = "home";
+
+function setDrawerView(nextView, { focus = true } = {}) {
+  const views = new Set(["home", "about", "contact", "history", "settings"]);
+  const previousView = drawerView;
+  drawerView = views.has(nextView) ? nextView : "home";
+  drawerHome.hidden = drawerView !== "home";
+  drawerAbout.hidden = drawerView !== "about";
+  drawerContact.hidden = drawerView !== "contact";
+  historyDialog.hidden = drawerView !== "history";
+  settingsDialog.hidden = drawerView !== "settings";
+  drawerOrbit.hidden = drawerView !== "home";
+  drawerBackButton.hidden = drawerView === "home";
+  const titleKey = {
+    about: "aboutUs",
+    contact: "contactUs",
+    history: "history",
+    settings: "settings",
+  }[drawerView] || "drawerTitle";
+  drawerTitle.dataset.i18n = titleKey;
+  drawerTitle.textContent = t(titleKey);
+  sideDrawer.querySelector(".drawer-scroll").scrollTop = 0;
+  if (!focus) return;
+  if (drawerView !== "home") {
+    drawerBackButton.focus({ preventScroll: true });
+    return;
+  }
+  const returnTarget = {
+    about: openAboutButton,
+    contact: openContactButton,
+    history: openHistoryButton,
+    settings: openSettingsButton,
+  }[previousView];
+  if (returnTarget) window.setTimeout(() => returnTarget.focus({ preventScroll: true }), 0);
+}
+
+function openDrawer() {
+  drawerRestoreFocus = document.activeElement;
+  setDrawerView("home", { focus: false });
+  appDrawer.hidden = false;
+  document.body.classList.add("drawer-open");
+  openMenuButton.setAttribute("aria-expanded", "true");
+  sideDrawer.focus({ preventScroll: true });
+}
+
+function closeDrawer({ restoreFocus = true } = {}) {
+  if (appDrawer.hidden) return;
+  appDrawer.hidden = true;
+  document.body.classList.remove("drawer-open");
+  openMenuButton.setAttribute("aria-expanded", "false");
+  if (restoreFocus && drawerRestoreFocus instanceof HTMLElement) drawerRestoreFocus.focus({ preventScroll: true });
+  drawerRestoreFocus = null;
+}
+
+function drawerFocusableElements() {
+  return [...sideDrawer.querySelectorAll("button, a[href], input, select, textarea, [tabindex]:not([tabindex='-1'])")]
+    .filter((element) => !element.disabled && !element.hidden && element.offsetParent !== null);
+}
+
+openMenuButton.addEventListener("click", openDrawer);
+closeMenuButton.addEventListener("click", () => closeDrawer());
+drawerBackdrop.addEventListener("click", () => closeDrawer());
+drawerBackButton.addEventListener("click", () => setDrawerView("home"));
+openAboutButton.addEventListener("click", () => setDrawerView("about"));
+openContactButton.addEventListener("click", () => setDrawerView("contact"));
+appDrawer.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    event.preventDefault();
+    closeDrawer();
+    return;
+  }
+  if (event.key !== "Tab") return;
+  const focusable = drawerFocusableElements();
+  if (!focusable.length) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+});
+
+languageButtons.forEach((button) => button.addEventListener("click", () => {
+  applyLanguage(button.dataset.language);
+  trackEvent("language_changed", { language: button.dataset.language });
+}));
+openHistoryButton.addEventListener("click", () => {
+  renderHistory();
+  setDrawerView("history");
+});
+openSettingsButton.addEventListener("click", () => setDrawerView("settings"));
+historyList.addEventListener("click", (event) => {
+  const openButton = event.target.closest("[data-history-open]");
+  const deleteButton = event.target.closest("[data-history-delete]");
+  if (openButton) {
+    const entry = historyEntries.find((item) => item.id === openButton.dataset.historyOpen);
+    openHistoryEntry(entry).catch((error) => {
+      console.error(error);
+      setStatus("failed", { message: error.message });
+    });
+  }
+  if (deleteButton) {
+    pendingHistoryDeleteId = deleteButton.dataset.historyDelete;
+    deleteHistoryDialog.showModal();
+  }
+});
+cancelHistoryDeleteButton.addEventListener("click", () => deleteHistoryDialog.close());
+confirmHistoryDeleteButton.addEventListener("click", () => {
+  if (pendingHistoryDeleteId) {
+    historyEntries = historyEntries.filter((entry) => entry.id !== pendingHistoryDeleteId);
+    persistHistory();
+    renderHistory();
+  }
+  deleteHistoryDialog.close();
+});
+deleteHistoryDialog.addEventListener("click", (event) => {
+  if (event.target === deleteHistoryDialog) deleteHistoryDialog.close();
+});
+deleteHistoryDialog.addEventListener("close", () => { pendingHistoryDeleteId = null; });
+cancelConfirmationButton.addEventListener("click", () => settleConfirmation(false));
+acceptConfirmationButton.addEventListener("click", () => settleConfirmation(true));
+confirmationDialog.addEventListener("cancel", (event) => {
+  event.preventDefault();
+  settleConfirmation(false);
+});
+confirmationDialog.addEventListener("click", (event) => {
+  if (event.target === confirmationDialog) settleConfirmation(false);
+});
+cancelHistoryOptOutButton.addEventListener("click", () => settleHistoryOptOut("cancel"));
+keepHistoryRecordsButton.addEventListener("click", () => settleHistoryOptOut("keep"));
+deleteHistoryRecordsButton.addEventListener("click", () => settleHistoryOptOut("delete"));
+historyOptOutDialog.addEventListener("cancel", (event) => {
+  event.preventDefault();
+  settleHistoryOptOut("cancel");
+});
+historyOptOutDialog.addEventListener("click", (event) => {
+  if (event.target === historyOptOutDialog) settleHistoryOptOut("cancel");
+});
+defaultPrivacyInput.addEventListener("change", () => {
+  appSettings.privacyByDefault = defaultPrivacyInput.checked;
+  persistSettings();
+  privacyToggle.checked = defaultPrivacyInput.checked;
+  if (lastData) {
+    render(lastData)
+      .then(createPosterImage)
+      .catch((error) => { setStatus("exportFailed", { message: error.message }); });
+  }
+});
+saveHistoryInput.addEventListener("change", async () => {
+  if (saveHistoryInput.checked) {
+    appSettings.keepHistory = true;
+    persistSettings();
+    return;
+  }
+  if (historyEntries.length) {
+    const choice = await requestHistoryOptOut();
+    if (choice === "cancel") {
+      saveHistoryInput.checked = true;
+      return;
+    }
+    appSettings.keepHistory = false;
+    if (choice === "delete") {
+      historyEntries = [];
+      persistHistory();
+      renderHistory();
+    }
+    persistSettings();
+    return;
+  }
+  appSettings.keepHistory = false;
+  persistSettings();
+});
+cloudSaveInput.addEventListener("change", () => {
+  if (!remoteServicesAllowed) return;
+  appSettings.cloudSave = cloudSaveInput.checked;
+  persistSettings();
+  updateConsent(currentConsent()).catch((error) => console.warn("Cloud consent was not synchronized.", error));
+});
+productAnalyticsInput.addEventListener("change", () => {
+  if (!remoteServicesAllowed) return;
+  appSettings.productAnalytics = productAnalyticsInput.checked;
+  persistSettings();
+  updateConsent(currentConsent()).catch((error) => console.warn("Analytics consent was not synchronized.", error));
+  trackEvent("privacy_mode_changed", { setting: "productAnalytics", enabled: productAnalyticsInput.checked });
+});
+deleteCloudDataButton.addEventListener("click", async () => {
+  if (!remoteServicesAllowed) return;
+  const accepted = await requestConfirmation({ titleKey: "deleteCloudTitle", messageKey: "deleteCloudConfirm", confirmKey: "deleteCloudData" });
+  if (!accepted) return;
+  deleteCloudDataButton.disabled = true;
+  try {
+    await deleteCloudData(currentConsent());
+    appSettings.cloudSave = false;
+    cloudSaveInput.checked = false;
+    persistSettings();
+    setStatus("cloudDeleted");
+  } catch (error) {
+    console.error(error);
+    setStatus("failed", { message: error.message });
+  } finally {
+    deleteCloudDataButton.disabled = false;
+  }
+});
+clearHistoryButton.addEventListener("click", async () => {
+  const accepted = await requestConfirmation({ titleKey: "clearHistoryTitle", messageKey: "clearHistoryConfirm", confirmKey: "clearHistory" });
+  if (!accepted) return;
+  historyEntries = [];
+  persistHistory();
+  renderHistory();
+  setStatus("historyCleared");
+});
+privacyToggle.addEventListener("change", () => {
+  if (!lastData) return;
+  render(lastData)
+    .then(createPosterImage)
+    .catch((error) => { setStatus("exportFailed", { message: error.message }); });
+});
+detailButton.addEventListener("click", () => {
+  if (lastData) {
+    detailDialog.showModal();
+    trackEvent("detail_opened");
+  }
+});
+closeDetailButton.addEventListener("click", () => detailDialog.close());
+shareDetailButton.addEventListener("click", async () => {
+  shareDetailButton.disabled = true;
+  shareDetailLabel.textContent = t("openingShareShort");
+  try {
+    const result = await shareLink(t("shareReadingText"));
+    if (result === "shared") flashShareLabel(shareDetailLabel, "sharedShort", "shareReading");
+    if (result === "copied") flashShareLabel(shareDetailLabel, "linkCopiedShort", "shareReading");
+    if (result === "cancelled") flashShareLabel(shareDetailLabel, "cancelledShort", "shareReading");
+    if (result === "unavailable") {
+      window.prompt(t("shareReadingText"), currentShareUrl());
+      shareDetailLabel.textContent = t("shareReading");
+    }
+  } catch (error) {
+    console.error(error);
+    shareDetailLabel.textContent = t("shareReading");
+  } finally {
+    shareDetailButton.disabled = false;
+  }
+});
+detailDialog.addEventListener("click", (event) => {
+  if (event.target === detailDialog) detailDialog.close();
+});
+editButton.addEventListener("click", showFormView);
+
+function invalidateChart() {
+  if (!lastData) return;
+  lastData = undefined;
+  clearPoster();
+  document.querySelector("#personName").textContent = "-";
+  document.querySelector("#birthLine").textContent = t("emptyChart");
+  document.querySelector("#designList").replaceChildren();
+  document.querySelector("#personalityList").replaceChildren();
+  document.querySelector("#properties").replaceChildren();
+  document.querySelector("#interpretationText").textContent = "";
+  celebrityMatches.replaceChildren();
+  detailContent.replaceChildren();
+  updateAccessibleResultSummary(null);
+  renderResultHighlights(null);
+  paintBodygraph({ Design: {}, Personality: {}, "Defined Centers": [] }).catch((error) => {
+    setStatus("failed", { message: error.message });
+  });
+}
+
+[fields.birthDate, fields.birthTime].forEach((field) => {
+  field.addEventListener("input", syncBirthControlDisplays);
+  field.addEventListener("change", () => {
+    syncBirthPartsFromNativeControls();
+    resetClockOccurrence();
+    setFieldError(field === fields.birthDate ? "birthDate" : "birthTime", null);
+  });
+});
+fields.name.addEventListener("input", () => setFieldError("name", null));
+fields.location.addEventListener("input", () => setFieldError("location", null));
+chartForm.addEventListener("input", invalidateChart);
+chartForm.addEventListener("change", invalidateChart);
+chartForm.addEventListener("input", () => trackEvent("form_started"), { once: true });
+
+nextToBirthButton.addEventListener("click", () => {
+  if (!validateNameStep()) return;
+  setStatus(null);
+  setFormStep(2, { focus: false });
+});
+
+nextToLocationButton.addEventListener("click", () => {
+  const validation = currentBirthValidation();
+  if (!validation.valid) {
+    focusBirthValidationError(validation);
+    return;
+  }
+  clearBirthValidationState();
+  setStatus(null);
+  setFormStep(3, { focus: false });
+});
+
+backToNameButton.addEventListener("click", () => {
+  setStatus(null);
+  setFormStep(1);
+});
+
+backToBirthButton.addEventListener("click", () => {
+  setStatus(null);
+  setFormStep(2);
+});
+
+resumeHistoryButton.addEventListener("click", () => {
+  openDrawer();
+  renderHistory();
+  setDrawerView("history");
+});
+
+function clearBirthValidationState() {
+  setFieldError("birthDate", null);
+  setFieldError("birthTime", null);
+}
+
+function focusBirthValidationError(validation) {
+  clearBirthValidationState();
+  const fieldName = ["year", "month", "day"].includes(validation.field) ? "birthDate" : "birthTime";
+  const field = fields[fieldName];
+  setFieldError(fieldName, validation.code);
+  field.focus();
+}
+
+chartForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const submit = event.submitter || document.querySelector("#chartForm button[type='submit']");
+  if (submit.disabled) return;
+  const name = fields.name.value.trim();
+  if (!name) {
+    setFormStep(1, { focus: false });
+    setFieldError("name", "enterName");
+    fields.name.focus();
+    return;
+  }
+  setFieldError("name", null);
+  const birthValidation = currentBirthValidation();
+  if (!birthValidation.valid) {
+    setFormStep(2, { focus: false });
+    focusBirthValidationError(birthValidation);
+    return;
+  }
+  clearBirthValidationState();
+  const time = { hour: birthValidation.value.hour24, minute: birthValidation.value.minute };
+  const locationQuery = fields.location.value.trim();
+  if (!locationQuery) {
+    setFormStep(3, { focus: false });
+    setFieldError("location", "enterLocation");
+    fields.location.focus();
+    return;
+  }
+  setFieldError("location", null);
+  setGenerationBusy(true);
+  let resultShown = false;
+  trackEvent("chart_generate_started");
+  try {
+    const place = selectedPlace?.label === locationQuery ? selectedPlace : await resolveTypedPlace(locationQuery);
+    if (!place) return;
+    selectedPlace = place;
+    const candidates = localToUtcCandidates(
+      Number(fields.year.value), Number(fields.month.value), Number(fields.day.value),
+      time.hour, time.minute, place.timezone,
+    );
+    if (!candidates.length) throw new RangeError(t("missingTime"));
+    if (candidates.length > 1 && clockOccurrenceField.hidden) {
+      clockOccurrenceField.hidden = false;
+      setFormStep(2, { focus: false });
+      setStatus("repeatedTime");
+      fields.clockOccurrence.focus();
+      return;
+    }
+    const selectedUtc = fields.clockOccurrence.value === "later" ? candidates[candidates.length - 1] : candidates[0];
+    if (selectedUtc > Date.now()) throw new RangeError(t("futureTime"));
+    setStatus("calculating");
+    const data = await calculateHumanDesign({
+      name,
+      location: place.label,
+      year: Number(fields.year.value),
+      month: Number(fields.month.value),
+      day: Number(fields.day.value),
+      hour: time.hour,
+      minute: time.minute,
+      timezone: place.timezone,
+      timeDisambiguation: fields.clockOccurrence.value,
+    });
+    const birthDate = `${fields.year.value}-${fields.month.value}-${fields.day.value}`;
+    const birthTime = `${String(time.hour).padStart(2, "0")}:${String(time.minute).padStart(2, "0")}`;
+    const snapshot = await createHumanDesignProfileSnapshot({
+      input: { birthDate, birthTime, timezone: place.timezone, locationLabel: place.label },
+      result: data,
+    });
+    if (remoteServicesAllowed) {
+      saveChartToCloud(snapshot, {
+        name,
+        birthDate,
+        birthTime,
+        locationLabel: place.label,
+        timezone: place.timezone,
+      }, currentConsent()).catch((error) => {
+        console.warn("Cloud chart save failed; the local chart remains available.", error);
+      });
+    }
+    await render(data);
+    lastData = data;
+    saveChartHistory(data, {
+      name,
+      year: Number(fields.year.value),
+      month: Number(fields.month.value),
+      day: Number(fields.day.value),
+      hour: fields.hour.value,
+      minute: fields.minute.value,
+      ampm: fields.ampm.value,
+      location: place.label,
+      place: { label: place.label, timezone: place.timezone },
+    });
+    setStatus("preparing");
+    setResultLoadingMessage("buildingResult");
+    showChartView();
+    resultShown = true;
+    await createPosterImage();
+    setStatus("calculated");
+    trackEvent("chart_generate_succeeded", {
+      schemaVersion: snapshot.schemaVersion,
+      engineVersion: snapshot.engineVersion,
+    });
+    trackChartCompletionInGoogleAnalytics(snapshot);
+  } catch (error) {
+    console.error(error);
+    if (resultShown) {
+      setResultLoadingMessage("posterFailed");
+      setMediaState(previewStage, "error");
+    } else {
+      setStatus("failed", { message: error.message });
+    }
+    trackEvent("chart_generate_failed", { category: resultShown ? "poster" : (error instanceof RangeError ? "validation" : "calculation") });
+  } finally {
+    setGenerationBusy(false);
+  }
+});
+
+function posterFileName() {
+  const fileName = privacyToggle.checked ? "private" : (lastData?.Properties.Name || "life-manual");
+  const safeName = fileName
+    .replace(/[<>:"/\\|?*\u0000-\u001f]/g, "-")
+    .trim()
+    .slice(0, 80) || "life-manual";
+  return `${safeName}-life-manual.png`;
+}
+
+function posterFile() {
+  return new File([posterBlob], posterFileName(), { type: "image/png" });
+}
+
+function canShareFile(file) {
+  try {
+    return Boolean(canUseSystemShare() && navigator.canShare?.({ files: [file] }));
+  } catch {
+    return false;
+  }
+}
+
+function downloadPoster() {
+  const link = document.createElement("a");
+  link.download = posterFileName();
+  link.href = posterUrl;
+  document.body.append(link);
+  link.click();
+  link.remove();
+}
+
+downloadButton.addEventListener("click", async () => {
+  if (!lastData || !posterBlob || !posterUrl) return;
+  downloadButton.disabled = true;
+  try {
+    const file = posterFile();
+    const mobile = isMobileDevice() || matchMedia("(pointer: coarse)").matches;
+    if (isNativeApp()) {
+      const base64 = await blobToBase64(posterBlob);
+      await nativePlugin.saveImage({ base64, fileName: posterFileName() });
+      setStatus("downloaded");
+    } else if (mobile && canShareFile(file)) {
+      setStatus("chooseSaveImage");
+      await navigator.share({ files: [file] });
+      setStatus("downloaded");
+    } else {
+      downloadPoster();
+      setStatus("downloaded");
+    }
+  } catch (error) {
+    if (error.name === "AbortError") setStatus("calculated");
+    else {
+      console.error(error);
+      setStatus("exportFailed", { message: error.message });
+    }
+  } finally {
+    downloadButton.disabled = !lastData || !posterBlob;
+  }
+});
+
+shareButton.addEventListener("click", async () => {
+  if (!lastData || !posterBlob || !posterUrl) return;
+  shareButton.disabled = true;
+  shareLabel.textContent = t("openingShareShort");
+  try {
+    const file = posterFile();
+    if (isNativeApp()) {
+      try {
+        const base64 = await blobToBase64(posterBlob);
+        const result = await nativePlugin.shareImage({
+          base64,
+          fileName: posterFileName(),
+          text: t("shareText"),
+          url: currentShareUrl(),
+        });
+        if (result?.completed === false) {
+          flashShareLabel(shareLabel, "cancelledShort", "share");
+          return;
+        }
+        setStatus("shared");
+        flashShareLabel(shareLabel, "sharedShort", "share");
+        return;
+      } catch (error) {
+        if (error?.name === "AbortError") {
+          flashShareLabel(shareLabel, "cancelledShort", "share");
+          return;
+        }
+        console.warn("Native image sharing failed; using the web fallback.", error);
+      }
+    }
+    if (canShareFile(file)) {
+      try {
+        await navigator.share({ files: [file], title: t("shareTitle"), text: t("shareText") });
+        setStatus("shared");
+        flashShareLabel(shareLabel, "sharedShort", "share");
+        return;
+      } catch (error) {
+        if (error?.name === "AbortError") {
+          flashShareLabel(shareLabel, "cancelledShort", "share");
+          return;
+        }
+        console.warn("System image sharing failed; sharing the page link instead.", error);
+      }
+    }
+    const result = await shareLink(t("shareText"));
+    if (result === "shared") {
+      setStatus("shared");
+      flashShareLabel(shareLabel, "sharedShort", "share");
+    } else if (result === "copied") {
+      setStatus("linkCopied");
+      flashShareLabel(shareLabel, "linkCopiedShort", "share");
+    } else if (result === "cancelled") {
+      flashShareLabel(shareLabel, "cancelledShort", "share");
+    } else if (result === "unavailable") {
+      downloadPoster();
+      setStatus("downloaded");
+      flashShareLabel(shareLabel, "downloadedShort", "share");
+    }
+  } catch (error) {
+    console.error(error);
+    downloadPoster();
+    setStatus("downloaded");
+    flashShareLabel(shareLabel, "downloadedShort", "share");
+  } finally {
+    shareButton.disabled = !lastData || !posterBlob;
+  }
+});
+
+paintBodygraph({ Design: {}, Personality: {}, "Defined Centers": [] }).catch((error) => {
+  setStatus("failed", { message: error.message });
+});
+initializeBirthControls();
+defaultPrivacyInput.checked = appSettings.privacyByDefault;
+saveHistoryInput.checked = appSettings.keepHistory;
+privacyToggle.checked = appSettings.privacyByDefault;
+updateRemoteServiceControls();
+applyLanguage(language, false);
+if (nativeRuntime) {
+  resultSummary.classList.remove("sr-only");
+  resultSummary.classList.add("native-summary");
+  previewStage.hidden = true;
+  downloadButton.hidden = true;
+  shareButton.hidden = true;
+  privacyToggle.closest("label").hidden = true;
+  defaultPrivacyInput.closest("label").hidden = true;
+  chartPanel.hidden = true;
+  privacyNote.textContent = language === "zh"
+    ? "说明书和每日提示仅保存在此设备。关闭本地历史后，首页与小组件不再使用已保存的结果。"
+    : "Life Manuals and daily tips stay on this device. Turning off local history stops saved results appearing on home and widgets.";
+  nativePlugin?.addListener?.("dailyTipOpened", () => {
+    consumeWidgetLink().catch(error => console.warn("Widget link deferred", error));
+  });
+  consumeWidgetLink().catch(error => console.warn("Widget link deferred", error));
+}
+trackEvent("app_open", { environment: globalThis.PLUTO_CONFIG?.environment || "development" });
+
+const dailyShareDialog = document.querySelector('#dailyShareDialog');
+let dailyShareBlob;
+let dailyShareUrl;
+let dailyShareGeneration = 0;
+let dailyShareFileName;
+let dailyShareLanguage = 'zh';
+let dailyShareBusy = false;
+function dailyShareText(zh, en) { return dailyShareLanguage === 'zh' ? zh : en; }
+function clearDailyShare() {
+  dailyShareGeneration += 1;
+  dailyShareDialog.classList.remove('daily-share-guided');
+  dailyShareBlob = undefined;
+  dailyShareUrl = undefined;
+  document.querySelector('#dailySharePreview').removeAttribute('src');
+}
+dailyShareDialog.addEventListener('close', clearDailyShare);
+document.querySelector('#closeDailyShare').addEventListener('click', () => dailyShareDialog.close());
+document.querySelector('#shareDailyTip').addEventListener('click', async event => {
+  const entry = latestSavedResult(historyEntries, appSettings.keepHistory);
+  const date = new Date();
+  const tip = getDailyTip(createDailyTipPayload(entry?.data, language), date);
+  if (!tip) return;
+  const button = event.currentTarget;
+  button.disabled = true;
+  dailyShareLanguage = language;
+  clearDailyShare();
+  const generation = dailyShareGeneration;
+  const status = document.querySelector('#dailyShareStatus');
+  const help = document.querySelector('#dailyShareHelp');
+  help.hidden = true;
+  document.querySelector('#dailyShareTitle').textContent = dailyShareText('分享今日提示', 'Share today’s thought');
+  document.querySelector('#closeDailyShare').textContent = dailyShareText('关闭', 'Close');
+  document.querySelector('#saveDailyImage').textContent = dailyShareText('保存图片', 'Save image');
+  document.querySelector('#sendDailyImage').textContent = dailyShareText('分享图片', 'Share image');
+  status.textContent = dailyShareText('正在生成分享卡片…', 'Creating your share card…');
+  document.querySelector('#saveDailyImage').disabled = true;
+  document.querySelector('#sendDailyImage').disabled = true;
+  dailyShareDialog.showModal();
+  try {
+    const blob = await createDailyTipPoster({ tip, language, date });
+    // A real PNG data URL keeps the preview available to embedded-browser image menus.
+    const imageUrl = `data:image/png;base64,${await blobToBase64(blob)}`;
+    if (!dailyShareDialog.open || generation !== dailyShareGeneration) return;
+    dailyShareBlob = blob;
+    dailyShareUrl = imageUrl;
+    dailyShareFileName = `buer-daily-${document.querySelector('#dailyTipDate').dateTime}.png`;
+    const preview = document.querySelector('#dailySharePreview');
+    preview.alt = dailyShareText(`${tip} 右下角二维码可打开 不二首页。`, `${tip} The QR code opens Buer.`);
+    preview.src = dailyShareUrl;
+    if (dailyImageNeedsLongPress()) {
+      document.querySelector('#saveDailyImage').textContent = dailyShareText('长按保存图片', 'Save with a long press');
+      document.querySelector('#sendDailyImage').textContent = dailyShareText('长按发送图片', 'Send with a long press');
+      showDailyImageHelp();
+    }
+    status.textContent = dailyShareText('图片仅包含今日提示，不含姓名或出生信息。', 'Includes only today’s thought, without your name or birth details.');
+    document.querySelector('#saveDailyImage').disabled = false;
+    document.querySelector('#sendDailyImage').disabled = false;
+  } catch (error) {
+    status.textContent = dailyShareText('图片生成失败，请关闭后重试。', 'Image creation failed. Close and try again.');
+    console.warn('Daily share image failed', error);
+  } finally { button.disabled = false; }
+});
+function dailyImageNeedsLongPress() {
+  if (nativeRuntime && nativePlugin) return false;
+  return isEmbeddedBrowser() || (isMobileDevice() && !canShareFile(new File([dailyShareBlob], dailyShareFileName, { type: 'image/png' })));
+}
+function showDailyImageHelp(save) {
+  const help = document.querySelector('#dailyShareHelp');
+  help.hidden = false;
+  help.textContent = save === true
+    ? dailyShareText('长按下方图片，在菜单中选择“保存图片”或“保存到手机”，再到相册查看。', 'Touch and hold the image below, then choose Save Image. Check your Photos app afterwards.')
+    : save === false
+      ? dailyShareText('长按下方图片，选择“发送给朋友”。若菜单没有此项，请先保存图片，再从微信相册发送。', 'Touch and hold the image below and choose Send to a friend. If unavailable, save it first and send it from Photos in WeChat.')
+      : dailyShareText('长按图片，保存到手机或发送给朋友。若没有发送选项，请先保存，再从微信相册发送。', 'Touch and hold the image to save or send it. If sending is unavailable, save it first and send it from Photos in WeChat.');
+  if (save !== undefined) {
+    dailyShareDialog.classList.add('daily-share-guided');
+    help.scrollIntoView({ block: 'start', behavior: 'instant' });
+    help.focus({ preventScroll: true });
+  }
+}
+async function shareDailyImage(save) {
+  if (!dailyShareBlob || dailyShareBusy) return;
+  dailyShareBusy = true;
+  const status = document.querySelector('#dailyShareStatus');
+  try {
+    const file = new File([dailyShareBlob], dailyShareFileName, { type:'image/png' });
+    if (nativeRuntime && nativePlugin) {
+      const base64 = await blobToBase64(dailyShareBlob);
+      const result = save
+        ? await nativePlugin.saveImage({ base64, fileName:dailyShareFileName })
+        : await nativePlugin.shareImage({ base64, fileName:dailyShareFileName });
+      if (result?.completed === false) return;
+      status.textContent = save ? dailyShareText('已保存到相册。', 'Saved to Photos.') : dailyShareText('已分享。', 'Shared.');
+    } else if (dailyImageNeedsLongPress()) {
+      showDailyImageHelp(save);
+    } else if (canShareFile(file)) {
+      status.textContent = save
+        ? dailyShareText('请在系统面板中选择“存储图像”或保存到相册。', 'Choose Save Image or save to Photos in the system sheet.')
+        : dailyShareText('请在系统面板中选择接收图片的应用或联系人。', 'Choose an app or contact to receive the image in the system sheet.');
+      await navigator.share({ files:[file], title:dailyShareText('不二今日提示', 'Buer daily thought') });
+    } else {
+      const link = document.createElement('a');
+      link.download = dailyShareFileName; link.href = dailyShareUrl;
+      document.body.append(link); link.click(); link.remove();
+      status.textContent = dailyShareText('已请求下载 PNG 图片，请在浏览器的下载记录中查看。', 'PNG download requested. Check your browser’s downloads.');
+    }
+  } catch (error) {
+    if (error?.name === 'AbortError') {
+      status.textContent = dailyShareText('已取消操作，图片仍可长按保存。', 'Cancelled. You can still touch and hold the image to save it.');
+    } else {
+      status.textContent = dailyShareText('操作未完成，请长按图片保存后发送。', 'Could not finish. Touch and hold the image to save it, then send it.');
+      showDailyImageHelp(save);
+    }
+  } finally { dailyShareBusy = false; }
+}
+document.querySelector('#saveDailyImage').addEventListener('click', () => shareDailyImage(true));
+document.querySelector('#sendDailyImage').addEventListener('click', () => shareDailyImage(false));
+
+initBuerHome({
+  getLanguage: () => language,
+  openManual: openDailyTipResult,
+  getReport: () => {
+    const data = latestSavedResult(historyEntries, appSettings.keepHistory)?.data;
+    return data?.Properties || null;
+  },
+});
