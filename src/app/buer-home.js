@@ -1,4 +1,4 @@
-import {readBuerEvents,anonymousReport,validChatHistory} from '../services/buer-conversation.js?v=22dcd02fdf086b07';
+import {readBuerEvents,anonymousReport,validChatHistory} from '../services/buer-conversation.js?v=078b114d538bec96';
 
 const copy={
   zh:{tagline:'与真实的自己 · 温柔相遇',home:'首页',manual:'人生说明书',history:'对话记录',railFoot:'更认识\n更自在',headline:'从一个问题，靠近自己。',intro:'在这里，任何关于你的问题，都值得被认真对待。',questionLabel:'此刻，你想更了解自己的哪一面？',workQuestion:'我适合怎样的工作节奏？',relationshipQuestion:'为什么我总在关系里内耗？',aiLabel:'AI 陪你探索',useReport:'结合我的说明书',newChat:'新对话',dataNote:'提问发送至 DeepSeek 处理；对话记录仅保存在本机。',myManual:'我的人生说明书',manualIntro:'一份专属于你的说明书，帮你更了解自己的倾向、节奏与选择。',contextFoot:'不是找到一个标准答案，\n而是更清楚地，做自己。',localHistory:'只保存在当前设备，不会同步到其他设备。',clearChats:'清空本机对话',clearConfirm:'清空后无法恢复这些对话。确定清空吗？',cancel:'取消',confirmClear:'确认清空',backHome:'返回对话',welcome:'先不用急着改变自己。\n从一件最近让你在意的小事开始，我们一起慢慢想明白。',connecting:'正在认真读你的问题…',streaming:'不二正在回应…',stopped:'已停止。你可以继续提问，或重新回答。',failed:'连接暂时中断，请稍后重试。',unconfigured:'AI 服务暂未就绪，输入的内容已保留。',rate:'提问有点频繁，稍等一分钟再试。',retry:'重新回答',copy:'复制',copied:'已复制回应',noHistory:'还没有对话。从首页的第一个问题开始。',send:'发送问题',stop:'停止回答',closeHistory:'关闭对话记录',contextHint:'仅参考类型、策略、权威与人生角色，不发送姓名或出生信息。',noStorage:'本机存储不可用，本次对话仅在当前页面保留。'},
@@ -9,7 +9,8 @@ export function initBuerHome({getLanguage,openManual,getReport}) {
   const form=$('#buerChatForm'), input=$('#buerQuestion'), messagesEl=$('#buerMessages'), status=$('#buerChatStatus');
   const key='buer-conversations-v1';let threads=[];
   try{threads=validChatHistory(JSON.parse(localStorage.getItem(key)||'[]'));}catch{}
-  let current={id:crypto.randomUUID(),date:Date.now(),messages:[]},controller=null,activeStatus='';
+  let current={id:crypto.randomUUID(),date:Date.now(),messages:[]},controller=null,activeStatus='',reportOverride=null;
+  const currentReport=()=>reportOverride||anonymousReport(getReport());
   const endpoint=()=>`${(globalThis.PLUTO_CONFIG?.apiBaseUrl||'').replace(/\/$/,'')}/v1/chat`;
   function setStatus(key){activeStatus=key;status.textContent=key?t(key):'';}
   function persist(){
@@ -41,7 +42,7 @@ export function initBuerHome({getLanguage,openManual,getReport}) {
   function refresh(){
     document.querySelectorAll('[data-buer]').forEach(el=>{el.textContent=t(el.dataset.buer);});
     input.placeholder=t('questionLabel');$('#buerSend').ariaLabel=t('send');$('#buerStop').ariaLabel=t('stop');$('#buerCloseHistory').ariaLabel=t('closeHistory');
-    $('#buerContextLabel').hidden=!anonymousReport(getReport());$('#buerContextLabel').title=t('contextHint');
+    $('#buerContextLabel').hidden=!currentReport();$('#buerContextLabel').title=t('contextHint');
     const date=new Date();$('#dailyTipDate').textContent=`${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')}`;
     $('#dailyTipDateSecondary').textContent=new Intl.DateTimeFormat(getLanguage()==='zh'?'zh-CN':'en',{weekday:'long'}).format(date);
     setStatus(activeStatus);renderMessages();
@@ -51,8 +52,18 @@ export function initBuerHome({getLanguage,openManual,getReport}) {
   document.querySelectorAll('[data-manual]').forEach(el=>el.addEventListener('click',()=>void openManual()));
   new MutationObserver(()=>{document.querySelectorAll('.rail-item').forEach(el=>el.classList.toggle('is-active',document.body.dataset.workspace==='home'?el.hasAttribute('data-home'):el.hasAttribute('data-manual')));}).observe(document.body,{attributes:true,attributeFilter:['data-workspace']});
   document.addEventListener('buer:language',refresh);
+  document.addEventListener('buer:manual-question',event=>{
+    if(controller){showHome();return;}
+    const {topic,chapter,report}=event.detail;
+    reportOverride=anonymousReport(report);
+    const zh=getLanguage()==='zh';
+    const questions=zh?{work:'结合这份说明书，我可以怎样找到更适合自己的工作节奏？',relationship:'结合这份说明书，我可以怎样在关系中减少内耗、建立边界？',decision:'结合这份说明书，做重要决定前，我可以怎样观察自己的感受？',chapter:`关于“${chapter||''}”这一章，我可以在生活中做什么小尝试？`}:{work:'Using my manual, how can I find a work rhythm that suits me?',relationship:'Using my manual, how can I build boundaries and feel more at ease in relationships?',decision:'Using my manual, what could I notice in myself before an important decision?',chapter:`What small experiment could I try based on the chapter “${chapter||''}”?`};
+    const question=questions[topic]||questions.decision;
+    input.value=input.value.trim()?`${input.value.trim()}\n\n${question}`:question;
+    $('#buerUseReport').checked=Boolean(reportOverride);showHome();input.dispatchEvent(new Event('input'));input.focus({preventScroll:true});form.scrollIntoView({block:'center',behavior:'smooth'});
+  });
   document.querySelectorAll('[data-question]').forEach(el=>el.addEventListener('click',()=>{input.value=t(el.dataset.question==='work'?'workQuestion':'relationshipQuestion');input.focus();}));
-  input.addEventListener('focus',()=>{$('#buerContextLabel').hidden=!anonymousReport(getReport());});
+  input.addEventListener('focus',()=>{$('#buerContextLabel').hidden=!currentReport();});
   input.addEventListener('keydown',event=>{if(event.key==='Enter' && !event.shiftKey && !event.isComposing){event.preventDefault();form.requestSubmit();}});
   input.addEventListener('input',()=>{input.style.height='auto';input.style.height=`${Math.min(input.scrollHeight,160)}px`;});
   function setBusy(busy){$('#buerSend').hidden=busy;$('#buerStop').hidden=!busy;$('#buerNewChat').disabled=busy;input.disabled=busy;document.querySelectorAll('[data-question]').forEach(b=>b.disabled=busy);$('#buerUseReport').disabled=busy;}
@@ -67,7 +78,7 @@ export function initBuerHome({getLanguage,openManual,getReport}) {
     const timeout=setTimeout(()=>active.abort('timeout'),110000);
     try {
       if(globalThis.PLUTO_CONFIG?.buerChatEnabled===false)throw new Error('AI_NOT_CONFIGURED');
-      const report=$('#buerUseReport').checked?anonymousReport(getReport()):null;
+      const report=$('#buerUseReport').checked?currentReport():null;
       const response=await fetch(endpoint(),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history,...(report?{report}:{})}),signal:active.signal});
       if(!response.ok){const data=await response.json().catch(()=>({}));throw new Error(data.error || 'AI_UNAVAILABLE');}
       if(!response.body)throw new Error('AI_UNAVAILABLE');
@@ -82,9 +93,9 @@ export function initBuerHome({getLanguage,openManual,getReport}) {
   }
   form.addEventListener('submit',event=>{event.preventDefault();void ask(input.value);});
   $('#buerStop').addEventListener('click',()=>controller?.abort());
-  $('#buerNewChat').addEventListener('click',()=>{if(controller)return;persist();current={id:crypto.randomUUID(),date:Date.now(),messages:[]};input.value='';$('#buerUseReport').checked=false;setStatus('');renderMessages();if(matchMedia('(min-width:761px)').matches)input.focus({preventScroll:true});});
+  $('#buerNewChat').addEventListener('click',()=>{if(controller)return;persist();current={id:crypto.randomUUID(),date:Date.now(),messages:[]};input.value='';reportOverride=null;$('#buerUseReport').checked=false;setStatus('');renderMessages();if(matchMedia('(min-width:761px)').matches)input.focus({preventScroll:true});});
   function renderHistory(){const list=$('#buerHistoryList');list.replaceChildren();if(!threads.length){const p=document.createElement('p');p.textContent=t('noHistory');list.append(p);return;}
-    for(const thread of threads){const first=thread.messages.find(m=>m.role==='user')?.content||t('newChat');const b=button(first.slice(0,80),()=>{if(controller)return;persist();current=structuredClone(thread);$('#buerHistory').close();showHome();});const small=document.createElement('small');small.textContent=new Intl.DateTimeFormat(getLanguage()==='zh'?'zh-CN':'en',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(thread.date));b.append(small);list.append(b);}
+    for(const thread of threads){const first=thread.messages.find(m=>m.role==='user')?.content||t('newChat');const b=button(first.slice(0,80),()=>{if(controller)return;persist();current=structuredClone(thread);reportOverride=null;$('#buerUseReport').checked=false;setStatus('');$('#buerHistory').close();showHome();});const small=document.createElement('small');small.textContent=new Intl.DateTimeFormat(getLanguage()==='zh'?'zh-CN':'en',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(thread.date));b.append(small);list.append(b);}
   }
   $('#buerHistoryButton').addEventListener('click',()=>{if(controller){setStatus('streaming');return;}persist();renderHistory();$('#buerClearConfirm').hidden=true;$('#buerHistory').showModal();});
   $('#buerCloseHistory').addEventListener('click',()=>$('#buerHistory').close());
