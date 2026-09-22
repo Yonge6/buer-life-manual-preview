@@ -3,10 +3,10 @@ globalThis.PLUTO_CONFIG = Object.freeze({
   "supabasePublishableKey": "",
   "apiBaseUrl": "",
   "buerChatEnabled": false,
-  "buerPublicUrl": "https://yonge6.github.io/buer-life-manual-preview/",
+  "buerPublicUrl": "https://buer.wonderelian.com/",
   "buerShareQrPath": "../../assets/buer-preview-qr.png",
   "appVersion": "1.1.0",
-  "gitCommit": "1ea0af1bff6b5b3dc185d75172da92d08630a1a0",
-  "buildDate": "2026-09-21T21:36:10.758Z",
+  "gitCommit": "c96d7fbdb38cf1cdee4ff8c29f4117ef1fc6bfd4",
+  "buildDate": "2026-09-22T01:36:21.792Z",
   "environment": "preview"
 });
