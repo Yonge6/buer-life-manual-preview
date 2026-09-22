@@ -147,7 +147,7 @@ html,body{overflow-x:clip;overflow-y:visible}
 .buer-compose-meta input{accent-color:#b8b5ff}
 
 /* Exported full chart shares the aurora palette with the surrounding UI. */
-#capture.chart-panel.export-mobile{background:linear-gradient(180deg,rgba(21,36,59,.12),#192d47 390px,#15243b),url("assets/buer-aurora-hero.webp?v=e5c13925e43da778") center top / 600px auto no-repeat,#15243b!important;border-color:#718bb4!important;color:#edf4ff!important}
+#capture.chart-panel.export-mobile{background:linear-gradient(180deg,rgba(21,36,59,.12),#192d47 390px,#15243b),url("assets/buer-aurora-hero.webp?v=c1bc7f2c3578046b") center top / 600px auto no-repeat,#15243b!important;border-color:#718bb4!important;color:#edf4ff!important}
 #capture .chart-meta{background:rgba(21,36,59,.35);border-radius:16px}
 #capture .planet-list,#capture .interpretation,#capture .celebrity-matches,#capture .properties{background:#203751!important;border-color:#60799d!important;box-shadow:none!important}
 #capture .property,#capture .planet-list li,#capture .celebrity-card{border-color:#496486!important;color:#edf4ff!important}
@@ -244,3 +244,9 @@ body[data-conversation="empty"] .buer-welcome{padding-top:0}
 #capture .poster-signature strong{grid-column:2;grid-row:1}
 #capture .poster-signature p{grid-column:2;grid-row:2;margin:3px 0 0}
 #capture .poster-signature small{grid-column:2;grid-row:3;margin-top:10px}
+@media(max-width:760px){#appDrawer{padding-top:calc(var(--buer-hero-height) - var(--buer-header-height) - 80px)}}
+@media(max-width:760px){
+ body[data-workspace="manual"] .buer-back-home{position:absolute;top:calc(var(--buer-hero-height) - 132px);left:22px;margin:0;min-height:36px}
+ body[data-workspace="manual"] .shell{padding-top:calc(var(--buer-hero-height) - var(--buer-header-height) - 80px)}
+ body[data-workspace="manual"] .shell .form-panel,body[data-workspace="manual"] .buer-form-intro{padding-top:0}
+}
