@@ -147,7 +147,7 @@ html,body{overflow-x:clip;overflow-y:visible}
 .buer-compose-meta input{accent-color:#b8b5ff}
 
 /* Exported full chart shares the aurora palette with the surrounding UI. */
-#capture.chart-panel.export-mobile{background:linear-gradient(180deg,rgba(21,36,59,.12),#192d47 390px,#15243b),url("assets/buer-aurora-hero.webp?v=c4b3ea943d8291ea") center top / 600px auto no-repeat,#15243b!important;border-color:#718bb4!important;color:#edf4ff!important}
+#capture.chart-panel.export-mobile{background:linear-gradient(180deg,rgba(21,36,59,.12),#192d47 390px,#15243b),url("assets/buer-aurora-hero.webp?v=96604723aa50efff") center top / 600px auto no-repeat,#15243b!important;border-color:#718bb4!important;color:#edf4ff!important}
 #capture .chart-meta{background:rgba(21,36,59,.35);border-radius:16px}
 #capture .planet-list,#capture .interpretation,#capture .celebrity-matches,#capture .properties{background:#203751!important;border-color:#60799d!important;box-shadow:none!important}
 #capture .property,#capture .planet-list li,#capture .celebrity-card{border-color:#496486!important;color:#edf4ff!important}
@@ -167,8 +167,8 @@ html,body{overflow-x:clip;overflow-y:visible}
 @media(max-width:760px){
   #buerContextLabel{display:inline-flex;align-items:center;gap:6px;min-height:32px}
   #buerUseReport{appearance:none;-webkit-appearance:none;box-sizing:border-box;width:14px;height:14px;min-width:14px;min-height:14px;max-width:14px;max-height:14px;flex:0 0 14px;padding:0;margin:0;border:1px solid #9baecc;border-radius:3px;background:transparent;position:relative;cursor:pointer}
-  #buerUseReport:checked{background:#bbb6ff;border-color:#bbb6ff}
-  #buerUseReport:checked::after{content:"";position:absolute;left:4px;top:1px;width:4px;height:7px;border:solid #263953;border-width:0 2px 2px 0;transform:rotate(45deg)}
+  #buerUseReport:checked{background:transparent;border-color:#bbb6ff}
+  #buerUseReport:checked::after{content:"";position:absolute;inset:3px;background:#bbb6ff;border:0;border-radius:1px}
 }
 .buer-manual-entry #dailyTipAction{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:42px;padding:10px 16px;border:1px solid #9da9df;border-radius:12px;background:rgba(109,120,180,.12);color:#d1c7ff}
 .buer-manual-entry #dailyTipAction:hover{background:rgba(134,145,207,.24);border-color:#c1bdff}
@@ -214,3 +214,5 @@ html,body{overflow-x:clip;overflow-y:visible}
 #capture .poster-center-legend i{width:9px;height:9px;border-radius:2px;display:block}
 #capture .defined-swatch{background:#8f69d6;border:1px solid #bccaff}
 #capture .undefined-swatch{background:#f4f7fc;border:1px solid #86a4d0}
+body[data-conversation="empty"] .buer-compose-zone{margin-top:44px}
+@media(max-width:760px){body[data-conversation="empty"] .buer-compose-zone{margin-top:36px}}
