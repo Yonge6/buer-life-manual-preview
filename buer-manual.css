@@ -147,7 +147,7 @@ html,body{overflow-x:clip;overflow-y:visible}
 .buer-compose-meta input{accent-color:#b8b5ff}
 
 /* Exported full chart shares the aurora palette with the surrounding UI. */
-#capture.chart-panel.export-mobile{background:linear-gradient(180deg,rgba(21,36,59,.12),#192d47 390px,#15243b),url("assets/buer-aurora-hero.webp?v=ff80ed6a5cb2c519") center top / 600px auto no-repeat,#15243b!important;border-color:#718bb4!important;color:#edf4ff!important}
+#capture.chart-panel.export-mobile{background:linear-gradient(180deg,rgba(21,36,59,.12),#192d47 390px,#15243b),url("assets/buer-aurora-hero.webp?v=368d9c6654756122") center top / 600px auto no-repeat,#15243b!important;border-color:#718bb4!important;color:#edf4ff!important}
 #capture .chart-meta{background:rgba(21,36,59,.35);border-radius:16px}
 #capture .planet-list,#capture .interpretation,#capture .celebrity-matches,#capture .properties{background:#203751!important;border-color:#60799d!important;box-shadow:none!important}
 #capture .property,#capture .planet-list li,#capture .celebrity-card{border-color:#496486!important;color:#edf4ff!important}
@@ -294,3 +294,64 @@ body[data-workspace="home"][data-conversation="active"] .topbar{background:rgba(
 .shell .form-panel .form-action-set>.form-secondary-action::before{content:"‹";font-size:20px;margin-right:8px;vertical-align:-1px}
 .confirm-dialog{border-radius:20px}
 .confirm-dialog .confirm-dialog-actions button{min-height:44px;border-radius:10px}
+
+/* Keep the iOS status area separate from sticky content. */
+@media(max-width:760px){
+ html.native-text-results{--buer-bottom-inset:env(safe-area-inset-bottom,0px)}
+ html.native-text-results .topbar{top:env(safe-area-inset-top,0px)}
+ html.native-text-results body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:100;background:#192c43;pointer-events:none}
+ html.native-text-results body[data-workspace="home"][data-conversation="active"] .buer-home{top:calc(64px + env(safe-area-inset-top,0px))}
+}
+
+/* App-only floating glass navigation, with a stable 44pt+ touch target. */
+@media(max-width:760px){
+ html.native-text-results .buer-rail{left:18px;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 8px);width:auto;height:64px;padding:5px;gap:4px;border:1px solid #d4e9ff40;border-radius:36px;background:linear-gradient(145deg,#adc8e029,#20385280);backdrop-filter:blur(28px) saturate(170%);-webkit-backdrop-filter:blur(28px) saturate(170%);box-shadow:inset 0 1px 0 #ffffff30,inset 0 -1px 0 #ffffff0a,0 8px 30px #02091445;overflow:hidden}
+ html.native-text-results .buer-rail .rail-item{position:relative;min-height:52px;height:52px;padding:5px 8px;gap:3px;border-radius:28px;color:#c0ccdb;transition:background .2s ease,color .2s ease,transform .2s ease}
+ html.native-text-results .buer-rail .rail-item .ph{font-size:23px;color:inherit;text-shadow:none;transform:none;-webkit-text-stroke:0}
+ html.native-text-results .buer-rail .rail-item span{font-size:10px;line-height:14px}
+ html.native-text-results .buer-rail .rail-item.is-active{background:#c7e8ff24;color:#c6efff;box-shadow:inset 0 1px 0 #f0faff26;font-weight:700}
+ html.native-text-results .buer-rail .rail-item.is-active .ph{-webkit-text-stroke:.5px currentColor}
+ html.native-text-results .buer-rail .rail-item:active{transform:scale(.96)}
+ html.native-text-results .buer-rail .rail-item:focus-visible{outline:2px solid #cef0ff;outline-offset:-3px}
+ html.native-text-results body[data-workspace="home"][data-conversation="active"] .buer-home{bottom:calc(82px + env(safe-area-inset-bottom,0px))}
+ html.native-text-results #appDrawer,html.native-text-results .shell,html.native-text-results .buer-home{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
+ html.native-text-results body[data-workspace="home"][data-conversation="active"] .buer-home{padding-bottom:8px}
+}
+@media(prefers-reduced-motion:reduce){html.native-text-results .buer-rail .rail-item{transition:none}}
+@media(prefers-reduced-transparency:reduce){html.native-text-results .buer-rail{background:#233950}}
+
+/* Native headers use viewport positioning; relative offsets double-count safe areas. */
+@media(max-width:760px){
+ html.native-text-results body{padding-top:calc(64px + env(safe-area-inset-top,0px))}
+ html.native-text-results .topbar{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;width:100%;height:64px;min-height:64px;z-index:30;margin:0}
+ html.native-text-results body[data-workspace="manual"] .buer-back-home{position:relative;top:auto;left:auto;margin:104px 22px 18px}
+ html.native-text-results body[data-workspace="manual"] .shell.form-view,
+ html.native-text-results body[data-workspace="manual"] .shell.result-view{padding-top:0}
+}
+
+@media(max-width:760px){
+ html.native-text-results .buer-rail{left:14px;right:14px;bottom:max(8px,calc(env(safe-area-inset-bottom,0px) - 12px));height:60px;padding:4px;border-radius:32px;background:linear-gradient(145deg,#aac6df1c,#20385266);box-shadow:inset 0 1px 0 #ffffff26,0 4px 20px #02091430}
+ html.native-text-results .buer-rail .rail-item{height:50px;min-height:50px}
+ html.native-text-results .buer-rail .rail-item .ph{font-size:22px}
+ html.native-text-results body[data-workspace="home"][data-conversation="active"] .buer-home{bottom:calc(68px + max(8px,env(safe-area-inset-bottom,0px) - 12px))}
+}
+
+/* The native system owns App tabs; retain DOM buttons for routing only. */
+html.native-system-tabs .buer-rail{display:none!important}
+
+/* UIKit already includes its tab bar in the web view's bottom safe area. */
+@media(max-width:760px){
+ html.native-system-tabs body[data-workspace="home"][data-conversation="active"] .buer-home{bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
+}
+.buer-membership{width:min(430px,calc(100vw - 32px));max-height:85dvh;overflow:auto;padding:24px;border:1px solid #718fa666;border-radius:24px;background:#1a2d44;color:#e9f2ff;font:14px/1.6 system-ui,sans-serif}
+.buer-membership::backdrop{background:#030a14b3;backdrop-filter:blur(8px)}
+.buer-membership h2{font:500 27px/1.3 Georgia,serif;margin:24px 0 16px}
+.buer-membership button,.membership-entry{min-height:44px;border-radius:12px;padding:10px 16px;color:#d8eeff;border:1px solid #8db8d459;background:#26425a}
+.buer-membership .membership-close{float:right;background:transparent}
+.buer-membership .membership-plan{display:block;width:100%;margin-top:10px;font-weight:600}
+.buer-membership .membership-note{font-size:12px;color:#b3c4d8}
+.membership-links{display:flex;flex-wrap:wrap;gap:16px;font-size:12px}.membership-links a{color:#a6e1f9}
+.membership-entry{width:100%;margin:12px 0}
+
+/* Leave room for the two-line English prompt on compact screens. */
+html[lang^="en"] #buerChatForm textarea:placeholder-shown{min-height:3.5em}
