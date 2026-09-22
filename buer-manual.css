@@ -147,7 +147,7 @@ html,body{overflow-x:clip;overflow-y:visible}
 .buer-compose-meta input{accent-color:#b8b5ff}
 
 /* Exported full chart shares the aurora palette with the surrounding UI. */
-#capture.chart-panel.export-mobile{background:linear-gradient(180deg,rgba(21,36,59,.12),#192d47 390px,#15243b),url("assets/buer-aurora-hero.webp?v=675d05810dec51a9") center top / 600px auto no-repeat,#15243b!important;border-color:#718bb4!important;color:#edf4ff!important}
+#capture.chart-panel.export-mobile{background:linear-gradient(180deg,rgba(21,36,59,.12),#192d47 390px,#15243b),url("assets/buer-aurora-hero.webp?v=e5c13925e43da778") center top / 600px auto no-repeat,#15243b!important;border-color:#718bb4!important;color:#edf4ff!important}
 #capture .chart-meta{background:rgba(21,36,59,.35);border-radius:16px}
 #capture .planet-list,#capture .interpretation,#capture .celebrity-matches,#capture .properties{background:#203751!important;border-color:#60799d!important;box-shadow:none!important}
 #capture .property,#capture .planet-list li,#capture .celebrity-card{border-color:#496486!important;color:#edf4ff!important}
@@ -230,3 +230,17 @@ body[data-conversation="empty"] .buer-compose-zone{margin-top:44px}
 .buer-rail .rail-item.is-active .ph{color:#b6ebff;transform:scale(1.12);-webkit-text-stroke:.6px currentColor;text-shadow:0 0 12px #88ceff88}
 
 #dailyShareStatus:empty{display:none}
+/* Begin introductory content below the shared aurora artwork. */
+:root{--buer-hero-height:350px;--buer-header-height:150px}
+body[data-conversation="empty"] .buer-home,#appDrawer{padding-top:calc(var(--buer-hero-height) - var(--buer-header-height) + 16px)}
+body[data-conversation="empty"] .buer-welcome{padding-top:0}
+#appDrawer .drawer-header{padding-top:0}
+@media(max-width:1100px){:root{--buer-header-height:130px}}
+@media(max-height:850px) and (min-width:1000px){:root{--buer-header-height:120px}}
+@media(max-width:760px){:root{--buer-hero-height:300px;--buer-header-height:64px}}
+#capture .poster-signature{display:grid;grid-template-columns:42px auto;column-gap:12px;row-gap:0;align-items:center}
+#capture .poster-signature>div{display:contents}
+#capture .poster-signature>img{grid-column:1;grid-row:1 / 3}
+#capture .poster-signature strong{grid-column:2;grid-row:1}
+#capture .poster-signature p{grid-column:2;grid-row:2;margin:3px 0 0}
+#capture .poster-signature small{grid-column:2;grid-row:3;margin-top:10px}

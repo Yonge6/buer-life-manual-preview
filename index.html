@@ -23,20 +23,20 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://buer-api.wonderelian.com https://photon.komoot.io https://geocode.arcgis.com https://api-human-design.wonderelian.com https://*.supabase.co https://www.google-analytics.com https://region1.google-analytics.com; img-src 'self' data: blob: https://wendao.wonderelian.com; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://www.googletagmanager.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'">
   <title>不二见己 | Human Design Chart</title>
   <link rel="canonical" href="https://buer.wonderelian.com/">
-  <link rel="icon" type="image/png" href="assets/buer-favicon.png?v=675d05810dec51a9">
-  <link rel="apple-touch-icon" href="assets/buer-app-icon-180.png?v=675d05810dec51a9">
-  <link rel="preload" as="image" href="assets/pluto-vellum-bg-v4.png?v=675d05810dec51a9">
-  <link rel="preload" as="image" href="assets/pluto-form-bg-v3.png?v=675d05810dec51a9">
-  <link rel="preload" as="image" href="assets/pluto-form-mobile-v4.png?v=675d05810dec51a9" media="(max-width: 560px)">
-  <link rel="stylesheet" href="style.css?v=675d05810dec51a9">
-  <link rel="stylesheet" href="vendor/phosphor/style.css?v=675d05810dec51a9">
-  <link rel="stylesheet" href="buer.css?v=675d05810dec51a9">
-  <link rel="stylesheet" href="buer-manual.css?v=675d05810dec51a9">
-  <script src="analytics.js?v=675d05810dec51a9" defer></script>
+  <link rel="icon" type="image/png" href="assets/buer-favicon.png?v=e5c13925e43da778">
+  <link rel="apple-touch-icon" href="assets/buer-app-icon-180.png?v=e5c13925e43da778">
+  <link rel="preload" as="image" href="assets/pluto-vellum-bg-v4.png?v=e5c13925e43da778">
+  <link rel="preload" as="image" href="assets/pluto-form-bg-v3.png?v=e5c13925e43da778">
+  <link rel="preload" as="image" href="assets/pluto-form-mobile-v4.png?v=e5c13925e43da778" media="(max-width: 560px)">
+  <link rel="stylesheet" href="style.css?v=e5c13925e43da778">
+  <link rel="stylesheet" href="vendor/phosphor/style.css?v=e5c13925e43da778">
+  <link rel="stylesheet" href="buer.css?v=e5c13925e43da778">
+  <link rel="stylesheet" href="buer-manual.css?v=e5c13925e43da778">
+  <script src="analytics.js?v=e5c13925e43da778" defer></script>
 </head>
 <body data-workspace="home">
   <header class="topbar">
-    <div class="brand"><img class="brand-symbol" src="assets/buer-orb-v2.png?v=675d05810dec51a9" alt=""><span data-i18n="brand">不二见己</span><small data-buer="tagline">与真实的自己 · 温柔相遇</small></div>
+    <div class="brand"><img class="brand-symbol" src="assets/buer-orb-v2.png?v=e5c13925e43da778" alt=""><span data-i18n="brand">不二见己</span><small data-buer="tagline">与真实的自己 · 温柔相遇</small></div>
     <div class="topbar-actions">
       <button id="buerMobileLanguage" class="buer-mobile-language" type="button" aria-label="切换到英文" title="切换到英文">EN</button>
       <div class="language-switch topbar-language-switch" role="group" aria-label="Language / 语言">
@@ -54,7 +54,7 @@
     <aside class="side-drawer" role="region" aria-labelledby="drawerTitle" tabindex="-1">
       <header class="drawer-header">
         <span class="drawer-leading">
-          <span class="drawer-orbit" aria-hidden="true"><img src="assets/buer-orb-v2.png?v=675d05810dec51a9" alt=""></span>
+          <span class="drawer-orbit" aria-hidden="true"><img src="assets/buer-orb-v2.png?v=e5c13925e43da778" alt=""></span>
           <button id="drawerBack" class="drawer-back" type="button" data-i18n-aria-label="drawerBack" aria-label="返回" hidden><span aria-hidden="true">←</span></button>
         </span>
         <div>
@@ -75,22 +75,22 @@
         <nav class="drawer-nav" data-i18n-aria-label="drawerActions" aria-label="你的空间">
           <button id="buerHistoryButton" type="button"><span class="drawer-nav-icon" aria-hidden="true"><i class="ph ph-chats-circle"></i></span><span><strong data-buer="history">对话记录</strong><small data-buer="chatHistoryHint">继续上次的探索</small></span><span class="drawer-chevron" aria-hidden="true">›</span></button>
           <button id="openHistory" type="button">
-            <span class="drawer-nav-icon" aria-hidden="true"><img src="assets/icons/history.svg?v=675d05810dec51a9" alt=""></span>
+            <span class="drawer-nav-icon" aria-hidden="true"><img src="assets/icons/history.svg?v=e5c13925e43da778" alt=""></span>
             <span><strong data-buer="manualHistory">说明书历史</strong><small data-i18n="drawerHistoryHint">重新打开保存在本机的人生说明书</small></span>
             <span class="drawer-chevron" aria-hidden="true">›</span>
           </button>
           <button id="openSettings" type="button">
-            <span class="drawer-nav-icon" aria-hidden="true"><img src="assets/icons/settings-2.svg?v=675d05810dec51a9" alt=""></span>
+            <span class="drawer-nav-icon" aria-hidden="true"><img src="assets/icons/settings-2.svg?v=e5c13925e43da778" alt=""></span>
             <span><strong data-i18n="settings">隐私设置</strong><small data-i18n="drawerSettingsHint">管理隐私模式、本地历史与数据</small></span>
             <span class="drawer-chevron" aria-hidden="true">›</span>
           </button>
           <button id="openAbout" type="button">
-            <span class="drawer-nav-icon" aria-hidden="true"><img src="assets/icons/circle-user-round.svg?v=675d05810dec51a9" alt=""></span>
+            <span class="drawer-nav-icon" aria-hidden="true"><img src="assets/icons/circle-user-round.svg?v=e5c13925e43da778" alt=""></span>
             <span><strong data-i18n="aboutUs">关于我们</strong><small data-i18n="drawerAboutHint">认识不二见己 与我们相信的生命观</small></span>
             <span class="drawer-chevron" aria-hidden="true">›</span>
           </button>
           <button id="openContact" type="button">
-            <span class="drawer-nav-icon" aria-hidden="true"><img src="assets/icons/mail.svg?v=675d05810dec51a9" alt=""></span>
+            <span class="drawer-nav-icon" aria-hidden="true"><img src="assets/icons/mail.svg?v=e5c13925e43da778" alt=""></span>
             <span><strong data-i18n="contactUs">联系我们</strong><small data-i18n="drawerContactHint">网站、邮箱与社交媒体</small></span>
             <span class="drawer-chevron" aria-hidden="true">›</span>
           </button>
@@ -241,13 +241,13 @@
 
 
   <nav class="buer-rail" aria-label="主要导航">
-    <button class="buer-mark" data-home aria-label="不二见己首页"><img src="assets/buer-orb-v2.png?v=675d05810dec51a9" alt=""></button>
+    <button class="buer-mark" data-home aria-label="不二见己首页"><img src="assets/buer-orb-v2.png?v=e5c13925e43da778" alt=""></button>
     <button class="rail-item is-active" data-home><i class="ph ph-house" aria-hidden="true"></i><span data-buer="home">见己</span></button>
     <button class="rail-item" data-manual><i class="ph ph-book-open-text" aria-hidden="true"></i><span data-buer="manual">人生说明书</span></button>
     <button class="rail-item" id="buerProfileButton" data-profile><i class="ph ph-user-circle" aria-hidden="true"></i><span data-buer="profile">我的</span></button>
     <div class="rail-foot" data-buer="railFoot">更认识<br>更自在</div>
   </nav>
-  <img class="buer-hero-art" src="assets/buer-aurora-hero.webp?v=675d05810dec51a9" alt="" aria-hidden="true">
+  <img class="buer-hero-art" src="assets/buer-aurora-hero.webp?v=e5c13925e43da778" alt="" aria-hidden="true">
   <section id="buerHome" class="buer-home" aria-label="与不二见己聊聊">
     <div class="buer-conversation-column">
       <header class="buer-welcome"><h1 data-buer="headline">从一个问题，靠近自己</h1><p data-buer="intro">在这里，任何关于你的问题，都值得被认真对待</p></header>
@@ -263,7 +263,7 @@
     </div>
     <aside class="buer-context">
       <aside id="dailyTipCard" class="daily-tip-card" aria-labelledby="dailyTipTitle">
-        <div class="daily-date-row"><div class="daily-date-copy"><time id="dailyTipDate"></time><small id="dailyTipDateSecondary" aria-hidden="true"></small></div><img class="daily-moon" src="assets/pluto-daily-moon.webp?v=675d05810dec51a9" width="92" height="92" alt="" aria-hidden="true"></div>
+        <div class="daily-date-row"><div class="daily-date-copy"><time id="dailyTipDate"></time><small id="dailyTipDateSecondary" aria-hidden="true"></small></div><img class="daily-moon" src="assets/pluto-daily-moon.webp?v=e5c13925e43da778" width="92" height="92" alt="" aria-hidden="true"></div>
         <div class="daily-tip-heading"><h2 id="dailyTipTitle">今日提示</h2><button id="shareDailyTip" class="daily-share-link" type="button" hidden>分享图片</button></div>
         <p id="dailyTipText"></p>
         <p id="dailyTipSource" class="daily-tip-source"></p>
@@ -425,7 +425,7 @@
       </div>
       </section></div>
       <aside class="buer-manual-aside">
-        <section class="buer-guide"><img src="assets/buer-orb-v2.png?v=675d05810dec51a9" alt=""><p class="buer-kicker" data-manual-copy="guideKicker">让理解，继续发生</p><h2 data-manual-copy="guideHeading">读到这里，<br>你想到了什么？</h2><p data-manual-copy="guideLead">带上这份说明书，聊聊眼前的一个决定，或最近让你在意的一件事。</p><button type="button" data-manual-question="decision"><span data-manual-copy="talk">结合说明书聊一聊</span><i class="ph ph-arrow-up-right" aria-hidden="true"></i></button><small data-manual-copy="contextNote">仅带入类型、策略、权威与人生角色；你发送问题后才会请求 AI。</small></section>
+        <section class="buer-guide"><img src="assets/buer-orb-v2.png?v=e5c13925e43da778" alt=""><p class="buer-kicker" data-manual-copy="guideKicker">让理解，继续发生</p><h2 data-manual-copy="guideHeading">读到这里，<br>你想到了什么？</h2><p data-manual-copy="guideLead">带上这份说明书，聊聊眼前的一个决定，或最近让你在意的一件事。</p><button type="button" data-manual-question="decision"><span data-manual-copy="talk">结合说明书聊一聊</span><i class="ph ph-arrow-up-right" aria-hidden="true"></i></button><small data-manual-copy="contextNote">仅带入类型、策略、权威与人生角色；你发送问题后才会请求 AI。</small></section>
         <section class="buer-manual-daily"><p class="buer-kicker" data-manual-copy="dailyKicker">一点点，回到自己</p><h3 data-manual-copy="dailyHeading">每天，一个小提醒</h3><p data-manual-copy="dailyLead">首页会根据最近保存的说明书，为你准备一句今日提示。也可以分享给在意的人。</p><button type="button" id="buerManualDaily"><span data-manual-copy="viewDaily">看看今日提示</span><i class="ph ph-arrow-right" aria-hidden="true"></i></button></section>
         <p class="buer-manual-note" data-manual-copy="reflectionNote">说明书是一份自我观察的邀请，不是对你的定义，也不替你决定人生。</p>
       </aside></div>
@@ -526,12 +526,12 @@
       </section>
       <div id="properties" class="properties"></div>
       <footer class="poster-footer">
-        <div class="poster-signature"><img src="assets/buer-orb-v2.png?v=675d05810dec51a9" alt=""><div><strong data-i18n="brand">不二见己</strong><p data-buer="tagline">与真实的自己 · 温柔相遇</p><small>buer.wonderelian.com</small></div></div>
-        <div class="qr-block"><img id="chartQr" src="assets/buer-preview-qr.png?v=675d05810dec51a9" width="360" height="360" alt="" aria-hidden="true"><p data-i18n="qrLabel">扫码获取</p></div>
+        <div class="poster-signature"><img src="assets/buer-orb-v2.png?v=e5c13925e43da778" alt=""><div><strong data-i18n="brand">不二见己</strong><p data-buer="tagline">与真实的自己 · 温柔相遇</p><small>buer.wonderelian.com</small></div></div>
+        <div class="qr-block"><img id="chartQr" src="assets/buer-preview-qr.png?v=e5c13925e43da778" width="360" height="360" alt="" aria-hidden="true"><p data-i18n="qrLabel">扫码获取</p></div>
       </footer>
     </section>
   </main>
-  <script src="vendor/tz-lookup/tz.js?v=675d05810dec51a9"></script>
+  <script src="vendor/tz-lookup/tz.js?v=e5c13925e43da778"></script>
   <dialog id="dailyShareDialog" class="daily-share-dialog" aria-labelledby="dailyShareTitle">
     <div class="daily-share-header"><h2 id="dailyShareTitle">分享今日提示</h2><button id="closeDailyShare" type="button">关闭</button></div>
     <p id="dailyShareHelp" class="daily-share-help" role="status" aria-live="polite" tabindex="-1" hidden></p>
@@ -539,9 +539,9 @@
     <p id="dailyShareStatus" role="status" aria-live="polite"></p>
     <div class="daily-share-actions"><button id="saveDailyImage" type="button">保存图片</button><button id="sendDailyImage" type="button">分享图片</button></div>
   </dialog>
-  <script src="vendor/html2canvas/html2canvas.min.js?v=675d05810dec51a9"></script>
-  <script src="runtime-config.js?v=675d05810dec51a9"></script>
-  <script src="build-provenance.js?v=675d05810dec51a9" defer></script>
-  <script type="module" src="app.js?v=675d05810dec51a9"></script>
+  <script src="vendor/html2canvas/html2canvas.min.js?v=e5c13925e43da778"></script>
+  <script src="runtime-config.js?v=e5c13925e43da778"></script>
+  <script src="build-provenance.js?v=e5c13925e43da778" defer></script>
+  <script type="module" src="app.js?v=e5c13925e43da778"></script>
 </body>
 </html>

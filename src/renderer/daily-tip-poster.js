@@ -1,4 +1,4 @@
-import { formatDailyTipText } from "../app/daily-tip.js?v=675d05810dec51a9";
+import { formatDailyTipText } from "../app/daily-tip.js?v=e5c13925e43da778";
 // A standalone text poster: no birth data, chart, or remote render service.
 function loadImage(url) {
   return new Promise((resolve, reject) => {
@@ -29,8 +29,8 @@ export async function createDailyTipPoster({ tip, language, date = new Date() })
   if (!tip) throw new Error('A saved result is required.');
   const [qr, hero, orb] = await Promise.all([
     loadImage(new URL(globalThis.PLUTO_CONFIG?.buerShareQrPath || '../../assets/chart-qr.png', import.meta.url).href),
-    loadImage(new URL('../../assets/buer-aurora-hero.webp?v=675d05810dec51a9', import.meta.url).href).catch(() => null),
-    loadImage(new URL("../../assets/buer-orb-v2.png?v=675d05810dec51a9", import.meta.url).href),
+    loadImage(new URL('../../assets/buer-aurora-hero.webp?v=e5c13925e43da778', import.meta.url).href).catch(() => null),
+    loadImage(new URL("../../assets/buer-orb-v2.png?v=e5c13925e43da778", import.meta.url).href),
     document.fonts.ready,
   ]);
   const chinese = language === 'zh';
@@ -47,12 +47,7 @@ export async function createDailyTipPoster({ tip, language, date = new Date() })
     fade.addColorStop(0, '#15243b00'); fade.addColorStop(1, '#1e3350');
     ctx.fillStyle = fade; ctx.fillRect(0, 0, 1080, 590);
   }
-  ctx.drawImage(orb, 878, 60, 140, 140);
   ctx.textBaseline = 'top';
-  ctx.fillStyle = '#f2f6ff'; ctx.font = '60px Georgia, serif';
-  ctx.fillText(chinese ? '不二见己' : 'Buer Within', 72, 70);
-  ctx.fillStyle = '#c5def5'; ctx.font = '23px sans-serif';
-  ctx.fillText(chinese ? '与真实的自己 · 温柔相遇' : 'Meet your true self', 74, 150);
   ctx.fillStyle = '#f2f6ff'; ctx.font = '64px sans-serif';
   ctx.fillText(`${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')}`, 74, 385);
   ctx.font = '23px sans-serif'; ctx.fillStyle = '#c5def5';
@@ -72,14 +67,14 @@ export async function createDailyTipPoster({ tip, language, date = new Date() })
   lines.forEach((line, index) => ctx.fillText(line, 74, 625 + index * size * 1.5));
   ctx.font = '22px sans-serif'; ctx.fillStyle = '#b9d0e6';
   ctx.fillText(chinese ? '来自我最近一次的人生说明书' : 'From my latest Life Manual', 74, Math.max(940, 625 + lines.length * size * 1.5 + 50));
-  ctx.fillStyle = '#a5e5ff'; ctx.font = '29px Georgia, serif'; ctx.fillText('BUER WITHIN', 74, 1180);
-  ctx.fillStyle = '#e3eefb'; ctx.font = '27px sans-serif';
-  ctx.fillText(chinese ? '从了解自己开始' : 'Begin with self-knowledge', 74, 1233);
+  ctx.drawImage(orb, 68, 1170, 100, 100);
+  ctx.fillStyle = '#f2f6ff'; ctx.font = '48px Georgia, serif';
+  ctx.fillText(chinese ? '不二见己' : 'Buer Within', 192, 1170);
   ctx.font = '21px sans-serif'; ctx.fillStyle = '#b9d0e6';
-  ctx.fillText((globalThis.PLUTO_CONFIG?.buerPublicUrl || 'https://human-design.wonderelian.com/').replace(/^https?:\/\//,'').replace(/\/$/,''), 74, 1324);
+  ctx.fillText((globalThis.PLUTO_CONFIG?.buerPublicUrl || 'https://human-design.wonderelian.com/').replace(/^https?:\/\//,'').replace(/\/$/,''), 194, 1240);
   // Preserve the white quiet zone and hard edges for reliable scanning.
   ctx.imageSmoothingEnabled = false; ctx.drawImage(qr, 800, 1150, 216, 216);
-  ctx.font = '20px sans-serif'; ctx.textAlign = 'center';
-  ctx.fillText(chinese ? '扫码，认识你自己' : 'Scan to explore', 908, 1384);
+  ctx.font = '19px sans-serif'; ctx.textAlign = 'right';
+  ctx.fillText(chinese ? '与真实的自己·温柔相遇' : 'Meet your true self, with kindness', 1016, 1384);
   return new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Image export failed.')), 'image/png'));
 }
