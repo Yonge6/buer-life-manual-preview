@@ -1,4 +1,5 @@
-import {readBuerEvents,anonymousReport,validChatHistory} from '../services/buer-conversation.js?v=c1bc7f2c3578046b';
+import {nextQuestionBatch} from './buer-suggestions.js?v=9e9e14abb1dd67c9';
+import {readBuerEvents,anonymousReport,validChatHistory} from '../services/buer-conversation.js?v=9e9e14abb1dd67c9';
 
 const copy={
   zh:{followupLabel:'继续聊聊你的想法…',decisionQuestion:'做决定时，怎样听见自己？',energyQuestion:'总觉得累，该怎样找回能量？',strengthQuestion:'怎样发现自己的优势？',boundaryQuestion:'如何温柔地建立边界？',profile:'我的',manualHistory:'说明书历史',chatHistoryHint:'继续上次的探索',tagline:'与真实的自己 · 温柔相遇',home:'见己',manual:'人生说明书',history:'对话记录',railFoot:'更认识\n更自在',headline:'从一个问题，靠近自己',intro:'在这里，任何关于你的问题，都值得被认真对待',questionLabel:'此刻，你想更了解自己的哪一面？',workQuestion:'我适合怎样的工作节奏？',relationshipQuestion:'为什么我总在关系里内耗？',aiLabel:'AI 陪你探索',useReport:'结合我的说明书',newChat:'新对话',dataNote:'提问发送至 DeepSeek 处理；对话记录仅保存在本机。',myManual:'我的人生说明书',manualIntro:'一份专属于你的说明书，帮你更了解自己的倾向、节奏与选择。',contextFoot:'不是找到一个标准答案，\n而是更清楚地，做自己。',localHistory:'只保存在当前设备，不会同步到其他设备。',clearChats:'清空本机对话',clearConfirm:'清空后无法恢复这些对话。确定清空吗？',cancel:'取消',confirmClear:'确认清空',backHome:'返回对话',welcome:'先不用急着改变自己。\n从一件最近让你在意的小事开始，我们一起慢慢想明白。',connecting:'正在认真读你的问题…',streaming:'不二见己正在回应…',stopped:'已停止。你可以继续提问，或重新回答。',failed:'连接暂时中断，请稍后重试。',unconfigured:'AI 服务暂未就绪，输入的内容已保留。',rate:'提问有点频繁，稍等一分钟再试。',retry:'重新回答',copy:'复制',copied:'已复制回应',noHistory:'还没有对话。从首页的第一个问题开始。',send:'发送问题',stop:'停止回答',closeHistory:'关闭对话记录',contextHint:'仅参考类型、策略、权威与人生角色，不发送姓名或出生信息。',noStorage:'本机存储不可用，本次对话仅在当前页面保留。'},
@@ -11,6 +12,19 @@ export function initBuerHome({getLanguage,setLanguage,openManual,getReport}) {
   window.addEventListener('scroll',syncHeader,{passive:true});
   window.addEventListener('pageshow',syncHeader);
   syncHeader();
+  let suggestionState={},suggestions=[];
+  try{suggestionState=JSON.parse(localStorage.getItem('buer-suggestion-rotation-v1')||'{}');}catch{}
+  function renderSuggestions(){
+    const container=$('.buer-suggestions');container.replaceChildren();
+    for(const question of suggestions){const b=document.createElement('button');b.type='button';b.dataset.question=String(question.id);b.textContent=question[getLanguage()==='en'?'en':'zh'];b.addEventListener('click',()=>{input.value=b.textContent;input.dispatchEvent(new Event('input'));input.focus({preventScroll:true});});container.append(b);}
+    container.scrollLeft=0;
+  }
+  function rotateSuggestions(){
+    const next=nextQuestionBatch(suggestionState);suggestionState=next.state;suggestions=next.questions;
+    try{localStorage.setItem('buer-suggestion-rotation-v1',JSON.stringify(suggestionState));}catch{}
+    renderSuggestions();
+  }
+  rotateSuggestions();
   const key='buer-conversations-v1';let threads=[];
   try{threads=validChatHistory(JSON.parse(localStorage.getItem(key)||'[]'));}catch{}
   let current={id:crypto.randomUUID(),date:Date.now(),messages:[]},controller=null,activeStatus='',reportOverride=null,reportPreference=null;
@@ -64,7 +78,7 @@ export function initBuerHome({getLanguage,setLanguage,openManual,getReport}) {
     syncReportSelection();$('#buerContextLabel').title=t('contextHint');
     const date=new Date();$('#dailyTipDate').textContent=`${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')}`;
     $('#dailyTipDateSecondary').textContent=new Intl.DateTimeFormat(getLanguage()==='zh'?'zh-CN':'en',{weekday:'long'}).format(date);
-    setStatus(activeStatus);renderMessages();
+    setStatus(activeStatus);renderSuggestions();renderMessages();
   }
   function showHome(){document.body.dataset.workspace='home';window.scrollTo({top:0,behavior:'instant'});refresh();}
   document.querySelectorAll('[data-home]').forEach(el=>el.addEventListener('click',showHome));
@@ -81,7 +95,6 @@ export function initBuerHome({getLanguage,setLanguage,openManual,getReport}) {
     input.value=input.value.trim()?`${input.value.trim()}\n\n${question}`:question;
     reportPreference=null;showHome();input.dispatchEvent(new Event('input'));input.focus({preventScroll:true});form.scrollIntoView({block:'center',behavior:'smooth'});
   });
-  document.querySelectorAll('[data-question]').forEach(el=>el.addEventListener('click',()=>{input.value=t(el.dataset.buer);input.focus();}));
   input.addEventListener('focus',syncReportSelection);
   input.addEventListener('keydown',event=>{if(event.key==='Enter' && !event.shiftKey && !event.isComposing){event.preventDefault();form.requestSubmit();}});
   input.addEventListener('input',()=>{input.style.height='auto';input.style.height=`${Math.min(input.scrollHeight,160)}px`;});
@@ -112,7 +125,7 @@ export function initBuerHome({getLanguage,setLanguage,openManual,getReport}) {
   }
   form.addEventListener('submit',event=>{event.preventDefault();void ask(input.value);});
   $('#buerStop').addEventListener('click',()=>controller?.abort());
-  $('#buerNewChat').addEventListener('click',()=>{if(controller)return;persist();current={id:crypto.randomUUID(),date:Date.now(),messages:[]};input.value='';reportOverride=null;reportPreference=null;syncReportSelection();setStatus('');renderMessages();if(matchMedia('(min-width:761px)').matches)input.focus({preventScroll:true});});
+  $('#buerNewChat').addEventListener('click',()=>{if(controller)return;persist();current={id:crypto.randomUUID(),date:Date.now(),messages:[]};input.value='';reportOverride=null;reportPreference=null;rotateSuggestions();syncReportSelection();setStatus('');renderMessages();if(matchMedia('(min-width:761px)').matches)input.focus({preventScroll:true});});
   function renderHistory(){const list=$('#buerHistoryList');list.replaceChildren();if(!threads.length){const p=document.createElement('p');p.textContent=t('noHistory');list.append(p);return;}
     for(const thread of threads){const first=thread.messages.find(m=>m.role==='user')?.content||t('newChat');const b=button(first.slice(0,80),()=>{if(controller)return;persist();current=structuredClone(thread);reportOverride=null;reportPreference=null;syncReportSelection();setStatus('');$('#buerHistory').close();showHome();});const small=document.createElement('small');small.textContent=new Intl.DateTimeFormat(getLanguage()==='zh'?'zh-CN':'en',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(thread.date));b.append(small);list.append(b);}
   }

@@ -147,7 +147,7 @@ html,body{overflow-x:clip;overflow-y:visible}
 .buer-compose-meta input{accent-color:#b8b5ff}
 
 /* Exported full chart shares the aurora palette with the surrounding UI. */
-#capture.chart-panel.export-mobile{background:linear-gradient(180deg,rgba(21,36,59,.12),#192d47 390px,#15243b),url("assets/buer-aurora-hero.webp?v=c1bc7f2c3578046b") center top / 600px auto no-repeat,#15243b!important;border-color:#718bb4!important;color:#edf4ff!important}
+#capture.chart-panel.export-mobile{background:linear-gradient(180deg,rgba(21,36,59,.12),#192d47 390px,#15243b),url("assets/buer-aurora-hero.webp?v=9e9e14abb1dd67c9") center top / 600px auto no-repeat,#15243b!important;border-color:#718bb4!important;color:#edf4ff!important}
 #capture .chart-meta{background:rgba(21,36,59,.35);border-radius:16px}
 #capture .planet-list,#capture .interpretation,#capture .celebrity-matches,#capture .properties{background:#203751!important;border-color:#60799d!important;box-shadow:none!important}
 #capture .property,#capture .planet-list li,#capture .celebrity-card{border-color:#496486!important;color:#edf4ff!important}
@@ -250,3 +250,13 @@ body[data-conversation="empty"] .buer-welcome{padding-top:0}
  body[data-workspace="manual"] .shell{padding-top:calc(var(--buer-hero-height) - var(--buer-header-height) - 80px)}
  body[data-workspace="manual"] .shell .form-panel,body[data-workspace="manual"] .buer-form-intro{padding-top:0}
 }
+body[data-workspace="home"][data-conversation="active"] .topbar{background:rgba(24,43,66,.9);border-bottom-color:#7694b32b;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+/* A quieter glass composer, shared by the welcome and conversation states. */
+#buerChatForm.buer-composer{border:1px solid rgba(165,195,234,.48);border-radius:22px;background:linear-gradient(145deg,rgba(53,77,108,.64),rgba(28,46,69,.86));box-shadow:inset 0 1px 0 rgba(222,235,255,.09),0 8px 26px rgba(5,16,32,.12);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+#buerChatForm.buer-composer:focus-within{border-color:rgba(167,212,255,.78);box-shadow:inset 0 1px 0 rgba(233,243,255,.13),0 0 0 3px rgba(139,179,240,.06),0 8px 26px rgba(5,16,32,.14)}
+#buerChatForm textarea{font-weight:400;color:#edf4ff;letter-spacing:.1px}
+#buerChatForm textarea::placeholder{color:#b9cbe2}
+#buerChatForm .buer-suggestions button{border-color:rgba(158,185,224,.3);background:rgba(134,159,202,.09);color:#cbdaf0;font-weight:500;box-shadow:inset 0 1px 0 rgba(225,235,255,.035)}
+#buerChatForm .buer-suggestions button:hover{background:rgba(145,173,221,.18);border-color:rgba(177,205,241,.58)}
+#buerChatForm .buer-send{background:linear-gradient(145deg,#afe5ff,#b7baff);border-color:rgba(226,238,255,.7);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 3px 12px rgba(134,167,245,.18);color:#304973}
+#buerChatForm .buer-send:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 4px 16px rgba(134,167,245,.28)}
