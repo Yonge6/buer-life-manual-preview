@@ -1,5 +1,5 @@
-import { hasSupabaseConfig, runtimeConfig } from "../config/runtime-config.js?v=97874b28f0bc9725";
-import { PRODUCT_EVENT_NAMES, validateProductEvent } from "../../shared/product-event-contract.js?v=97874b28f0bc9725";
+import { hasSupabaseConfig, runtimeConfig } from "../config/runtime-config.js?v=b62d04d9762d8200";
+import { PRODUCT_EVENT_NAMES, validateProductEvent } from "../../shared/product-event-contract.js?v=b62d04d9762d8200";
 
 export const PRODUCT_EVENTS = PRODUCT_EVENT_NAMES;
 
