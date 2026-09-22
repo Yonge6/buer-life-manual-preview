@@ -2,9 +2,9 @@
 
 直接体验：https://buer.wonderelian.com/
 
-源码与许可证：https://github.com/Yonge6/human-design-chart/tree/c96d7fbdb38cf1cdee4ff8c29f4117ef1fc6bfd4
+源码与许可证：https://github.com/Yonge6/human-design-chart/tree/76dce02c7c923f74a5bb2e89e5d867a221887e6f
 
-这是独立体验站，不覆盖原网站。包含新版首页、说明书计算、每日提示和图片分享。AI 服务未配置，在确认服务端密钥后另行启用。
+这是独立体验站，不覆盖原网站。包含新版首页、说明书计算、每日提示和图片分享。AI 对话由独立服务端连接 DeepSeek，密钥不会进入网页。
 
 构建命令：node scripts/build-buer-preview.mjs
 

@@ -1,12 +1,12 @@
 globalThis.PLUTO_CONFIG = Object.freeze({
   "supabaseUrl": "",
   "supabasePublishableKey": "",
-  "apiBaseUrl": "",
-  "buerChatEnabled": false,
+  "apiBaseUrl": "https://buer-api.wonderelian.com",
+  "buerChatEnabled": true,
   "buerPublicUrl": "https://buer.wonderelian.com/",
   "buerShareQrPath": "../../assets/buer-preview-qr.png",
   "appVersion": "1.1.0",
-  "gitCommit": "c96d7fbdb38cf1cdee4ff8c29f4117ef1fc6bfd4",
-  "buildDate": "2026-09-22T01:36:21.792Z",
+  "gitCommit": "76dce02c7c923f74a5bb2e89e5d867a221887e6f",
+  "buildDate": "2026-09-22T01:51:08.903Z",
   "environment": "preview"
 });
