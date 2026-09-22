@@ -643,7 +643,7 @@ var _SwissEphemeris = class _SwissEphemeris {
    */
   async init(wasmPath) {
     if (this.ready) return;
-    const SwissEphModuleImport = await import("./swisseph.js?v=4034de6cad639197");
+    const SwissEphModuleImport = await import("./swisseph.js?v=cfd75dd7d2b043f3");
     let SwissEphModuleFactory;
     if (typeof SwissEphModuleImport.default === "function") {
       SwissEphModuleFactory = SwissEphModuleImport.default;
@@ -660,7 +660,7 @@ var _SwissEphemeris = class _SwissEphemeris {
     let resolvedWasmPath = wasmPath;
     if (!resolvedWasmPath) {
       try {
-        resolvedWasmPath = new URL("./swisseph.wasm?v=4034de6cad639197", import.meta.url).href;
+        resolvedWasmPath = new URL("./swisseph.wasm?v=cfd75dd7d2b043f3", import.meta.url).href;
       } catch (e) {
         resolvedWasmPath = "swisseph.wasm";
       }

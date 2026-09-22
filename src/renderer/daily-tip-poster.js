@@ -1,4 +1,4 @@
-import { formatDailyTipText } from "../app/daily-tip.js?v=4034de6cad639197";
+import { formatDailyTipText } from "../app/daily-tip.js?v=cfd75dd7d2b043f3";
 // A standalone text poster: no birth data, chart, or remote render service.
 function loadImage(url) {
   return new Promise((resolve, reject) => {
@@ -29,7 +29,7 @@ export async function createDailyTipPoster({ tip, language, date = new Date() })
   if (!tip) throw new Error('A saved result is required.');
   const [qr, moon] = await Promise.all([
     loadImage(new URL(globalThis.PLUTO_CONFIG?.buerShareQrPath || '../../assets/chart-qr.png', import.meta.url).href),
-    loadImage(new URL('../../assets/buer-ai-orb.webp?v=4034de6cad639197', import.meta.url).href).catch(() => null),
+    loadImage(new URL('../../assets/buer-ai-orb.webp?v=cfd75dd7d2b043f3', import.meta.url).href).catch(() => null),
     document.fonts.ready,
   ]);
   const chinese = language === 'zh';
