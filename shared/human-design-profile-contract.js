@@ -1,1 +1,1 @@
-export * from "../supabase/functions/_shared/human-design-profile-contract.js?v=ae6c616e87011d58";
+export * from "../supabase/functions/_shared/human-design-profile-contract.js?v=c4b3ea943d8291ea";

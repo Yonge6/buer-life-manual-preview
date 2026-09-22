@@ -98,7 +98,7 @@ body{background:linear-gradient(180deg,#1e3552 0,#15243b 520px,#15243b 100%);col
 .topbar{background:transparent;border-bottom:1px solid transparent;backdrop-filter:none;-webkit-backdrop-filter:none;transition:background .18s,border-color .18s}
 .topbar.is-scrolled{background:rgba(24,43,66,.9);border-bottom-color:#7694b32b;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .buer-rail{background:#1a2d46f5;border-color:#49617e}
-.buer-rail .rail-item{color:#bdcde1}.buer-rail .rail-item.is-active{color:#a8eaff;background:#294361}
+.buer-rail .rail-item{color:#bdcde1}.buer-rail .rail-item.is-active{color:#a8eaff;background:transparent}
 .buer-mobile-language,.topbar .language-switch{background:#263e59;border-color:#56718e}
 .brand small,.buer-welcome p,.buer-empty p,.buer-manual-entry p,.buer-context-foot{color:#c0d0e5}
 .buer-composer{background:#21354ded;border-color:#82a4c8;box-shadow:0 10px 35px #07132330}
@@ -134,7 +134,7 @@ html,body{overflow-x:clip;overflow-y:visible}
 /* Aurora accents echo the blue-violet glass brand mark. */
 :root{--buer-cyan:#a6dfff;--buer-blue:#a4bdff;--buer-violet:#c6b1ff}
 .buer-rail .rail-item .ph,.buer-manual-entry .ph,.buer-back-home .ph,.buer-compose-meta button{color:#b9c8ff}
-.buer-rail .rail-item.is-active{color:#e1d8ff;background:linear-gradient(135deg,#345379,#443c68)}
+.buer-rail .rail-item.is-active{color:#e1d8ff;background:transparent}
 .rail-item.is-active .ph{color:#d9d0ff;text-shadow:0 0 15px #a398ff80}
 .buer-composer .buer-send{background:linear-gradient(135deg,#9de4ff,#b8b2ff);border-color:#d2d8ff;color:#273765;box-shadow:0 0 22px #8b9cff45}
 #appDrawer .drawer-nav-icon{background:linear-gradient(135deg,#2c4e72,#3e365f);border-color:#7a8abd;color:#c8bbff}
@@ -147,7 +147,7 @@ html,body{overflow-x:clip;overflow-y:visible}
 .buer-compose-meta input{accent-color:#b8b5ff}
 
 /* Exported full chart shares the aurora palette with the surrounding UI. */
-#capture.chart-panel.export-mobile{background:linear-gradient(180deg,rgba(21,36,59,.12),#192d47 390px,#15243b),url("assets/buer-aurora-hero.webp?v=ae6c616e87011d58") center top / 600px auto no-repeat,#15243b!important;border-color:#718bb4!important;color:#edf4ff!important}
+#capture.chart-panel.export-mobile{background:linear-gradient(180deg,rgba(21,36,59,.12),#192d47 390px,#15243b),url("assets/buer-aurora-hero.webp?v=c4b3ea943d8291ea") center top / 600px auto no-repeat,#15243b!important;border-color:#718bb4!important;color:#edf4ff!important}
 #capture .chart-meta{background:rgba(21,36,59,.35);border-radius:16px}
 #capture .planet-list,#capture .interpretation,#capture .celebrity-matches,#capture .properties{background:#203751!important;border-color:#60799d!important;box-shadow:none!important}
 #capture .property,#capture .planet-list li,#capture .celebrity-card{border-color:#496486!important;color:#edf4ff!important}

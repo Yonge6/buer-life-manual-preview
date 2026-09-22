@@ -1,24 +1,24 @@
-import { initBuerManual } from './src/app/buer-manual.js?v=ae6c616e87011d58';
-import { initBuerHome } from "./src/app/buer-home.js?v=ae6c616e87011d58";
+import { initBuerManual } from './src/app/buer-manual.js?v=c4b3ea943d8291ea';
+import { initBuerHome } from "./src/app/buer-home.js?v=c4b3ea943d8291ea";
 import {
   calculateHumanDesign,
   localToUtcCandidates,
   preloadHumanDesignEngine,
-} from "./human-design-engine.js?v=ae6c616e87011d58";
-import { fetchPlaceCandidates, inferTimezoneFromAddress } from "./src/services/location-service.js?v=ae6c616e87011d58";
-import { createHumanDesignProfileSnapshot } from "./src/engine/profile-snapshot.js?v=ae6c616e87011d58";
-import { DEFAULT_CONSENT, deleteCloudData, recordProductEvent, saveChartToCloud, updateConsent } from "./src/services/backend-service.js?v=ae6c616e87011d58";
-import { canUseSystemShare, isEmbeddedBrowser, isMobileDevice, sharePageLink } from "./src/services/sharing-service.js?v=ae6c616e87011d58";
-import { readStoredJson, writeStoredJson } from "./src/services/storage-service.js?v=ae6c616e87011d58";
-import { createBodygraphRenderer } from "./src/renderer/bodygraph-renderer.js?v=ae6c616e87011d58";
-import { renderPosterElement } from "./src/renderer/poster-renderer.js?v=ae6c616e87011d58";
-import { validateBirthSelection } from "./src/app/form-validation.js?v=ae6c616e87011d58";
-import { canUseRemoteServices, effectiveRemoteConsent, isCapacitorNativeRuntime } from "./src/app/runtime-security.js?v=ae6c616e87011d58";
-import { getReleaseFeatureAvailability } from "./src/app/release-feature-availability.js?v=ae6c616e87011d58";
-import { hasSupabaseConfig } from "./src/config/runtime-config.js?v=ae6c616e87011d58";
-import { createDailyTipPayload, getDailyTip, latestSavedResult, formatDailyTipText } from "./src/app/daily-tip.js?v=ae6c616e87011d58";
+} from "./human-design-engine.js?v=c4b3ea943d8291ea";
+import { fetchPlaceCandidates, inferTimezoneFromAddress } from "./src/services/location-service.js?v=c4b3ea943d8291ea";
+import { createHumanDesignProfileSnapshot } from "./src/engine/profile-snapshot.js?v=c4b3ea943d8291ea";
+import { DEFAULT_CONSENT, deleteCloudData, recordProductEvent, saveChartToCloud, updateConsent } from "./src/services/backend-service.js?v=c4b3ea943d8291ea";
+import { canUseSystemShare, isEmbeddedBrowser, isMobileDevice, sharePageLink } from "./src/services/sharing-service.js?v=c4b3ea943d8291ea";
+import { readStoredJson, writeStoredJson } from "./src/services/storage-service.js?v=c4b3ea943d8291ea";
+import { createBodygraphRenderer } from "./src/renderer/bodygraph-renderer.js?v=c4b3ea943d8291ea";
+import { renderPosterElement } from "./src/renderer/poster-renderer.js?v=c4b3ea943d8291ea";
+import { validateBirthSelection } from "./src/app/form-validation.js?v=c4b3ea943d8291ea";
+import { canUseRemoteServices, effectiveRemoteConsent, isCapacitorNativeRuntime } from "./src/app/runtime-security.js?v=c4b3ea943d8291ea";
+import { getReleaseFeatureAvailability } from "./src/app/release-feature-availability.js?v=c4b3ea943d8291ea";
+import { hasSupabaseConfig } from "./src/config/runtime-config.js?v=c4b3ea943d8291ea";
+import { createDailyTipPayload, getDailyTip, latestSavedResult, formatDailyTipText } from "./src/app/daily-tip.js?v=c4b3ea943d8291ea";
 
-import { createDailyTipPoster } from "./src/renderer/daily-tip-poster.js?v=ae6c616e87011d58";
+import { createDailyTipPoster } from "./src/renderer/daily-tip-poster.js?v=c4b3ea943d8291ea";
 
 const publicAppUrl = "https://human-design.wonderelian.com/";
 preloadHumanDesignEngine().catch((error) => {
@@ -824,7 +824,7 @@ let pendingConfirmation = null;
 let pendingHistoryOptOut = null;
 const paintBodygraph = nativeRuntime ? async () => null : createBodygraphRenderer({
   container: graph,
-  templateUrl: "./assets/bodygraph-template.svg?v=ae6c616e87011d58",
+  templateUrl: "./assets/bodygraph-template.svg?v=c4b3ea943d8291ea",
   centerColors,
   label: "Life Manual BodyGraph",
 });
