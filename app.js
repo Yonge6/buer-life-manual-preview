@@ -1,24 +1,24 @@
-import { initBuerManual } from './src/app/buer-manual.js?v=0efb9b7c3cf49fbc';
-import { initBuerHome } from "./src/app/buer-home.js?v=0efb9b7c3cf49fbc";
+import { initBuerManual } from './src/app/buer-manual.js?v=13680a80e1076253';
+import { initBuerHome } from "./src/app/buer-home.js?v=13680a80e1076253";
 import {
   calculateHumanDesign,
   localToUtcCandidates,
   preloadHumanDesignEngine,
-} from "./human-design-engine.js?v=0efb9b7c3cf49fbc";
-import { fetchPlaceCandidates, inferTimezoneFromAddress } from "./src/services/location-service.js?v=0efb9b7c3cf49fbc";
-import { createHumanDesignProfileSnapshot } from "./src/engine/profile-snapshot.js?v=0efb9b7c3cf49fbc";
-import { DEFAULT_CONSENT, deleteCloudData, recordProductEvent, saveChartToCloud, updateConsent } from "./src/services/backend-service.js?v=0efb9b7c3cf49fbc";
-import { canUseSystemShare, isEmbeddedBrowser, isMobileDevice, sharePageLink } from "./src/services/sharing-service.js?v=0efb9b7c3cf49fbc";
-import { readStoredJson, writeStoredJson } from "./src/services/storage-service.js?v=0efb9b7c3cf49fbc";
-import { createBodygraphRenderer } from "./src/renderer/bodygraph-renderer.js?v=0efb9b7c3cf49fbc";
-import { renderPosterElement } from "./src/renderer/poster-renderer.js?v=0efb9b7c3cf49fbc";
-import { validateBirthSelection } from "./src/app/form-validation.js?v=0efb9b7c3cf49fbc";
-import { canUseRemoteServices, effectiveRemoteConsent, isCapacitorNativeRuntime } from "./src/app/runtime-security.js?v=0efb9b7c3cf49fbc";
-import { getReleaseFeatureAvailability } from "./src/app/release-feature-availability.js?v=0efb9b7c3cf49fbc";
-import { hasSupabaseConfig } from "./src/config/runtime-config.js?v=0efb9b7c3cf49fbc";
-import { createDailyTipPayload, getDailyTip, latestSavedResult, formatDailyTipText } from "./src/app/daily-tip.js?v=0efb9b7c3cf49fbc";
+} from "./human-design-engine.js?v=13680a80e1076253";
+import { fetchPlaceCandidates, inferTimezoneFromAddress } from "./src/services/location-service.js?v=13680a80e1076253";
+import { createHumanDesignProfileSnapshot } from "./src/engine/profile-snapshot.js?v=13680a80e1076253";
+import { DEFAULT_CONSENT, deleteCloudData, recordProductEvent, saveChartToCloud, updateConsent } from "./src/services/backend-service.js?v=13680a80e1076253";
+import { canUseSystemShare, isEmbeddedBrowser, isMobileDevice, sharePageLink } from "./src/services/sharing-service.js?v=13680a80e1076253";
+import { readStoredJson, writeStoredJson } from "./src/services/storage-service.js?v=13680a80e1076253";
+import { createBodygraphRenderer } from "./src/renderer/bodygraph-renderer.js?v=13680a80e1076253";
+import { renderPosterElement } from "./src/renderer/poster-renderer.js?v=13680a80e1076253";
+import { validateBirthSelection } from "./src/app/form-validation.js?v=13680a80e1076253";
+import { canUseRemoteServices, effectiveRemoteConsent, isCapacitorNativeRuntime } from "./src/app/runtime-security.js?v=13680a80e1076253";
+import { getReleaseFeatureAvailability } from "./src/app/release-feature-availability.js?v=13680a80e1076253";
+import { hasSupabaseConfig } from "./src/config/runtime-config.js?v=13680a80e1076253";
+import { createDailyTipPayload, getDailyTip, latestSavedResult, formatDailyTipText } from "./src/app/daily-tip.js?v=13680a80e1076253";
 
-import { createDailyTipPoster } from "./src/renderer/daily-tip-poster.js?v=0efb9b7c3cf49fbc";
+import { createDailyTipPoster } from "./src/renderer/daily-tip-poster.js?v=13680a80e1076253";
 
 const publicAppUrl = "https://human-design.wonderelian.com/";
 preloadHumanDesignEngine().catch((error) => {
@@ -824,7 +824,7 @@ let pendingConfirmation = null;
 let pendingHistoryOptOut = null;
 const paintBodygraph = nativeRuntime ? async () => null : createBodygraphRenderer({
   container: graph,
-  templateUrl: "./assets/bodygraph-template.svg?v=0efb9b7c3cf49fbc",
+  templateUrl: "./assets/bodygraph-template.svg?v=13680a80e1076253",
   centerColors,
   label: "Life Manual BodyGraph",
 });
@@ -1862,6 +1862,11 @@ function invalidateChart() {
 }
 
 [fields.birthDate, fields.birthTime].forEach((field) => {
+  field.addEventListener("click", () => {
+    if (!nativeRuntime && typeof field.showPicker === "function") {
+      try { field.showPicker(); } catch { /* Keep native text editing available. */ }
+    }
+  });
   field.addEventListener("input", syncBirthControlDisplays);
   field.addEventListener("change", () => {
     syncBirthPartsFromNativeControls();
