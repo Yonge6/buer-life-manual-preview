@@ -17,7 +17,7 @@
 
 @font-face {
   font-family: "human-design";
-  src: url("assets/fonts/human-design.woff2?v=2ba309191101f480") format("woff2");
+  src: url("assets/fonts/human-design.woff2?v=0efb9b7c3cf49fbc") format("woff2");
   font-display: block;
 }
 
@@ -128,7 +128,7 @@ body {
   border-left: 1px solid rgba(216, 177, 125, .28);
   background:
     linear-gradient(180deg, rgba(16, 12, 19, .96), rgba(24, 15, 25, .985)),
-    url("assets/pluto-vellum-bg-v4.png?v=2ba309191101f480") center / cover no-repeat;
+    url("assets/pluto-vellum-bg-v4.png?v=0efb9b7c3cf49fbc") center / cover no-repeat;
   box-shadow: -24px 0 70px rgba(0, 0, 0, .42);
   color: var(--ink);
   animation: drawer-enter 240ms cubic-bezier(.22, 1, .36, 1);
@@ -939,7 +939,7 @@ body.drawer-open { overflow: hidden; }
   padding: 28px 34px 30px;
   background:
     linear-gradient(rgba(250, 241, 226, .22), rgba(234, 213, 184, .16)),
-    url("assets/pluto-vellum-bg-v4.png?v=2ba309191101f480") center / cover no-repeat,
+    url("assets/pluto-vellum-bg-v4.png?v=0efb9b7c3cf49fbc") center / cover no-repeat,
     #f3e3cc;
   color: #2c2525;
 }
@@ -1508,7 +1508,7 @@ button:disabled { cursor: not-allowed; opacity: .52; }
   padding: 46px 32px 42px !important;
   border: 1px solid #76542f !important;
   border-radius: 0 !important;
-  background: url("assets/pluto-chart-mobile-v1.png?v=2ba309191101f480") center / cover no-repeat, #0d0b12 !important;
+  background: url("assets/pluto-chart-mobile-v1.png?v=0efb9b7c3cf49fbc") center / cover no-repeat, #0d0b12 !important;
   box-shadow: none !important;
   color: #f3e8d7 !important;
 }
