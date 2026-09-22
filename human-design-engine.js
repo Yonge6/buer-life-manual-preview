@@ -1,1 +1,1 @@
-export * from "./src/engine/human-design-engine.js?v=416c42fd17d2438f";
+export * from "./src/engine/human-design-engine.js?v=8d771d31c50b2996";
