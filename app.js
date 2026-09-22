@@ -1,24 +1,24 @@
-import { initBuerManual } from './src/app/buer-manual.js?v=cfd75dd7d2b043f3';
-import { initBuerHome } from "./src/app/buer-home.js?v=cfd75dd7d2b043f3";
+import { initBuerManual } from './src/app/buer-manual.js?v=182994443b5687f7';
+import { initBuerHome } from "./src/app/buer-home.js?v=182994443b5687f7";
 import {
   calculateHumanDesign,
   localToUtcCandidates,
   preloadHumanDesignEngine,
-} from "./human-design-engine.js?v=cfd75dd7d2b043f3";
-import { fetchPlaceCandidates, inferTimezoneFromAddress } from "./src/services/location-service.js?v=cfd75dd7d2b043f3";
-import { createHumanDesignProfileSnapshot } from "./src/engine/profile-snapshot.js?v=cfd75dd7d2b043f3";
-import { DEFAULT_CONSENT, deleteCloudData, recordProductEvent, saveChartToCloud, updateConsent } from "./src/services/backend-service.js?v=cfd75dd7d2b043f3";
-import { canUseSystemShare, isEmbeddedBrowser, isMobileDevice, sharePageLink } from "./src/services/sharing-service.js?v=cfd75dd7d2b043f3";
-import { readStoredJson, writeStoredJson } from "./src/services/storage-service.js?v=cfd75dd7d2b043f3";
-import { createBodygraphRenderer } from "./src/renderer/bodygraph-renderer.js?v=cfd75dd7d2b043f3";
-import { renderPosterElement } from "./src/renderer/poster-renderer.js?v=cfd75dd7d2b043f3";
-import { validateBirthSelection } from "./src/app/form-validation.js?v=cfd75dd7d2b043f3";
-import { canUseRemoteServices, effectiveRemoteConsent, isCapacitorNativeRuntime } from "./src/app/runtime-security.js?v=cfd75dd7d2b043f3";
-import { getReleaseFeatureAvailability } from "./src/app/release-feature-availability.js?v=cfd75dd7d2b043f3";
-import { hasSupabaseConfig } from "./src/config/runtime-config.js?v=cfd75dd7d2b043f3";
-import { createDailyTipPayload, getDailyTip, latestSavedResult, formatDailyTipText } from "./src/app/daily-tip.js?v=cfd75dd7d2b043f3";
+} from "./human-design-engine.js?v=182994443b5687f7";
+import { fetchPlaceCandidates, inferTimezoneFromAddress } from "./src/services/location-service.js?v=182994443b5687f7";
+import { createHumanDesignProfileSnapshot } from "./src/engine/profile-snapshot.js?v=182994443b5687f7";
+import { DEFAULT_CONSENT, deleteCloudData, recordProductEvent, saveChartToCloud, updateConsent } from "./src/services/backend-service.js?v=182994443b5687f7";
+import { canUseSystemShare, isEmbeddedBrowser, isMobileDevice, sharePageLink } from "./src/services/sharing-service.js?v=182994443b5687f7";
+import { readStoredJson, writeStoredJson } from "./src/services/storage-service.js?v=182994443b5687f7";
+import { createBodygraphRenderer } from "./src/renderer/bodygraph-renderer.js?v=182994443b5687f7";
+import { renderPosterElement } from "./src/renderer/poster-renderer.js?v=182994443b5687f7";
+import { validateBirthSelection } from "./src/app/form-validation.js?v=182994443b5687f7";
+import { canUseRemoteServices, effectiveRemoteConsent, isCapacitorNativeRuntime } from "./src/app/runtime-security.js?v=182994443b5687f7";
+import { getReleaseFeatureAvailability } from "./src/app/release-feature-availability.js?v=182994443b5687f7";
+import { hasSupabaseConfig } from "./src/config/runtime-config.js?v=182994443b5687f7";
+import { createDailyTipPayload, getDailyTip, latestSavedResult, formatDailyTipText } from "./src/app/daily-tip.js?v=182994443b5687f7";
 
-import { createDailyTipPoster } from "./src/renderer/daily-tip-poster.js?v=cfd75dd7d2b043f3";
+import { createDailyTipPoster } from "./src/renderer/daily-tip-poster.js?v=182994443b5687f7";
 
 const publicAppUrl = "https://human-design.wonderelian.com/";
 preloadHumanDesignEngine().catch((error) => {
@@ -824,7 +824,7 @@ let pendingConfirmation = null;
 let pendingHistoryOptOut = null;
 const paintBodygraph = nativeRuntime ? async () => null : createBodygraphRenderer({
   container: graph,
-  templateUrl: "./assets/bodygraph-template.svg?v=cfd75dd7d2b043f3",
+  templateUrl: "./assets/bodygraph-template.svg?v=182994443b5687f7",
   centerColors,
   label: "Life Manual BodyGraph",
 });
@@ -1614,7 +1614,6 @@ function applyLanguage(nextLanguage, rerender = true) {
   }
 }
 
-let drawerRestoreFocus = null;
 let drawerView = "home";
 
 function setDrawerView(nextView, { focus = true } = {}) {
@@ -1637,6 +1636,7 @@ function setDrawerView(nextView, { focus = true } = {}) {
   drawerTitle.dataset.i18n = titleKey;
   drawerTitle.textContent = t(titleKey);
   sideDrawer.querySelector(".drawer-scroll").scrollTop = 0;
+  if(document.body.dataset.workspace === "profile") window.scrollTo({top:0,behavior:"instant"});
   if (!focus) return;
   if (drawerView !== "home") {
     drawerBackButton.focus({ preventScroll: true });
@@ -1652,27 +1652,20 @@ function setDrawerView(nextView, { focus = true } = {}) {
 }
 
 function openDrawer() {
-  drawerRestoreFocus = document.activeElement;
   setDrawerView("home", { focus: false });
+  document.body.dataset.workspace = "profile";
   appDrawer.hidden = false;
-  document.body.classList.add("drawer-open");
-  openMenuButton.setAttribute("aria-expanded", "true");
-  sideDrawer.focus({ preventScroll: true });
+  window.scrollTo({top:0,behavior:"instant"});
 }
 
-function closeDrawer({ restoreFocus = true } = {}) {
-  if (appDrawer.hidden) return;
+function closeDrawer() {
   appDrawer.hidden = true;
-  document.body.classList.remove("drawer-open");
-  openMenuButton.setAttribute("aria-expanded", "false");
-  if (restoreFocus && drawerRestoreFocus instanceof HTMLElement) drawerRestoreFocus.focus({ preventScroll: true });
-  drawerRestoreFocus = null;
 }
 
-function drawerFocusableElements() {
-  return [...sideDrawer.querySelectorAll("button, a[href], input, select, textarea, [tabindex]:not([tabindex='-1'])")]
-    .filter((element) => !element.disabled && !element.hidden && element.offsetParent !== null);
-}
+new MutationObserver(() => {
+  appDrawer.hidden = document.body.dataset.workspace !== "profile";
+}).observe(document.body, {attributes:true,attributeFilter:["data-workspace"]});
+document.querySelector('#buerProfileButton').addEventListener('click',openDrawer);
 
 openMenuButton.addEventListener("click", openDrawer);
 closeMenuButton.addEventListener("click", () => closeDrawer());
@@ -1680,24 +1673,8 @@ drawerBackdrop.addEventListener("click", () => closeDrawer());
 drawerBackButton.addEventListener("click", () => setDrawerView("home"));
 openAboutButton.addEventListener("click", () => setDrawerView("about"));
 openContactButton.addEventListener("click", () => setDrawerView("contact"));
-appDrawer.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    event.preventDefault();
-    closeDrawer();
-    return;
-  }
-  if (event.key !== "Tab") return;
-  const focusable = drawerFocusableElements();
-  if (!focusable.length) return;
-  const first = focusable[0];
-  const last = focusable[focusable.length - 1];
-  if (event.shiftKey && document.activeElement === first) {
-    event.preventDefault();
-    last.focus();
-  } else if (!event.shiftKey && document.activeElement === last) {
-    event.preventDefault();
-    first.focus();
-  }
+appDrawer.addEventListener("keydown", event => {
+  if(event.key === "Escape" && drawerView !== "home") setDrawerView("home");
 });
 
 languageButtons.forEach((button) => button.addEventListener("click", () => {
