@@ -147,7 +147,7 @@ html,body{overflow-x:clip;overflow-y:visible}
 .buer-compose-meta input{accent-color:#b8b5ff}
 
 /* Exported full chart shares the aurora palette with the surrounding UI. */
-#capture.chart-panel.export-mobile{background:linear-gradient(180deg,rgba(21,36,59,.12),#192d47 390px,#15243b),url("assets/buer-aurora-hero.webp?v=10ac60030e9d71da") center top / 600px auto no-repeat,#15243b!important;border-color:#718bb4!important;color:#edf4ff!important}
+#capture.chart-panel.export-mobile{background:linear-gradient(180deg,rgba(21,36,59,.12),#192d47 390px,#15243b),url("assets/buer-aurora-hero.webp?v=ff80ed6a5cb2c519") center top / 600px auto no-repeat,#15243b!important;border-color:#718bb4!important;color:#edf4ff!important}
 #capture .chart-meta{background:rgba(21,36,59,.35);border-radius:16px}
 #capture .planet-list,#capture .interpretation,#capture .celebrity-matches,#capture .properties{background:#203751!important;border-color:#60799d!important;box-shadow:none!important}
 #capture .property,#capture .planet-list li,#capture .celebrity-card{border-color:#496486!important;color:#edf4ff!important}
