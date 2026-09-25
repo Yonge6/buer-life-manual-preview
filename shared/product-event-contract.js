@@ -1,1 +1,1 @@
-export * from "../supabase/functions/_shared/product-event-contract.js?v=491d9065c1ee9003";
+export * from "../supabase/functions/_shared/product-event-contract.js?v=0375141c474e1601";
