@@ -1,7 +1,7 @@
-import {GROWTH_KEY,DOMAINS,QUESTIONS,readGrowth,saveGrowth,cleanGrowth,setGrowthAnswer,answeredCount,assessmentContext} from '../services/buer-growth.js?v=f84e8cb38b7d2ef2';
-import {readBuerEvents} from '../services/buer-conversation.js?v=f84e8cb38b7d2ef2';
-import {ensureAIConsent,chatAccess,showMembership} from './buer-membership.js?v=f84e8cb38b7d2ef2';
-import {renderAssistantText} from './buer-message-format.js?v=f84e8cb38b7d2ef2';
+import {GROWTH_KEY,DOMAINS,QUESTIONS,readGrowth,saveGrowth,cleanGrowth,setGrowthAnswer,answeredCount,assessmentContext} from '../services/buer-growth.js?v=afb330d7b45e53bb';
+import {readBuerEvents} from '../services/buer-conversation.js?v=afb330d7b45e53bb';
+import {ensureAIConsent,chatAccess,showMembership} from './buer-membership.js?v=afb330d7b45e53bb';
+import {renderAssistantText} from './buer-message-format.js?v=afb330d7b45e53bb';
 
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function renderGrowthReport(element,content){
