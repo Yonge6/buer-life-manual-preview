@@ -18,7 +18,7 @@ body::before,body::after{display:none}
 .buer-rail .rail-foot{color:var(--muted);border-color:var(--line)}
 body[data-conversation="empty"] .buer-home{padding-top:0}
 .buer-home{gap:56px;padding:0 48px 48px;grid-template-columns:minmax(0,1fr) 300px;max-width:1500px}
-.buer-welcome{position:relative;background:url('assets/editorial-hero.webp?v=0fe34e6e09475ffe') center right/cover no-repeat;margin:0 -24px;padding:88px 24px 70px!important;min-height:295px;box-sizing:border-box}
+.buer-welcome{position:relative;background:url('assets/editorial-hero.webp?v=2ac07e47d26d40e7') center right/cover no-repeat;margin:0 -24px;padding:88px 24px 70px!important;min-height:295px;box-sizing:border-box}
 .buer-welcome h1{position:relative;text-align:left;margin:0;white-space:pre-line!important;font:400 clamp(32px,3.6vw,52px)/1.42 var(--editorial-serif);letter-spacing:-.5px;color:#22271f;text-wrap:balance}
 .buer-welcome p{position:relative;text-align:left;color:#64735e;font-size:15px;letter-spacing:1px;margin:12px 0 0}
 .buer-conversation-column{min-height:0;max-height:none}
@@ -89,7 +89,7 @@ dialog::backdrop{background:#24282370;backdrop-filter:blur(5px)}
  #buerChatForm textarea{font-size:17px;min-height:60px;height:60px;padding-top:8px}
  #buerChatForm .buer-suggestions{margin-top:30px}
  #buerChatForm .buer-suggestions button{font-size:12px;min-height:44px;padding:12px 0}
- .buer-context{position:relative;margin:26px -22px 0;padding:24px 22px 22px;border:0;background:url('assets/editorial-journal.webp?v=0fe34e6e09475ffe') center right/cover no-repeat;min-height:185px}
+ .buer-context{position:relative;margin:26px -22px 0;padding:24px 22px 22px;border:0;background:url('assets/editorial-journal.webp?v=2ac07e47d26d40e7') center right/cover no-repeat;min-height:185px}
  .buer-context .daily-tip-heading{margin-bottom:12px}
  .buer-context #dailyTipText{font-size:27px;max-width:85%;line-height:1.5}
  .buer-context #dailyTipSource{font-size:10px;max-width:70%;margin-top:12px}
