@@ -1,25 +1,25 @@
-import { initBuerManual } from './src/app/buer-manual.js?v=afb330d7b45e53bb';
-import { initBuerGrowth } from "./src/app/buer-growth.js?v=afb330d7b45e53bb";
-import { initBuerHome } from "./src/app/buer-home.js?v=afb330d7b45e53bb";
+import { initBuerManual } from './src/app/buer-manual.js?v=0fe34e6e09475ffe';
+import { initBuerGrowth } from "./src/app/buer-growth.js?v=0fe34e6e09475ffe";
+import { initBuerHome } from "./src/app/buer-home.js?v=0fe34e6e09475ffe";
 import {
   calculateHumanDesign,
   localToUtcCandidates,
   preloadHumanDesignEngine,
-} from "./human-design-engine.js?v=afb330d7b45e53bb";
-import { fetchPlaceCandidates, inferTimezoneFromAddress } from "./src/services/location-service.js?v=afb330d7b45e53bb";
-import { createHumanDesignProfileSnapshot } from "./src/engine/profile-snapshot.js?v=afb330d7b45e53bb";
-import { DEFAULT_CONSENT, deleteCloudData, recordProductEvent, saveChartToCloud, updateConsent } from "./src/services/backend-service.js?v=afb330d7b45e53bb";
-import { canUseSystemShare, isEmbeddedBrowser, isMobileDevice, sharePageLink } from "./src/services/sharing-service.js?v=afb330d7b45e53bb";
-import { readStoredJson, writeStoredJson } from "./src/services/storage-service.js?v=afb330d7b45e53bb";
-import { createBodygraphRenderer } from "./src/renderer/bodygraph-renderer.js?v=afb330d7b45e53bb";
-import { renderPosterElement } from "./src/renderer/poster-renderer.js?v=afb330d7b45e53bb";
-import { validateBirthSelection } from "./src/app/form-validation.js?v=afb330d7b45e53bb";
-import { canUseRemoteServices, effectiveRemoteConsent, isCapacitorNativeRuntime } from "./src/app/runtime-security.js?v=afb330d7b45e53bb";
-import { getReleaseFeatureAvailability } from "./src/app/release-feature-availability.js?v=afb330d7b45e53bb";
-import { hasSupabaseConfig } from "./src/config/runtime-config.js?v=afb330d7b45e53bb";
-import { createDailyTipPayload, getDailyTip, latestSavedResult, formatDailyTipText } from "./src/app/daily-tip.js?v=afb330d7b45e53bb";
+} from "./human-design-engine.js?v=0fe34e6e09475ffe";
+import { fetchPlaceCandidates, inferTimezoneFromAddress } from "./src/services/location-service.js?v=0fe34e6e09475ffe";
+import { createHumanDesignProfileSnapshot } from "./src/engine/profile-snapshot.js?v=0fe34e6e09475ffe";
+import { DEFAULT_CONSENT, deleteCloudData, recordProductEvent, saveChartToCloud, updateConsent } from "./src/services/backend-service.js?v=0fe34e6e09475ffe";
+import { canUseSystemShare, isEmbeddedBrowser, isMobileDevice, sharePageLink } from "./src/services/sharing-service.js?v=0fe34e6e09475ffe";
+import { readStoredJson, writeStoredJson } from "./src/services/storage-service.js?v=0fe34e6e09475ffe";
+import { createBodygraphRenderer } from "./src/renderer/bodygraph-renderer.js?v=0fe34e6e09475ffe";
+import { renderPosterElement } from "./src/renderer/poster-renderer.js?v=0fe34e6e09475ffe";
+import { validateBirthSelection } from "./src/app/form-validation.js?v=0fe34e6e09475ffe";
+import { canUseRemoteServices, effectiveRemoteConsent, isCapacitorNativeRuntime } from "./src/app/runtime-security.js?v=0fe34e6e09475ffe";
+import { getReleaseFeatureAvailability } from "./src/app/release-feature-availability.js?v=0fe34e6e09475ffe";
+import { hasSupabaseConfig } from "./src/config/runtime-config.js?v=0fe34e6e09475ffe";
+import { createDailyTipPayload, getDailyTip, latestSavedResult, formatDailyTipText } from "./src/app/daily-tip.js?v=0fe34e6e09475ffe";
 
-import { createDailyTipPoster } from "./src/renderer/daily-tip-poster.js?v=afb330d7b45e53bb";
+import { createDailyTipPoster } from "./src/renderer/daily-tip-poster.js?v=0fe34e6e09475ffe";
 
 const publicAppUrl = "https://human-design.wonderelian.com/";
 preloadHumanDesignEngine().catch((error) => {
@@ -825,7 +825,7 @@ let pendingConfirmation = null;
 let pendingHistoryOptOut = null;
 const paintBodygraph = nativeRuntime ? async () => null : createBodygraphRenderer({
   container: graph,
-  templateUrl: "./assets/bodygraph-template.svg?v=afb330d7b45e53bb",
+  templateUrl: "./assets/bodygraph-template.svg?v=0fe34e6e09475ffe",
   centerColors,
   label: "Life Manual BodyGraph",
 });
@@ -850,18 +850,18 @@ function refreshDailyTip() {
   card.dataset.state = tip ? "ready" : "empty";
   document.querySelector("#shareDailyTip").hidden = !tip;
   document.querySelector("#shareDailyTip").textContent = language === "zh" ? "分享图片" : "Share image";
-  document.querySelector("#dailyTipTitle").textContent = language === "zh" ? "今日提示" : "A thought for today";
+  document.querySelector("#dailyTipTitle").textContent = language === "zh" ? "留给今天的一句话" : "A thought for today";
   const date = new Date();
   const dateElement = document.querySelector("#dailyTipDate");
   dateElement.textContent = `${String(date.getMonth()+1).padStart(2,"0")}.${String(date.getDate()).padStart(2,"0")}`;
   document.querySelector("#dailyTipDateSecondary").textContent = new Intl.DateTimeFormat(language === "zh" ? "zh-CN" : "en", {weekday:"long"}).format(date);
   dateElement.dateTime = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
   document.querySelector("#dailyTipText").textContent = (tip ? formatDailyTipText(tip, language) : tip) || (language === "zh"
-    ? "生成你的第一份说明书，获得属于你的每日生活提示。"
-    : "Create your first Life Manual for a daily suggestion shaped by your result.");
+    ? "先听见自己，\n再决定下一步。"
+    : "Listen to yourself.\nThen take the next step.");
   document.querySelector("#dailyTipSource").textContent = tip
     ? (language === "zh" ? "来自你最近一次的解读" : "From your latest Life Manual")
-    : (language === "zh" ? "从了解自己开始，让每一天更自在。" : "A little self-knowledge for a more grounded day.");
+    : (language === "zh" ? "给自己一点从容。" : "Leave a little room for yourself.");
   document.querySelector("#dailyTipAction").textContent = tip
     ? (language === "zh" ? "查看我的解读" : "Read my Life Manual")
     : (language === "zh" ? "开始认识自己" : "Get to know yourself");
