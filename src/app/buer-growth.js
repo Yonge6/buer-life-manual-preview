@@ -1,7 +1,7 @@
-import {GROWTH_KEY,DOMAINS,QUESTIONS,readGrowth,saveGrowth,cleanGrowth,setGrowthAnswer,answeredCount,assessmentContext} from '../services/buer-growth.js?v=749c6c468281d884';
-import {readBuerEvents} from '../services/buer-conversation.js?v=749c6c468281d884';
-import {ensureAIConsent,chatAccess,showMembership} from './buer-membership.js?v=749c6c468281d884';
-import {renderAssistantText} from './buer-message-format.js?v=749c6c468281d884';
+import {GROWTH_KEY,DOMAINS,QUESTIONS,readGrowth,saveGrowth,cleanGrowth,setGrowthAnswer,answeredCount,assessmentContext} from '../services/buer-growth.js?v=efff841e3a760375';
+import {readBuerEvents} from '../services/buer-conversation.js?v=efff841e3a760375';
+import {ensureAIConsent,chatAccess,showMembership} from './buer-membership.js?v=efff841e3a760375';
+import {renderAssistantText} from './buer-message-format.js?v=efff841e3a760375';
 
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function renderGrowthReport(element,content){
