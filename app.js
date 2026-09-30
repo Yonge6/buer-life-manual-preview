@@ -1,25 +1,25 @@
-import { initBuerManual } from './src/app/buer-manual.js?v=efff841e3a760375';
-import { initBuerGrowth } from "./src/app/buer-growth.js?v=efff841e3a760375";
-import { initBuerHome } from "./src/app/buer-home.js?v=efff841e3a760375";
+import { initBuerManual } from './src/app/buer-manual.js?v=6a23c0cbd843e00a';
+import { initBuerGrowth } from "./src/app/buer-growth.js?v=6a23c0cbd843e00a";
+import { initBuerHome } from "./src/app/buer-home.js?v=6a23c0cbd843e00a";
 import {
   calculateHumanDesign,
   localToUtcCandidates,
   preloadHumanDesignEngine,
-} from "./human-design-engine.js?v=efff841e3a760375";
-import { fetchPlaceCandidates, inferTimezoneFromAddress } from "./src/services/location-service.js?v=efff841e3a760375";
-import { createHumanDesignProfileSnapshot } from "./src/engine/profile-snapshot.js?v=efff841e3a760375";
-import { DEFAULT_CONSENT, deleteCloudData, recordProductEvent, saveChartToCloud, updateConsent } from "./src/services/backend-service.js?v=efff841e3a760375";
-import { canUseSystemShare, isEmbeddedBrowser, isMobileDevice, sharePageLink } from "./src/services/sharing-service.js?v=efff841e3a760375";
-import { readStoredJson, writeStoredJson } from "./src/services/storage-service.js?v=efff841e3a760375";
-import { createBodygraphRenderer } from "./src/renderer/bodygraph-renderer.js?v=efff841e3a760375";
-import { renderPosterElement } from "./src/renderer/poster-renderer.js?v=efff841e3a760375";
-import { validateBirthSelection } from "./src/app/form-validation.js?v=efff841e3a760375";
-import { canUseRemoteServices, effectiveRemoteConsent, isCapacitorNativeRuntime } from "./src/app/runtime-security.js?v=efff841e3a760375";
-import { getReleaseFeatureAvailability } from "./src/app/release-feature-availability.js?v=efff841e3a760375";
-import { hasSupabaseConfig } from "./src/config/runtime-config.js?v=efff841e3a760375";
-import { createDailyTipPayload, getDailyTip, latestSavedResult, formatDailyTipText } from "./src/app/daily-tip.js?v=efff841e3a760375";
+} from "./human-design-engine.js?v=6a23c0cbd843e00a";
+import { fetchPlaceCandidates, inferTimezoneFromAddress } from "./src/services/location-service.js?v=6a23c0cbd843e00a";
+import { createHumanDesignProfileSnapshot } from "./src/engine/profile-snapshot.js?v=6a23c0cbd843e00a";
+import { DEFAULT_CONSENT, deleteCloudData, recordProductEvent, saveChartToCloud, updateConsent } from "./src/services/backend-service.js?v=6a23c0cbd843e00a";
+import { canUseSystemShare, isEmbeddedBrowser, isMobileDevice, sharePageLink } from "./src/services/sharing-service.js?v=6a23c0cbd843e00a";
+import { readStoredJson, writeStoredJson } from "./src/services/storage-service.js?v=6a23c0cbd843e00a";
+import { createBodygraphRenderer } from "./src/renderer/bodygraph-renderer.js?v=6a23c0cbd843e00a";
+import { renderPosterElement } from "./src/renderer/poster-renderer.js?v=6a23c0cbd843e00a";
+import { validateBirthSelection } from "./src/app/form-validation.js?v=6a23c0cbd843e00a";
+import { canUseRemoteServices, effectiveRemoteConsent, isCapacitorNativeRuntime } from "./src/app/runtime-security.js?v=6a23c0cbd843e00a";
+import { getReleaseFeatureAvailability } from "./src/app/release-feature-availability.js?v=6a23c0cbd843e00a";
+import { hasSupabaseConfig } from "./src/config/runtime-config.js?v=6a23c0cbd843e00a";
+import { createDailyTipPayload, getDailyTip, latestSavedResult, formatDailyTipText } from "./src/app/daily-tip.js?v=6a23c0cbd843e00a";
 
-import { createDailyTipPoster } from "./src/renderer/daily-tip-poster.js?v=efff841e3a760375";
+import { createDailyTipPoster } from "./src/renderer/daily-tip-poster.js?v=6a23c0cbd843e00a";
 
 const publicAppUrl = "https://human-design.wonderelian.com/";
 preloadHumanDesignEngine().catch((error) => {
@@ -825,7 +825,7 @@ let pendingConfirmation = null;
 let pendingHistoryOptOut = null;
 const paintBodygraph = nativeRuntime ? async () => null : createBodygraphRenderer({
   container: graph,
-  templateUrl: "./assets/bodygraph-template.svg?v=efff841e3a760375",
+  templateUrl: "./assets/bodygraph-template.svg?v=6a23c0cbd843e00a",
   centerColors,
   label: "Life Manual BodyGraph",
 });
