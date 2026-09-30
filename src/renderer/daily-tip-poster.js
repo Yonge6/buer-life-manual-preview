@@ -1,4 +1,4 @@
-import { formatDailyTipText } from "../app/daily-tip.js?v=7713a7c2ed40a849";
+import { formatDailyTipText } from "../app/daily-tip.js?v=a1c8f194c45390e3";
 // A standalone text poster: no birth data, chart, or remote render service.
 function loadImage(url) {
   return new Promise((resolve, reject) => {
@@ -36,8 +36,8 @@ export async function createDailyTipPoster({ tip, language, date = new Date() })
   if (!tip) throw new Error('A saved result is required.');
   const [qr, hero, orb] = await Promise.all([
     loadImage(new URL(globalThis.PLUTO_CONFIG?.buerShareQrPath || '../../assets/chart-qr.png', import.meta.url).href),
-    loadImage(new URL('../../assets/companion-growth.webp?v=7713a7c2ed40a849', import.meta.url).href).catch(() => null),
-    loadImage(new URL("../../assets/buer-companion-logo.png?v=7713a7c2ed40a849", import.meta.url).href),
+    loadImage(new URL('../../assets/companion-growth.webp?v=a1c8f194c45390e3', import.meta.url).href).catch(() => null),
+    loadImage(new URL("../../assets/buer-companion-logo.png?v=a1c8f194c45390e3", import.meta.url).href),
     document.fonts.ready,
   ]);
   const chinese = language === 'zh';
@@ -79,7 +79,5 @@ export async function createDailyTipPoster({ tip, language, date = new Date() })
   ctx.fillText((globalThis.PLUTO_CONFIG?.buerPublicUrl || 'https://buer.wonderelian.com/').replace(/^https?:\/\//,'').replace(/\/$/,''), 186, 1250);
   // Preserve the white quiet zone and hard edges for reliable scanning.
   ctx.imageSmoothingEnabled = false; ctx.drawImage(qr, 810, 1164, 190, 190);
-  ctx.font = '19px sans-serif'; ctx.textAlign = 'right';
-  ctx.fillText(chinese ? '扫码，认识自己' : 'Explore your Life Manual', 1000, 1370);
   return new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Image export failed.')), 'image/png'));
 }
