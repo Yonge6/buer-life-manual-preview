@@ -1,1 +1,1 @@
-export { canonicalJson, chartHashPayload, createChartHash } from "../../shared/human-design-profile-contract.js?v=d91d09af5766def7";
+export { canonicalJson, chartHashPayload, createChartHash } from "../../shared/human-design-profile-contract.js?v=bc9f87c3587ad751";
