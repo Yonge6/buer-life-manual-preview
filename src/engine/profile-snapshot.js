@@ -1,8 +1,8 @@
-import { createChartHash } from "./chart-hash.js?v=6526e3628561722a";
-import { ENGINE_VERSION } from "./human-design-engine.js?v=6526e3628561722a";
-import { PROFILE_SCHEMA_VERSION, PROFILE_VERIFICATION } from "../../shared/human-design-profile-contract.js?v=6526e3628561722a";
+import { createChartHash } from "./chart-hash.js?v=dd501809ac3381e6";
+import { ENGINE_VERSION } from "./human-design-engine.js?v=dd501809ac3381e6";
+import { PROFILE_SCHEMA_VERSION, PROFILE_VERIFICATION } from "../../shared/human-design-profile-contract.js?v=dd501809ac3381e6";
 
-export { PROFILE_SCHEMA_VERSION } from "../../shared/human-design-profile-contract.js?v=6526e3628561722a";
+export { PROFILE_SCHEMA_VERSION } from "../../shared/human-design-profile-contract.js?v=dd501809ac3381e6";
 
 const activationNames = {
   Sun: "sun",
