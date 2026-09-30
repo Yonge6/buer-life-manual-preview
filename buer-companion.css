@@ -19,7 +19,7 @@ button,a,input,textarea,select{-webkit-tap-highlight-color:transparent}
 .buer-rail .buer-mark,.buer-rail .rail-foot{display:none}
 .language-switch,.buer-mobile-language{border-radius:12px!important}
 .buer-home,body[data-conversation="empty"] .buer-home{display:block;margin:0 auto;padding:0 24px 56px;max-width:1600px;min-height:0}
-body[data-conversation="empty"] .buer-conversation-column{position:relative;min-height:560px;max-height:none;padding:56px 4% 40px;background:#e4e9da url('assets/brand-companion-hero.webp?v=13e7a134f501c20e') center/cover no-repeat;border-radius:32px;overflow:hidden}
+body[data-conversation="empty"] .buer-conversation-column{position:relative;min-height:560px;max-height:none;padding:56px 4% 40px;background:#e4e9da url('assets/brand-companion-hero.webp?v=f76cf10680858720') center/cover no-repeat;border-radius:32px;overflow:hidden}
 .buer-welcome{background:none;margin:0;padding:20px 0 34px!important;min-height:0;width:65%}
 .buer-welcome h1{font:600 clamp(32px,3.5vw,50px)/1.35 var(--editorial-serif);white-space:normal!important;text-wrap:balance;letter-spacing:0;color:#213a2d}
 .buer-welcome p{font-size:18px;letter-spacing:2px;line-height:1.7;margin-top:16px;color:#3d5746}
@@ -164,7 +164,7 @@ body[data-conversation="empty"] .buer-growth-context,body[data-conversation="emp
 }
 
 /* Smooth the illustration into the hero and keep auxiliary controls compact. */
-@media(min-width:761px){body[data-conversation="empty"] .buer-conversation-column{background-image:linear-gradient(90deg,#e4e9da 20%,transparent 45%),url("assets/brand-companion-hero.webp?v=13e7a134f501c20e")} .buer-welcome h1{font-size:clamp(36px,4.5vw,68px)}}
+@media(min-width:761px){body[data-conversation="empty"] .buer-conversation-column{background-image:linear-gradient(90deg,#e4e9da 20%,transparent 45%),url("assets/brand-companion-hero.webp?v=f76cf10680858720")} .buer-welcome h1{font-size:clamp(36px,4.5vw,68px)}}
 body[data-workspace="manual"] .buer-back-home{width:fit-content;margin-left:max(36px,calc((100vw - 1128px)/2));padding:0 14px}
 @media(max-width:760px){body[data-workspace="manual"] .buer-back-home{margin-left:20px}body[data-conversation="empty"] .buer-compose-zone:not(:has(#buerContextLabel:not([hidden]))) .buer-compose-meta{flex:1 1 auto}}
 
@@ -185,7 +185,7 @@ body dialog.buer-membership .ai-consent-actions .consent-secondary{background:tr
  body[data-conversation="empty"] .buer-conversation-column{background-size:auto 80%;background-position:right bottom}
  body[data-conversation="empty"] .buer-compose-zone{width:52%}
 }
-@media(min-width:761px) and (max-width:1100px){body[data-conversation="empty"] .buer-conversation-column{background-image:linear-gradient(0deg,transparent 94%,#e4e9da 100%),linear-gradient(90deg,#e4e9da 20%,transparent 45%),url("assets/brand-companion-hero.webp?v=13e7a134f501c20e")}}
+@media(min-width:761px) and (max-width:1100px){body[data-conversation="empty"] .buer-conversation-column{background-image:linear-gradient(0deg,transparent 94%,#e4e9da 100%),linear-gradient(90deg,#e4e9da 20%,transparent 45%),url("assets/brand-companion-hero.webp?v=f76cf10680858720")}}
 
 /* Shared control geometry: parent and children use the same sizing contract. */
 .topbar .language-switch{box-sizing:border-box;grid-template-columns:repeat(2,58px);gap:2px;width:auto;height:44px;padding:3px;align-items:center}
@@ -217,6 +217,36 @@ body dialog.buer-membership .ai-consent-actions .consent-secondary{background:tr
 .buer-home,body[data-conversation="empty"] .buer-home,#buerGrowth,#appDrawer,.shell{box-sizing:border-box;width:100%;max-width:var(--buer-page-max);margin-left:auto;margin-right:auto}
 .buer-home,body[data-conversation="empty"] .buer-home{padding-left:var(--buer-page-gutter);padding-right:var(--buer-page-gutter)}
 #appDrawer .side-drawer{width:100%;max-width:none}
+
+/* Shared reading hierarchy for navigation and portfolio cards. */
+:root{--buer-card-title:16px;--buer-card-copy:14px}
+#appDrawer :is(.drawer-nav,.drawer-work-card) strong{font-size:var(--buer-card-title);line-height:1.5}
+#appDrawer :is(.drawer-nav small,.drawer-work-card em,.drawer-work-card small){font-size:var(--buer-card-copy);line-height:1.65;color:#586452}
+#appDrawer .drawer-work-card{padding:20px 18px;align-items:start}
+#appDrawer .drawer-work-index{font-size:12px;line-height:2}
+
+/* A printed field guide, independent of the screen theme. */
+#capture.chart-panel.export-mobile{background:#f4f0e7!important;color:#263c32!important;border-top:8px solid #526649!important;padding-top:30px!important}
+#capture :is(.chart-meta,.interpretation,.celebrity-matches,.properties,.property,.planet-list li,.poster-footer){border-color:#ccd0bf!important}
+#capture :is(#personName,#interpretationText,.planet-list b,.celebrity-card h3,.property,.poster-signature strong){color:#263c32!important}
+#capture :is(.poster-edition,.eyebrow,.side-column>p,.interpretation-title,.celebrity-title,.property b,.celebrity-rank){color:#526649!important}
+#capture :is(#birthLine,.celebrity-card p,.celebrity-note,.celebrity-heading p:last-child,.watermark,.planet-list span,.planet-list i,.qr-block p,.poster-signature p,.poster-signature small,.poster-center-legend){color:#596653!important}
+#capture .planet-list{background:#e7e9dc!important;border-radius:8px}
+#capture .celebrity-card{background:#eeeee3!important;border-color:#ccd0bf!important;color:#263c32!important}
+#capture .chart-frame::before,#capture .chart-frame::after,#capture .chart-graph::before{display:none!important}
+#capture #personName{font-family:Georgia,"Songti SC",serif!important;font-weight:400!important;font-size:38px!important}
+#capture .poster-edition{margin-bottom:20px;letter-spacing:2.4px}
+#capture .poster-signature>img{border-radius:10px}
+#manualChart .preview-stage{background:#e7e9df!important;border-color:#ccd0bf!important;padding:24px 16px}
+#manualChart .chart-preview{box-shadow:0 8px 30px #263c3218}
+#manualChart .media-loading-placeholder{background:#f4f0e7!important}
+#manualChart .result-loading-status{color:#263c32;gap:18px}
+#manualChart .result-loading-companion{width:80px;height:80px;border-radius:20px}
+#manualChart .result-loading-copy strong{display:block;font-size:16px;line-height:1.6}
+#manualChart .result-loading-copy small{display:block;font-size:14px;line-height:1.6;font-weight:400;color:#596653;margin-top:8px}
+#manualChart .loading-orbit{width:24px;height:24px;border-color:#ccd0bf;border-top-color:#526649}
+#manualChart [data-media-state="error"] .result-loading-copy small{display:none}
+@media(max-width:760px){#manualChart .preview-stage{padding:12px 8px}}
 @media(max-width:760px){
  :root{--buer-page-gutter:20px}
  .buer-home,body[data-conversation="empty"] .buer-home{padding-left:var(--buer-page-gutter);padding-right:var(--buer-page-gutter)}

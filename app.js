@@ -1,25 +1,25 @@
-import { initBuerManual } from './src/app/buer-manual.js?v=13e7a134f501c20e';
-import { initBuerGrowth } from "./src/app/buer-growth.js?v=13e7a134f501c20e";
-import { initBuerHome } from "./src/app/buer-home.js?v=13e7a134f501c20e";
+import { initBuerManual } from './src/app/buer-manual.js?v=f76cf10680858720';
+import { initBuerGrowth } from "./src/app/buer-growth.js?v=f76cf10680858720";
+import { initBuerHome } from "./src/app/buer-home.js?v=f76cf10680858720";
 import {
   calculateHumanDesign,
   localToUtcCandidates,
   preloadHumanDesignEngine,
-} from "./human-design-engine.js?v=13e7a134f501c20e";
-import { fetchPlaceCandidates, inferTimezoneFromAddress } from "./src/services/location-service.js?v=13e7a134f501c20e";
-import { createHumanDesignProfileSnapshot } from "./src/engine/profile-snapshot.js?v=13e7a134f501c20e";
-import { DEFAULT_CONSENT, deleteCloudData, recordProductEvent, saveChartToCloud, updateConsent } from "./src/services/backend-service.js?v=13e7a134f501c20e";
-import { canUseSystemShare, isEmbeddedBrowser, isMobileDevice, sharePageLink } from "./src/services/sharing-service.js?v=13e7a134f501c20e";
-import { readStoredJson, writeStoredJson } from "./src/services/storage-service.js?v=13e7a134f501c20e";
-import { createBodygraphRenderer } from "./src/renderer/bodygraph-renderer.js?v=13e7a134f501c20e";
-import { renderPosterElement } from "./src/renderer/poster-renderer.js?v=13e7a134f501c20e";
-import { validateBirthSelection } from "./src/app/form-validation.js?v=13e7a134f501c20e";
-import { canUseRemoteServices, effectiveRemoteConsent, isCapacitorNativeRuntime } from "./src/app/runtime-security.js?v=13e7a134f501c20e";
-import { getReleaseFeatureAvailability } from "./src/app/release-feature-availability.js?v=13e7a134f501c20e";
-import { hasSupabaseConfig } from "./src/config/runtime-config.js?v=13e7a134f501c20e";
-import { createDailyTipPayload, getDailyTip, latestSavedResult, formatDailyTipText } from "./src/app/daily-tip.js?v=13e7a134f501c20e";
+} from "./human-design-engine.js?v=f76cf10680858720";
+import { fetchPlaceCandidates, inferTimezoneFromAddress } from "./src/services/location-service.js?v=f76cf10680858720";
+import { createHumanDesignProfileSnapshot } from "./src/engine/profile-snapshot.js?v=f76cf10680858720";
+import { DEFAULT_CONSENT, deleteCloudData, recordProductEvent, saveChartToCloud, updateConsent } from "./src/services/backend-service.js?v=f76cf10680858720";
+import { canUseSystemShare, isEmbeddedBrowser, isMobileDevice, sharePageLink } from "./src/services/sharing-service.js?v=f76cf10680858720";
+import { readStoredJson, writeStoredJson } from "./src/services/storage-service.js?v=f76cf10680858720";
+import { createBodygraphRenderer } from "./src/renderer/bodygraph-renderer.js?v=f76cf10680858720";
+import { renderPosterElement } from "./src/renderer/poster-renderer.js?v=f76cf10680858720";
+import { validateBirthSelection } from "./src/app/form-validation.js?v=f76cf10680858720";
+import { canUseRemoteServices, effectiveRemoteConsent, isCapacitorNativeRuntime } from "./src/app/runtime-security.js?v=f76cf10680858720";
+import { getReleaseFeatureAvailability } from "./src/app/release-feature-availability.js?v=f76cf10680858720";
+import { hasSupabaseConfig } from "./src/config/runtime-config.js?v=f76cf10680858720";
+import { createDailyTipPayload, getDailyTip, latestSavedResult, formatDailyTipText } from "./src/app/daily-tip.js?v=f76cf10680858720";
 
-import { createDailyTipPoster } from "./src/renderer/daily-tip-poster.js?v=13e7a134f501c20e";
+import { createDailyTipPoster } from "./src/renderer/daily-tip-poster.js?v=f76cf10680858720";
 
 const publicAppUrl = "https://human-design.wonderelian.com/";
 preloadHumanDesignEngine().catch((error) => {
@@ -174,7 +174,7 @@ const copy = {
     locationPlaceholder: "城市、区县或地区", locationSuggestions: "出生地点建议", clockOccurrence: "重复时刻",
     bodygraphLabel: "人生使用说明书图谱",
     firstOccurrence: "第一次出现", secondOccurrence: "第二次出现", attribution: "可直接输入完整地点，无需选择候选。",
-    generate: "免费获取人生使用说明书", generating: "正在生成，请稍候", yourChart: "你的人生使用说明书", emptyChart: "填写出生资料后生成。", editChart: "重新填写", download: "保存图片", share: "分享", previewAlt: "人生使用说明书", strengthsEyebrow: "优势先看", strengthsTitle: "先记住这三点", coreEnergyStrength: "核心能量", decisionStrength: "决策优势", workStyleStrength: "工作方式", buildingResult: "正在整理你的人生说明书…", posterFailed: "图片暂时未生成，你仍可查看优势与详细解读。",
+    generate: "免费获取人生使用说明书", generating: "正在生成，请稍候", yourChart: "你的人生使用说明书", emptyChart: "填写出生资料后生成。", editChart: "重新填写", download: "保存图片", share: "分享", previewAlt: "人生使用说明书", strengthsEyebrow: "优势先看", strengthsTitle: "先记住这三点", coreEnergyStrength: "核心能量", decisionStrength: "决策优势", workStyleStrength: "工作方式", buildingResult: "正在整理你的人生说明书…", buildingResultHint: "正在绘制图谱与整理你的阅读内容", posterFailed: "图片暂时未生成，你仍可查看优势与详细解读。",
     design: "设计", personality: "人格", watermark: "Swiss Ephemeris · 出生前回溯 88° 太阳弧 · True Node", interpretationTitle: "解读", celebrityTitle: "拥有相似基础配置的人物", celebrityBasis: "基于类型、权威、人生角色与定义匹配", celebrityNote: "名人结构参考公开出生资料；相似仅指基础配置，不代表完整图谱、性格、经历或命运相同。", qrLabel: "扫码获取", privacyMode: "隐私模式",
     searchingPlace: "正在搜索地点…", noPlace: "暂未显示候选，仍可直接点击生成人生使用说明书。", placeUnavailable: "搜索建议暂时未加载，仍可直接点击生成人生使用说明书。",
     resolvingPlace: "正在确认地点和当地时间…", placeNeedsDetail: "暂时无法确认这个地点，请补充城市、省/州和国家后再试。", enterName: "请输入姓名。",
@@ -197,7 +197,7 @@ const copy = {
     locationPlaceholder: "City, district or region", locationSuggestions: "Birth location suggestions", clockOccurrence: "Clock occurrence",
     bodygraphLabel: "Life Manual bodygraph",
     firstOccurrence: "First occurrence", secondOccurrence: "Second occurrence", attribution: "Enter the full place directly; selecting a suggestion is optional.",
-    generate: "Get Your Life Manual Free", generating: "Creating your manual…", yourChart: "Your Life Manual", emptyChart: "Enter details to generate.", editChart: "Edit Details", download: "Save Image", share: "Share", previewAlt: "Personal life manual", strengthsEyebrow: "Start with your strengths", strengthsTitle: "Three things to remember", coreEnergyStrength: "Core energy", decisionStrength: "Decision strength", workStyleStrength: "Work style", buildingResult: "Organizing your Life Manual…", posterFailed: "The image is not ready, but your strengths and full reading are available.",
+    generate: "Get Your Life Manual Free", generating: "Creating your manual…", yourChart: "Your Life Manual", emptyChart: "Enter details to generate.", editChart: "Edit Details", download: "Save Image", share: "Share", previewAlt: "Personal life manual", strengthsEyebrow: "Start with your strengths", strengthsTitle: "Three things to remember", coreEnergyStrength: "Core energy", decisionStrength: "Decision strength", workStyleStrength: "Work style", buildingResult: "Organizing your Life Manual…", buildingResultHint: "Drawing your chart and arranging the reading", posterFailed: "The image is not ready, but your strengths and full reading are available.",
     design: "Design", personality: "Personality", watermark: "Swiss Ephemeris · 88° pre-birth solar-arc · True Node", interpretationTitle: "Reading", celebrityTitle: "People with Similar Core Configurations", celebrityBasis: "Matched by type, authority, profile, and definition", celebrityNote: "Celebrity structures use public birth records; similarity means core configuration, not a complete chart, personality, experience, or destiny.", qrLabel: "Scan to get", privacyMode: "Privacy mode",
     searchingPlace: "Searching locations…", noPlace: "No suggestions yet. You can still generate the chart directly.", placeUnavailable: "Suggestions did not load. You can still generate the chart directly.",
     resolvingPlace: "Confirming the place and its local time…", placeNeedsDetail: "We could not confirm this place. Add the city, state or region, and country, then try again.", enterName: "Enter a name.",
@@ -562,7 +562,7 @@ function setGenerationBusy(isBusy) {
 
 function setResultLoadingMessage(key = "buildingResult") {
   resultLoadingKey = key;
-  const label = resultLoadingStatus.querySelector("span:last-child");
+  const label = resultLoadingStatus.querySelector(".result-loading-label");
   label.dataset.i18n = key;
   label.textContent = t(key);
 }
@@ -825,7 +825,7 @@ let pendingConfirmation = null;
 let pendingHistoryOptOut = null;
 const paintBodygraph = nativeRuntime ? async () => null : createBodygraphRenderer({
   container: graph,
-  templateUrl: "./assets/bodygraph-template.svg?v=13e7a134f501c20e",
+  templateUrl: "./assets/bodygraph-template.svg?v=f76cf10680858720",
   centerColors,
   label: "Life Manual BodyGraph",
 });
@@ -1552,6 +1552,7 @@ async function createPosterImage() {
 }
 
 function showFormView() {
+  rememberManualOrigin();
   document.body.dataset.workspace = "manual";
   if (detailDialog.open) detailDialog.close();
   setStatus(null);
@@ -1565,6 +1566,7 @@ function showFormView() {
 }
 
 function showChartView() {
+  rememberManualOrigin();
   document.body.dataset.workspace = "manual";
   formPanel.hidden = true;
   chartResult.hidden = false;
@@ -2317,7 +2319,23 @@ async function shareDailyImage(save) {
 document.querySelector('#saveDailyImage').addEventListener('click', () => shareDailyImage(true));
 document.querySelector('#sendDailyImage').addEventListener('click', () => shareDailyImage(false));
 
+var manualOrigin;
+function rememberManualOrigin() {
+  const workspace = document.body.dataset.workspace || 'home';
+  if (workspace === 'manual') return;
+  manualOrigin = { workspace, scrollY: window.scrollY, focus: document.activeElement };
+}
+
 const buerGrowth = initBuerGrowth({getLanguage:()=>language,openHumanDesign:()=>lastData ? showChartView() : openDailyTipResult(),getReport:()=>lastData || latestSavedResult(historyEntries, appSettings.keepHistory)?.data});
+
+document.querySelector('#buerBackPrevious').addEventListener('click', () => {
+  const origin = manualOrigin || { workspace: 'home', scrollY: 0 };
+  document.body.dataset.workspace = origin.workspace;
+  requestAnimationFrame(() => {
+    origin.focus?.focus({ preventScroll: true });
+    window.scrollTo({ top: origin.scrollY, behavior: 'instant' });
+  });
+});
 
 initBuerHome({
   getLanguage: () => language,
