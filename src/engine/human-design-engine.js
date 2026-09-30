@@ -1,5 +1,5 @@
-import { SwissEphemeris } from "../../vendor/swisseph/swisseph-browser.js?v=bc9f87c3587ad751";
-import { getIncarnationCross } from "../../vendor/natalengine/incarnation-crosses.js?v=bc9f87c3587ad751";
+import { SwissEphemeris } from "../../vendor/swisseph/swisseph-browser.js?v=2e8cb2fabcb57491";
+import { getIncarnationCross } from "../../vendor/natalengine/incarnation-crosses.js?v=2e8cb2fabcb57491";
 
 export const ENGINE_VERSION = "1.0.0";
 
@@ -102,10 +102,10 @@ async function getSwissEphemeris() {
   if (!swePromise) {
     swePromise = (async () => {
       const swe = new SwissEphemeris();
-      await swe.init(new URL("../../vendor/swisseph/swisseph.wasm?v=bc9f87c3587ad751", import.meta.url).href);
+      await swe.init(new URL("../../vendor/swisseph/swisseph.wasm?v=2e8cb2fabcb57491", import.meta.url).href);
       await swe.loadEphemerisFiles(EPHEMERIS_FILES.map((name) => ({
         name,
-        url: new URL(`../../vendor/swisseph/ephe/${name}?v=bc9f87c3587ad751`, import.meta.url).href,
+        url: new URL(`../../vendor/swisseph/ephe/${name}?v=2e8cb2fabcb57491`, import.meta.url).href,
       })));
       return swe;
     })();
