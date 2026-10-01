@@ -1,25 +1,26 @@
-import { initBuerManual } from './src/app/buer-manual.js?v=4681b81621509bf3';
-import { initBuerGrowth } from "./src/app/buer-growth.js?v=4681b81621509bf3";
-import { initBuerHome } from "./src/app/buer-home.js?v=4681b81621509bf3";
+import { trackUsage } from './src/services/buer-analytics.js?v=eeaba9b20d84d2de';
+import { initBuerManual } from './src/app/buer-manual.js?v=eeaba9b20d84d2de';
+import { initBuerGrowth } from "./src/app/buer-growth.js?v=eeaba9b20d84d2de";
+import { initBuerHome } from "./src/app/buer-home.js?v=eeaba9b20d84d2de";
 import {
   calculateHumanDesign,
   localToUtcCandidates,
   preloadHumanDesignEngine,
-} from "./human-design-engine.js?v=4681b81621509bf3";
-import { fetchPlaceCandidates, inferTimezoneFromAddress } from "./src/services/location-service.js?v=4681b81621509bf3";
-import { createHumanDesignProfileSnapshot } from "./src/engine/profile-snapshot.js?v=4681b81621509bf3";
-import { DEFAULT_CONSENT, deleteCloudData, recordProductEvent, saveChartToCloud, updateConsent } from "./src/services/backend-service.js?v=4681b81621509bf3";
-import { canUseSystemShare, isEmbeddedBrowser, isMobileDevice, sharePageLink } from "./src/services/sharing-service.js?v=4681b81621509bf3";
-import { readStoredJson, writeStoredJson } from "./src/services/storage-service.js?v=4681b81621509bf3";
-import { createBodygraphRenderer } from "./src/renderer/bodygraph-renderer.js?v=4681b81621509bf3";
-import { renderPosterElement } from "./src/renderer/poster-renderer.js?v=4681b81621509bf3";
-import { validateBirthSelection } from "./src/app/form-validation.js?v=4681b81621509bf3";
-import { canUseRemoteServices, effectiveRemoteConsent, isCapacitorNativeRuntime } from "./src/app/runtime-security.js?v=4681b81621509bf3";
-import { getReleaseFeatureAvailability } from "./src/app/release-feature-availability.js?v=4681b81621509bf3";
-import { hasSupabaseConfig } from "./src/config/runtime-config.js?v=4681b81621509bf3";
-import { createDailyTipPayload, getDailyTip, latestSavedResult, formatDailyTipText } from "./src/app/daily-tip.js?v=4681b81621509bf3";
+} from "./human-design-engine.js?v=eeaba9b20d84d2de";
+import { fetchPlaceCandidates, inferTimezoneFromAddress } from "./src/services/location-service.js?v=eeaba9b20d84d2de";
+import { createHumanDesignProfileSnapshot } from "./src/engine/profile-snapshot.js?v=eeaba9b20d84d2de";
+import { DEFAULT_CONSENT, deleteCloudData, recordProductEvent, saveChartToCloud, updateConsent } from "./src/services/backend-service.js?v=eeaba9b20d84d2de";
+import { canUseSystemShare, isEmbeddedBrowser, isMobileDevice, sharePageLink } from "./src/services/sharing-service.js?v=eeaba9b20d84d2de";
+import { readStoredJson, writeStoredJson } from "./src/services/storage-service.js?v=eeaba9b20d84d2de";
+import { createBodygraphRenderer } from "./src/renderer/bodygraph-renderer.js?v=eeaba9b20d84d2de";
+import { renderPosterElement } from "./src/renderer/poster-renderer.js?v=eeaba9b20d84d2de";
+import { validateBirthSelection } from "./src/app/form-validation.js?v=eeaba9b20d84d2de";
+import { canUseRemoteServices, effectiveRemoteConsent, isCapacitorNativeRuntime } from "./src/app/runtime-security.js?v=eeaba9b20d84d2de";
+import { getReleaseFeatureAvailability } from "./src/app/release-feature-availability.js?v=eeaba9b20d84d2de";
+import { hasSupabaseConfig } from "./src/config/runtime-config.js?v=eeaba9b20d84d2de";
+import { createDailyTipPayload, getDailyTip, latestSavedResult, formatDailyTipText } from "./src/app/daily-tip.js?v=eeaba9b20d84d2de";
 
-import { createDailyTipPoster } from "./src/renderer/daily-tip-poster.js?v=4681b81621509bf3";
+import { createDailyTipPoster } from "./src/renderer/daily-tip-poster.js?v=eeaba9b20d84d2de";
 
 const publicAppUrl = "https://human-design.wonderelian.com/";
 preloadHumanDesignEngine().catch((error) => {
@@ -825,7 +826,7 @@ let pendingConfirmation = null;
 let pendingHistoryOptOut = null;
 const paintBodygraph = nativeRuntime ? async () => null : createBodygraphRenderer({
   container: graph,
-  templateUrl: "./assets/bodygraph-template.svg?v=4681b81621509bf3",
+  templateUrl: "./assets/bodygraph-template.svg?v=eeaba9b20d84d2de",
   centerColors,
   label: "Life Manual BodyGraph",
 });
@@ -949,7 +950,12 @@ function updateRemoteServiceControls() {
     : "privacyNote";
 }
 
+function trackManualUsage(eventName) {
+  const usageName={chart_generate_started:'manual_request',chart_generate_succeeded:'manual_success',chart_generate_failed:'manual_error'}[eventName];
+  if(usageName)trackUsage(usageName);
+}
 function trackEvent(eventName, properties = {}) {
+  trackManualUsage(eventName);
   if (!remoteServicesAllowed) return;
   recordProductEvent(eventName, properties, currentConsent()).catch((error) => {
     console.warn("Anonymous product event was not sent.", error);
@@ -1509,6 +1515,7 @@ function clearPoster() {
   setMediaState(previewStage, "loading");
   chartResult.removeAttribute("aria-busy");
   downloadButton.disabled = true;
+  trackUsage('share_request');
   shareButton.disabled = true;
   privacyToggle.disabled = false;
   languageButtons.forEach((button) => { button.disabled = false; });
@@ -1524,6 +1531,7 @@ async function createPosterImage() {
   setMediaState(previewStage, "loading");
   chartResult.setAttribute("aria-busy", "true");
   downloadButton.disabled = true;
+  trackUsage('share_request');
   shareButton.disabled = true;
   privacyToggle.disabled = true;
   try {
@@ -2107,6 +2115,7 @@ downloadButton.addEventListener("click", async () => {
 
 shareButton.addEventListener("click", async () => {
   if (!lastData || !posterBlob || !posterUrl) return;
+  trackUsage('share_request');
   shareButton.disabled = true;
   shareLabel.textContent = t("openingShareShort");
   try {
@@ -2124,6 +2133,7 @@ shareButton.addEventListener("click", async () => {
           flashShareLabel(shareLabel, "cancelledShort", "share");
           return;
         }
+        trackUsage('share_success');
         setStatus("shared");
         flashShareLabel(shareLabel, "sharedShort", "share");
         return;
@@ -2138,6 +2148,7 @@ shareButton.addEventListener("click", async () => {
     if (canShareFile(file)) {
       try {
         await navigator.share({ files: [file], title: t("shareTitle"), text: t("shareText") });
+        trackUsage('share_success');
         setStatus("shared");
         flashShareLabel(shareLabel, "sharedShort", "share");
         return;
@@ -2283,6 +2294,7 @@ function showDailyImageHelp(save) {
 }
 async function shareDailyImage(save) {
   if (!dailyShareBlob || dailyShareBusy) return;
+  if (!save) trackUsage('share_request');
   dailyShareBusy = true;
   const status = document.querySelector('#dailyShareStatus');
   try {
@@ -2293,6 +2305,7 @@ async function shareDailyImage(save) {
         ? await nativePlugin.saveImage({ base64, fileName:dailyShareFileName })
         : await nativePlugin.shareImage({ base64, fileName:dailyShareFileName });
       if (result?.completed === false) return;
+      if (!save) trackUsage('share_success');
       status.textContent = save ? dailyShareText('已保存到相册。', 'Saved to Photos.') : dailyShareText('已分享。', 'Shared.');
     } else if (dailyImageNeedsLongPress()) {
       showDailyImageHelp(save);
@@ -2301,6 +2314,7 @@ async function shareDailyImage(save) {
         ? dailyShareText('请在系统面板中选择“存储图像”或保存到相册。', 'Choose Save Image or save to Photos in the system sheet.')
         : dailyShareText('请在系统面板中选择接收图片的应用或联系人。', 'Choose an app or contact to receive the image in the system sheet.');
       await navigator.share({ files:[file], title:dailyShareText('不二见己今日提示', 'Buer Within daily thought') });
+      if (!save) trackUsage('share_success');
     } else {
       const link = document.createElement('a');
       link.download = dailyShareFileName; link.href = dailyShareUrl;
@@ -2311,6 +2325,7 @@ async function shareDailyImage(save) {
     if (error?.name === 'AbortError') {
       status.textContent = dailyShareText('已取消操作，图片仍可长按保存。', 'Cancelled. You can still touch and hold the image to save it.');
     } else {
+      if (!save) trackUsage('share_error');
       status.textContent = dailyShareText('操作未完成，请长按图片保存后发送。', 'Could not finish. Touch and hold the image to save it, then send it.');
       showDailyImageHelp(save);
     }
