@@ -27,7 +27,7 @@ export function accountConfig(config = globalThis.PLUTO_CONFIG || {}) {
 }
 
 export async function createAccount({ config = accountConfig(), native = globalThis.Capacitor?.isNativePlatform?.(),
-  plugin = globalThis.Capacitor?.Plugins?.PlutoNative, loadSDK = () => import('../../vendor/supabase/client.js?v=3125ba23d2cf8b0a'), fetchImpl = globalThis.fetch } = {}) {
+  plugin = globalThis.Capacitor?.Plugins?.PlutoNative, loadSDK = () => import('../../vendor/supabase/client.js?v=92919fea1a3049e9'), fetchImpl = globalThis.fetch } = {}) {
   if (!config) return null;
   if (globalThis.isSecureContext === false && !native) return null;
   const { createClient } = await loadSDK();
@@ -57,7 +57,9 @@ export async function createAccount({ config = accountConfig(), native = globalT
       appleProviderToken = null;
       globalThis.sessionStorage?.removeItem?.('buer-apple-provider-token');
     }
-    if (event === 'TOKEN_REFRESHED' && session?.user.id === user?.id) return;
+    // Supabase emits SIGNED_IN again when a tab regains focus. A verified,
+    // unchanged identity must not discard open forms on every focus event.
+    if (['TOKEN_REFRESHED', 'SIGNED_IN'].includes(event) && user && session?.user.id === user.id) return;
     const epoch = ++authEpoch;
     publish(null);
     if (!session) return;
