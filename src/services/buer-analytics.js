@@ -1,4 +1,4 @@
-import {CONSENT_KEY,usageEvent} from '../../shared/buer-analytics-contract.js?v=2bf2531f896a2c07';
+import {CONSENT_KEY,usageEvent} from '../../shared/buer-analytics-contract.js?v=68b334d0970352c2';
 
 export function createUsage({storage,surface='h5',send,setNativeConsent=async()=>{}}) {
   let enabled=false,epoch=0,ready=Promise.resolve(),lastActive=null;
