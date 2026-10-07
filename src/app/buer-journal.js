@@ -1,5 +1,5 @@
-import { createAccount } from '../services/buer-account.js?v=4dc387c5c919ecd7';
-import { createJournalStore, indexedJournalCache, journalRepository, localDate } from '../services/buer-journal.js?v=4dc387c5c919ecd7';
+import { createAccount } from '../services/buer-account.js?v=87c145d5961b2a07';
+import { createJournalStore, indexedJournalCache, journalRepository, localDate } from '../services/buer-journal.js?v=87c145d5961b2a07';
 
 const copy = {
   zh: { journal: '见己日记', hint: '记录生活，慢慢认识自己', account: '我的账号', accountHint: 'H5 与 App，同一个你',
