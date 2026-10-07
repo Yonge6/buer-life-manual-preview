@@ -1,13 +1,13 @@
-import { relationshipRepository, cleanPerson, relationshipMessages } from '../services/buer-relationships.js?v=87c145d5961b2a07';
-import { calculateHumanDesign, localToUtcCandidates } from '../../human-design-engine.js?v=87c145d5961b2a07';
-import { createHumanDesignProfileSnapshot } from '../engine/profile-snapshot.js?v=87c145d5961b2a07';
-import { readBuerEvents } from '../services/buer-conversation.js?v=87c145d5961b2a07';
-import { ensureAIConsent, chatAccess, showMembership } from './buer-membership.js?v=87c145d5961b2a07';
-import { renderAssistantText } from './buer-message-format.js?v=87c145d5961b2a07';
-import { cleanPersonalContext, SCOPE_KEYS, RELATION_TYPES } from '../services/buer-personal-context.js?v=87c145d5961b2a07';
-import { readGrowth, QUESTIONS } from '../services/buer-growth.js?v=87c145d5961b2a07';
-import { validChatHistory } from '../services/buer-conversation.js?v=87c145d5961b2a07';
-import { fetchPlaceCandidates, inferTimezoneFromAddress } from '../services/location-service.js?v=87c145d5961b2a07';
+import { relationshipRepository, cleanPerson, relationshipMessages } from '../services/buer-relationships.js?v=2bf2531f896a2c07';
+import { calculateHumanDesign, localToUtcCandidates } from '../../human-design-engine.js?v=2bf2531f896a2c07';
+import { createHumanDesignProfileSnapshot } from '../engine/profile-snapshot.js?v=2bf2531f896a2c07';
+import { readBuerEvents } from '../services/buer-conversation.js?v=2bf2531f896a2c07';
+import { ensureAIConsent, chatAccess, showMembership } from './buer-membership.js?v=2bf2531f896a2c07';
+import { renderAssistantText } from './buer-message-format.js?v=2bf2531f896a2c07';
+import { cleanPersonalContext, SCOPE_KEYS, RELATION_TYPES } from '../services/buer-personal-context.js?v=2bf2531f896a2c07';
+import { readGrowth, QUESTIONS } from '../services/buer-growth.js?v=2bf2531f896a2c07';
+import { validChatHistory } from '../services/buer-conversation.js?v=2bf2531f896a2c07';
+import { fetchPlaceCandidates, inferTimezoneFromAddress } from '../services/location-service.js?v=2bf2531f896a2c07';
 
 const el = (tag, text = '', attributes = {}) => {
   const node = document.createElement(tag); node.textContent = text;
@@ -137,7 +137,7 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
     if (!visible.length) cards.append(el('p', l('从一个你在意的人开始。选择关系，填写 TA 的出生信息，就可以聊聊你们之间的事。', 'Start with someone who matters. Choose a relationship and add their birth information.'), { class: 'journal-empty' }));
     content.append(cards);
   }
-  function detail(person){invalidate();reset(person.nickname);if(!dialog.open)dialog.showModal();content.append(el('p',person.relationship),chartSummary(person));if(person.notes)content.append(el('p',person.notes));content.append(button('编辑 TA 的资料','Edit their profile',()=>edit(person,false)),button('聊聊我们的关系','Talk about us',()=>conversation(person),'journal-primary'));}
+  function detail(person){invalidate();reset(person.nickname);if(!dialog.open)dialog.showModal();content.append(el('p',person.relationship),chartSummary(person));if(person.notes)content.append(el('p',person.notes));const actions=el('div','',{class:'relationship-detail-actions'});actions.append(button('编辑 TA 的资料','Edit their profile',()=>edit(person,false)),button('聊聊我们的关系','Talk about us',()=>conversation(person),'journal-primary'));content.append(actions);}
   function edit(person, isSelf) {
     invalidate(); const ticket = epoch, id = person?.id || crypto.randomUUID();
     if(!dialog.open)dialog.showModal();
