@@ -1,19 +1,20 @@
-import { relationshipRepository, cleanPerson, relationshipMessages } from '../services/buer-relationships.js?v=de713d7fc296e3b0';
-import { calculateHumanDesign, localToUtcCandidates } from '../../human-design-engine.js?v=de713d7fc296e3b0';
-import { createHumanDesignProfileSnapshot } from '../engine/profile-snapshot.js?v=de713d7fc296e3b0';
-import { readBuerEvents } from '../services/buer-conversation.js?v=de713d7fc296e3b0';
-import { ensureAIConsent, chatAccess, showMembership } from './buer-membership.js?v=de713d7fc296e3b0';
-import { renderAssistantText, renderReadingText } from './buer-message-format.js?v=de713d7fc296e3b0';
-import { cleanPersonalContext, SCOPE_KEYS, RELATION_TYPES, relationshipScopeDefaults } from '../services/buer-personal-context.js?v=de713d7fc296e3b0';
-import { readGrowth, QUESTIONS } from '../services/buer-growth.js?v=de713d7fc296e3b0';
-import { validChatHistory } from '../services/buer-conversation.js?v=de713d7fc296e3b0';
-import { fetchPlaceCandidates, inferTimezoneFromAddress } from '../services/location-service.js?v=de713d7fc296e3b0';
-import { personManualData } from '../services/buer-person-manual.js?v=de713d7fc296e3b0';
-import { createBodygraphRenderer } from '../renderer/bodygraph-renderer.js?v=de713d7fc296e3b0';
-import { orderedPeople, movePerson, relationshipGuidePrompt } from '../services/buer-people-tools.js?v=de713d7fc296e3b0';
-import {PAIR_SECTIONS,makeGuideSource,cleanGuideSource,parsePairSections,pairManualStale,guideSourceEqual,pairManualPrompt} from '../services/buer-pair-manual.js?v=de713d7fc296e3b0';
-import { loadingPreview } from './buer-loading.js?v=de713d7fc296e3b0';
-import { pairComparisonGroups, comparisonTable } from './buer-pair-comparison.js?v=de713d7fc296e3b0';
+import { relationshipRepository, cleanPerson, relationshipMessages } from '../services/buer-relationships.js?v=5cc9d81665ffbf8a';
+import { calculateHumanDesign, localToUtcCandidates } from '../../human-design-engine.js?v=5cc9d81665ffbf8a';
+import { createHumanDesignProfileSnapshot } from '../engine/profile-snapshot.js?v=5cc9d81665ffbf8a';
+import { readBuerEvents } from '../services/buer-conversation.js?v=5cc9d81665ffbf8a';
+import { ensureAIConsent, chatAccess, showMembership } from './buer-membership.js?v=5cc9d81665ffbf8a';
+import { renderAssistantText, renderReadingText } from './buer-message-format.js?v=5cc9d81665ffbf8a';
+import { cleanPersonalContext, SCOPE_KEYS, RELATION_TYPES, relationshipScopeDefaults } from '../services/buer-personal-context.js?v=5cc9d81665ffbf8a';
+import { readGrowth, QUESTIONS } from '../services/buer-growth.js?v=5cc9d81665ffbf8a';
+import { validChatHistory } from '../services/buer-conversation.js?v=5cc9d81665ffbf8a';
+import { fetchPlaceCandidates, inferTimezoneFromAddress } from '../services/location-service.js?v=5cc9d81665ffbf8a';
+import { personManualData } from '../services/buer-person-manual.js?v=5cc9d81665ffbf8a';
+import { createBodygraphRenderer } from '../renderer/bodygraph-renderer.js?v=5cc9d81665ffbf8a';
+import { orderedPeople, movePerson, relationshipGuidePrompt } from '../services/buer-people-tools.js?v=5cc9d81665ffbf8a';
+import {PAIR_SECTIONS,makeGuideSource,cleanGuideSource,parsePairSections,pairManualStale,guideSourceEqual,pairManualPrompt} from '../services/buer-pair-manual.js?v=5cc9d81665ffbf8a';
+import { loadingPreview } from './buer-loading.js?v=5cc9d81665ffbf8a';
+import { pairComparisonGroups, comparisonTable } from './buer-pair-comparison.js?v=5cc9d81665ffbf8a';
+import { createReadingCache } from '../services/buer-reading-cache.js?v=5cc9d81665ffbf8a';
 
 const el = (tag, text = '', attributes = {}) => {
   const node = document.createElement(tag); node.textContent = text;
@@ -33,6 +34,7 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
   let owner = null, epoch = 0, people = [], busy = false, dirty = false, controller = null, trigger = null;
   let activeThread = null, unsavedThread = null;
   let personal=null,filter='',peopleOrder=null;
+  const readingCache=createReadingCache();
   const root=el('section','',{id:'buerPeople','aria-label':'People in your life'});
   const hero=el('header','',{class:'people-hero companion-section-hero'}),listContent=el('div','',{class:'people-content'});
   root.append(hero,listContent);document.querySelector('#buerHome').after(root);
@@ -129,18 +131,19 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
   function drawList() {
     const content=listContent;content.replaceChildren();
     const actions = el('div', '', { class: 'journal-actions' });
-    actions.append(button('＋ 添加身边的人', '＋ Add someone', () => edit(null, false), 'journal-primary'),button('调整顺序','Adjust order',sortPeople),button('刷新', 'Refresh', list)); content.append(actions);
+    actions.append(button('＋ 添加身边的人', '＋ Add someone', () => edit(null, false), 'journal-primary'),button('调整顺序','Adjust order',sortPeople),button('刷新', 'Refresh', ()=>{readingCache.clear();return list();})); content.append(actions);
     const filters=el('div','',{class:'people-filters',role:'group','aria-label':l('按关系筛选','Filter relationships')});
     for(const [zh,en] of [['',''],...RELATION_TYPES]){const b=button(zh||'全部',en||'All',()=>{filter=zh;drawList();});b.setAttribute('aria-pressed',String(filter===zh));filters.append(b);}content.append(filters);
     const cards = el('div', '', { class: 'journal-list relationship-people' });
     const visible=orderedPeople(people,peopleOrder?.person_ids).filter(p=>!filter||p.relationship===filter||(filter==='其他'&&!RELATION_TYPES.some(([name])=>name===p.relationship)));
     for (const person of visible) {
       const card = el('article', '', { class: 'relationship-person' });
-      card.append(el('span', person.nickname.slice(0, 1), { class: 'relationship-avatar', 'aria-hidden': 'true' }),
+      card.append(
         el('small', person.relationship), el('h3', person.nickname));
       const core=person.chart?.core;card.append(el('p',core?`${chartText(core.type)} · ${core.profile} · ${chartText(core.authority)}`:l('出生时刻待确认 · 也可以先聊聊','Birth time unknown · You can still talk')));
       const controls = el('div', '', { class: 'journal-actions' });
-      controls.append(button('了解 TA', 'About them', () => detail(person)));
+      if(person.chart)controls.append(button('查看说明书', 'View manual', () => manual(person)));
+      controls.append(button('编辑资料', 'Edit profile', () => edit(person,false)));
       controls.append(button('相处指南', 'Relationship guide', () => pairManual(person)));
       if (!person.is_self) controls.append(button('聊聊我们的关系', 'Talk about us', () => conversation(person), 'journal-primary'));
       card.append(controls); cards.append(card);
@@ -148,14 +151,17 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
     if (!visible.length) cards.append(el('p', l('从一个你在意的人开始。选择关系，填写 TA 的出生信息，就可以聊聊你们之间的事。', 'Start with someone who matters. Choose a relationship and add their birth information.'), { class: 'journal-empty' }));
     content.append(cards);
   }
-  async function pairManual(person){
+  async function pairManual(person,force=false){
+    if(force)readingCache.clear();
     invalidate();const ticket=epoch;reset(l(`我与${person.nickname} · 相处说明书`,`Me & ${person.nickname} · Relationship manual`));if(!dialog.open)dialog.showModal();
     let source=null,saved=null,selected='overview',pending=null,otherProperties=null,chartError=null;
+    const remember=()=>{if(valid(ticket)&&!chartError)readingCache.set(owner,person,{source,saved,otherProperties});};
     const localSource=()=>makeGuideSource(getGrowthReport(),readGrowth(localStorage));
     function draw(){
       content.replaceChildren();
-      const actions=el('div','',{class:'journal-actions'});actions.append(button('← 返回人物档案','← Back to profile',()=>detail(person)),button('聊聊我们的关系','Talk about us',()=>conversation(person),'journal-primary'));content.append(actions);
+      const actions=el('div','',{class:'journal-actions'});actions.append(button('← 返回人物列表','← Back to people',list),button('聊聊我们的关系','Talk about us',()=>conversation(person),'journal-primary'));content.append(actions);
       content.append(el('p',l('基础资料直接阅读；个性化解读生成后保存到账号，再次打开不调用 AI。人类图是反思线索，不是关系定论。','Read facts directly. Personalized sections are saved to your account; reopening does not call AI. Chart ideas are reflection prompts, not relationship verdicts.'),{class:'relationship-chat-note'}));
+      content.append(button('重新读取最新版本','Reload latest version',()=>pairManual(person,true)));
       const local=localSource(),snapshot=source?cleanGuideSource(source.payload):local;
       if(source)content.append(el('small',l(`参考成长档案同步于 ${new Date(source.updated_at).toLocaleString()}。`,`Source synced ${new Date(source.updated_at).toLocaleString()}.`)));
       else content.append(el('p',l('下方“我”的信息是本机成长档案预览，尚未同步到当前账号。','Your information below previews this device’s growth profile; it is not yet synced to this account.')));
@@ -196,6 +202,7 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
           const next=sync?localSource():source?.payload;
           if(!next?.chart||!person.chart)throw Error('GUIDE_CHART_REQUIRED');
           if(!await ensureAIConsent()||!valid(ticket))return;
+          readingCache.clear();
           if(sync&&(!source||!guideSourceEqual(next,source.payload))){const row=await repo.saveGuideSource(owner,source?.revision||0,crypto.randomUUID(),next);if(!valid(ticket))return;source=row;}
           const session=await account.client.auth.getSession();if(!valid(ticket))return;
           if(!session.data?.session?.access_token)throw Error('SIGN_IN_REQUIRED');
@@ -211,14 +218,16 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
         status.textContent=l('解读已生成，正在保存到账号…','Reading generated. Saving to your account…');
         phase('保存中…','Saving…');
         const row=await repo.savePairManual(owner,person,source,saved,pending.sections,pending.language,pending.mutation);if(!valid(ticket))return;
-        saved=row;pending=null;dirty=false;status.textContent=l('说明书已保存，下次打开直接阅读。','Saved. Open it next time without generating again.');
+        saved=row;pending=null;dirty=false;remember();status.textContent=l('说明书已保存，下次打开直接阅读。','Saved. Open it next time without generating again.');
       }catch(error){if(valid(ticket))status.textContent=errorMessage(error)+(saved?l(' 旧版说明书仍保留。',' Your previous reading is preserved.'):'');}
       finally{if(valid(ticket)){controller=null;busy=false;draw();}}
     }
+    const cached=force?null:readingCache.get(owner,person);
+    if(cached&&valid(ticket)){({source,saved,otherProperties}=cached);draw();status.textContent=l('已直接显示本次浏览缓存（5 分钟内有效）；可重新读取最新版本。','Showing this session’s cached reading (valid for 5 minutes). Reload for the latest version.');return;}
     busy=true;status.textContent=l('正在读取已保存的说明书…','Loading saved reading…');
     const preview=loadingPreview(l('正在连接账号，读取已保存的内容…','Connecting to your account and loading saved content…'),PAIR_SECTIONS.map(s=>s[getLanguage()==='en'?2:1]));
     content.append(chartSummary(person),preview);
-    try{const rows=await Promise.all([repo.guideSource(owner),repo.pairManual(owner,person.id),personManualData(person).catch(error=>{chartError=error;return null;})]);if(!valid(ticket))return;[source,saved]=rows;otherProperties=rows[2]?.Properties||null;status.textContent='';draw();}
+    try{const rows=await Promise.all([repo.guideSource(owner),repo.pairManual(owner,person.id),personManualData(person).catch(error=>{chartError=error;return null;})]);if(!valid(ticket))return;[source,saved]=rows;otherProperties=rows[2]?.Properties||null;remember();status.textContent='';draw();}
     catch(error){if(valid(ticket)){preview.remove();status.textContent=errorMessage(error);content.append(button('重新读取','Retry',()=>pairManual(person)));}}
     finally{if(ticket===epoch)busy=false;}
   }
@@ -248,10 +257,10 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
     });}
     draw();if(!ids.length)live.textContent=l('先添加身边的人，再来调整顺序。','Add someone first, then adjust the order.');
   }
-  function detail(person){invalidate();reset(person.nickname);if(!dialog.open)dialog.showModal();content.append(el('p',person.relationship),chartSummary(person));if(person.notes)content.append(el('p',person.notes));const actions=el('div','',{class:'relationship-detail-actions'});if(person.chart)actions.append(button('查看 TA 的说明书','View their Life Manual',()=>manual(person)));actions.append(button('编辑 TA 的资料','Edit their profile',()=>edit(person,false)),button('聊聊我们的关系','Talk about us',()=>conversation(person),'journal-primary'));content.append(actions);}
   async function manual(person){
     invalidate();const ticket=epoch;reset(l(`${person.nickname}的说明书`,`${person.nickname}’s Life Manual`));
-    content.append(button('← 返回人物档案','← Back to profile',()=>detail(person)));
+    if(!dialog.open)dialog.showModal();
+    content.append(button('← 返回人物列表','← Back to people',list));
     status.textContent=l('正在整理 TA 的说明书…','Preparing their manual…');
     const preview=loadingPreview(l('正在整理图谱与阅读内容…','Preparing chart and reading…'),[l('概览','Overview'),l('深入解读','In depth'),l('人类图','Human Design')]);content.append(preview);
     try{
@@ -285,7 +294,7 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
       panels[2].append(chartLayout);
       select('overview');content.append(root);
       const colors=Object.fromEntries(['head','ajna','throat','g','heart','sacral','splenic','solar-plexus','root'].map(k=>[`${k}-center`,'#718565']));
-      await createBodygraphRenderer({container:graph,templateUrl:new URL('../../assets/bodygraph-template.svg?v=de713d7fc296e3b0',import.meta.url).href,centerColors:colors,label:l(`${person.nickname}的人类图`,`${person.nickname}’s Human Design`)})(data);
+      await createBodygraphRenderer({container:graph,templateUrl:new URL('../../assets/bodygraph-template.svg?v=5cc9d81665ffbf8a',import.meta.url).href,centerColors:colors,label:l(`${person.nickname}的人类图`,`${person.nickname}’s Human Design`)})(data);
       if(!valid(ticket))return;
       content.append(button('聊聊我们的关系','Talk about us',()=>conversation(person),'journal-primary'));status.textContent='';
     }catch(error){if(valid(ticket)){preview.remove();status.textContent=errorMessage(error);}}
@@ -355,6 +364,7 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
           chart = await createHumanDesignProfileSnapshot({ input: { birthDate: date.value, birthTime: time.value, timezone, locationLabel: location.value }, result });
         }
         if (!valid(ticket)) return;
+        readingCache.clear();
         await repo.save(owner, id, person?.revision || 0, crypto.randomUUID(), cleanPerson({ nickname: nickname.value, relationship: relationship.value, is_self: isSelf, source: person?.source || (isSelf?'self':'entered'),
           birth: { date: date.value, time: time.value, timezone, location: location.value.trim(), certainty: 'known' }, chart, notes: notes.value }));
         if (!valid(ticket)) return; dirty = false; await list();
@@ -364,7 +374,7 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
     if (person) content.append(button('删除人物及相关关系对话', 'Delete profile and its conversations', async () => {
       if (!await askConfirm('删除后，该人物资料及涉及此人的关系对话会从所有设备移除，无法恢复。日记不会被删除。', 'Delete this profile and its relationship conversations from every device? This cannot be undone. Journals are kept.')) return;
       if (!valid(ticket)) return; busy = true;
-      try { await repo.remove(owner, person, crypto.randomUUID()); if (valid(ticket)) { dirty = false; await list(); } }
+      try { readingCache.clear();await repo.remove(owner, person, crypto.randomUUID()); if (valid(ticket)) { dirty = false; await list(); } }
       finally { if (ticket === epoch) busy = false; }
     }, 'journal-danger'));
   }
@@ -403,7 +413,7 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
     invalidate(); const ticket = epoch;
     reset(l('我与','Me & ') + person.nickname);if(!dialog.open)dialog.showModal();
     const controls = el('div', '', { class: 'relationship-chat-toolbar' });
-    controls.append(button('← 返回', '← Back', async () => { if (await mayLeave()) detail(person); }), button('新对话', 'New chat', async () => { if (await mayLeave()) await conversation(person); })); content.append(controls);
+    controls.append(button('← 返回人物列表', '← Back to people', async () => { if (await mayLeave()) await list(); }), button('新对话', 'New chat', async () => { if (await mayLeave()) await conversation(person); })); content.append(controls);
     const pair = el('details', '', { class: 'relationship-context' });pair.append(el('summary', l('对话设置','Chat settings')));
     pair.append(el('p',`${person.relationship} · ${person.chart?.core?`${chartText(person.chart.core.type)} / ${person.chart.core.profile}`:l('暂无精确人类图','No precise chart')}`));
     const allowed=relationshipScopeDefaults(personal),scopes={...allowed};
@@ -482,7 +492,7 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
     if(document.body.dataset.workspace==='people'&&!dialog.open&&!busy)void list(); }
   document.addEventListener('buer:language', language); language();
   document.addEventListener('buer:relationships', () => void open());
-  account?.subscribe(user => { const next = user?.id || null; if (owner === next) return; invalidate(); owner = next; people = [];personal=null;peopleOrder=null; content.replaceChildren();listContent.replaceChildren(); status.textContent = '';dialog.close(); if (document.body.dataset.workspace==='people') void list(); });
+  account?.subscribe(user => { const next = user?.id || null; if (owner === next) return; readingCache.clear();invalidate(); owner = next; people = [];personal=null;peopleOrder=null; content.replaceChildren();listContent.replaceChildren(); status.textContent = '';dialog.close(); if (document.body.dataset.workspace==='people') void list(); });
   window.addEventListener('beforeunload', event => { if (dirty || busy) { event.preventDefault(); event.returnValue = ''; } });
   const viewport = () => { const v = window.visualViewport, follow = v && matchMedia('(max-width:760px)').matches && Math.abs(v.scale-1)<.01; dialog.style.setProperty('--journal-viewport-height', follow ? `${v.height}px` : '100dvh'); dialog.style.setProperty('--journal-viewport-top', follow ? `${v.offsetTop}px` : '0px'); };
   window.visualViewport?.addEventListener('resize', viewport); window.visualViewport?.addEventListener('scroll', viewport); viewport();
