@@ -1,7 +1,7 @@
-import { createAccount } from '../services/buer-account.js?v=cb403477cef1f12c';
-import {workspace,onWorkspaceChange} from '../services/buer-workspace.js?v=cb403477cef1f12c';
-import { loadingPreview } from './buer-loading.js?v=cb403477cef1f12c';
-import { createJournalStore, indexedJournalCache, journalRepository, localDate } from '../services/buer-journal.js?v=cb403477cef1f12c';
+import { createAccount } from '../services/buer-account.js?v=fc2ad42d2a2c83e4';
+import {workspace,onWorkspaceChange} from '../services/buer-workspace.js?v=fc2ad42d2a2c83e4';
+import { loadingPreview } from './buer-loading.js?v=fc2ad42d2a2c83e4';
+import { createJournalStore, indexedJournalCache, journalRepository, localDate } from '../services/buer-journal.js?v=fc2ad42d2a2c83e4';
 
 const copy = {
   zh: { journal: '见己日记', hint: '记录生活，慢慢认识自己', account: '我的账号', accountHint: 'H5 与 App，同一个你',
