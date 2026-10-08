@@ -1,6 +1,6 @@
-import { calculateHumanDesign, localToUtcCandidates } from '../../human-design-engine.js?v=ef5945a57d2cb37d';
-import { createHumanDesignProfileSnapshot } from '../engine/profile-snapshot.js?v=ef5945a57d2cb37d';
-import { validateHumanDesignProfileSnapshot } from '../../shared/human-design-profile-contract.js?v=ef5945a57d2cb37d';
+import { calculateHumanDesign, localToUtcCandidates } from '../../human-design-engine.js?v=cb403477cef1f12c';
+import { createHumanDesignProfileSnapshot } from '../engine/profile-snapshot.js?v=cb403477cef1f12c';
+import { validateHumanDesignProfileSnapshot } from '../../shared/human-design-profile-contract.js?v=cb403477cef1f12c';
 
 // Read-only calculation: never touches the main reading, local history or account.
 export async function personManualData(person) {
