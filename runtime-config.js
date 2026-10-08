@@ -9,7 +9,7 @@ globalThis.PLUTO_CONFIG = Object.freeze({
   "buerPublicUrl": "https://buer.wonderelian.com/",
   "buerShareQrPath": "../../assets/buer-preview-qr.png",
   "appVersion": "1.1.0",
-  "gitCommit": "7d68f5781d0bde0da0b483e1d97866762596ae0b",
-  "buildDate": "2026-10-08T02:59:15.689Z",
+  "gitCommit": "da496ac0f494b11f87e37f6b4fd745a8dc34a231",
+  "buildDate": "2026-10-08T03:07:45.248Z",
   "environment": "preview"
 });

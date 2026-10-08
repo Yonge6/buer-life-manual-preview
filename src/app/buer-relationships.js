@@ -1,18 +1,19 @@
-import { relationshipRepository, cleanPerson, relationshipMessages } from '../services/buer-relationships.js?v=442cca3a8776b2af';
-import { calculateHumanDesign, localToUtcCandidates } from '../../human-design-engine.js?v=442cca3a8776b2af';
-import { createHumanDesignProfileSnapshot } from '../engine/profile-snapshot.js?v=442cca3a8776b2af';
-import { readBuerEvents } from '../services/buer-conversation.js?v=442cca3a8776b2af';
-import { ensureAIConsent, chatAccess, showMembership } from './buer-membership.js?v=442cca3a8776b2af';
-import { renderAssistantText } from './buer-message-format.js?v=442cca3a8776b2af';
-import { cleanPersonalContext, SCOPE_KEYS, RELATION_TYPES, relationshipScopeDefaults } from '../services/buer-personal-context.js?v=442cca3a8776b2af';
-import { readGrowth, QUESTIONS } from '../services/buer-growth.js?v=442cca3a8776b2af';
-import { validChatHistory } from '../services/buer-conversation.js?v=442cca3a8776b2af';
-import { fetchPlaceCandidates, inferTimezoneFromAddress } from '../services/location-service.js?v=442cca3a8776b2af';
-import { personManualData } from '../services/buer-person-manual.js?v=442cca3a8776b2af';
-import { createBodygraphRenderer } from '../renderer/bodygraph-renderer.js?v=442cca3a8776b2af';
-import { orderedPeople, movePerson, relationshipGuidePrompt } from '../services/buer-people-tools.js?v=442cca3a8776b2af';
-import {PAIR_SECTIONS,makeGuideSource,cleanGuideSource,parsePairSections,pairManualStale,guideSourceEqual,pairManualPrompt} from '../services/buer-pair-manual.js?v=442cca3a8776b2af';
-import { loadingPreview } from './buer-loading.js?v=442cca3a8776b2af';
+import { relationshipRepository, cleanPerson, relationshipMessages } from '../services/buer-relationships.js?v=a427f5f1edfeedfb';
+import { calculateHumanDesign, localToUtcCandidates } from '../../human-design-engine.js?v=a427f5f1edfeedfb';
+import { createHumanDesignProfileSnapshot } from '../engine/profile-snapshot.js?v=a427f5f1edfeedfb';
+import { readBuerEvents } from '../services/buer-conversation.js?v=a427f5f1edfeedfb';
+import { ensureAIConsent, chatAccess, showMembership } from './buer-membership.js?v=a427f5f1edfeedfb';
+import { renderAssistantText } from './buer-message-format.js?v=a427f5f1edfeedfb';
+import { cleanPersonalContext, SCOPE_KEYS, RELATION_TYPES, relationshipScopeDefaults } from '../services/buer-personal-context.js?v=a427f5f1edfeedfb';
+import { readGrowth, QUESTIONS } from '../services/buer-growth.js?v=a427f5f1edfeedfb';
+import { validChatHistory } from '../services/buer-conversation.js?v=a427f5f1edfeedfb';
+import { fetchPlaceCandidates, inferTimezoneFromAddress } from '../services/location-service.js?v=a427f5f1edfeedfb';
+import { personManualData } from '../services/buer-person-manual.js?v=a427f5f1edfeedfb';
+import { createBodygraphRenderer } from '../renderer/bodygraph-renderer.js?v=a427f5f1edfeedfb';
+import { orderedPeople, movePerson, relationshipGuidePrompt } from '../services/buer-people-tools.js?v=a427f5f1edfeedfb';
+import {PAIR_SECTIONS,makeGuideSource,cleanGuideSource,parsePairSections,pairManualStale,guideSourceEqual,pairManualPrompt} from '../services/buer-pair-manual.js?v=a427f5f1edfeedfb';
+import { loadingPreview } from './buer-loading.js?v=a427f5f1edfeedfb';
+import { pairComparisonGroups, comparisonTable } from './buer-pair-comparison.js?v=a427f5f1edfeedfb';
 
 const el = (tag, text = '', attributes = {}) => {
   const node = document.createElement(tag); node.textContent = text;
@@ -152,8 +153,6 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
     invalidate();const ticket=epoch;reset(l(`我与${person.nickname} · 相处说明书`,`Me & ${person.nickname} · Relationship manual`));if(!dialog.open)dialog.showModal();
     let source=null,saved=null,selected='overview',pending=null;
     const localSource=()=>makeGuideSource(getGrowthReport(),readGrowth(localStorage));
-    const labels={Type:'类型',Strategy:'策略','Inner Authority':'内在权威',Profile:'人生角色',Definition:'定义','Incarnation Cross':'轮回交叉',Sign:'标志','Not Self Theme':'非自己主题',Digestion:'消化',Sense:'感知',Environment:'环境'};
-    const fmt=c=>c?Object.entries(c).filter(([,v])=>v).map(([k,v])=>`${l(labels[k]||k,k)} · ${chartText(translateValue(k,v))}`).join('\n'):l('尚未建立人类图','No chart yet');
     function draw(){
       content.replaceChildren();
       const actions=el('div','',{class:'journal-actions'});actions.append(button('← 返回人物档案','← Back to profile',()=>detail(person)),button('聊聊我们的关系','Talk about us',()=>conversation(person),'journal-primary'));content.append(actions);
@@ -169,14 +168,11 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
       const pane=el('section','',{class:'pair-manual-reading'});content.append(pane);
       pane.append(el('h3',PAIR_SECTIONS.find(s=>s[0]===selected)[getLanguage()==='en'?2:1]));
       if(selected==='overview'){
-        const cards=el('div','',{class:'pair-manual-facts'});
-        const me=el('article');me.append(el('h4',l('我 · 成长档案','Me · Growth profile')),el('p',fmt(snapshot.chart?.core)));
-        const other=el('article');other.append(el('h4',person.nickname),el('p',person.relationship),el('p',fmt(person.chart?.core?{'Type':person.chart.core.type,'Strategy':person.chart.core.strategy,'Inner Authority':person.chart.core.authority,'Profile':person.chart.core.profile,'Definition':person.chart.core.definition,'Incarnation Cross':person.chart.core.incarnationCross}:null)));cards.append(me,other);pane.append(cards);
+        const options={language:getLanguage(),otherName:person.nickname};
+        const groups=pairComparisonGroups(snapshot.chart,person.chart,{...options,translate:(key,value)=>chartText(translateValue(key,value))});
+        pane.append(comparisonTable(groups[0],options));
         const charts=el('details');charts.append(el('summary',l('双方图谱基础信息 · 中心、通道与行星','Chart details · centers, channels & planets')));
-        charts.append(el('h4',l('我的图谱','My chart')),el('p',l('已定义中心：','Defined centers: ')+(snapshot.chart?.centers||[]).map(chartText).join(' · ')),el('p',l('通道：','Channels: ')+(snapshot.chart?.channels||[]).map(c=>c.join('–')).join(' · ')));
-        for(const [key,zh,en] of [['design','设计','Design'],['personality','人格','Personality']])charts.append(el('p',l(zh,en)+'\n'+Object.entries(snapshot.chart?.[key]||{}).map(([k,v])=>`${k} · ${v.Gate}.${v.Line}`).join(' · ')));
-        charts.append(el('h4',person.nickname),el('p',l('已定义中心：','Defined centers: ')+(person.chart?.structure?.definedCenters||[]).map(chartText).join(' · ')),el('p',l('通道：','Channels: ')+(person.chart?.structure?.channels||[]).map(c=>c.join('–')).join(' · ')));
-        for(const [key,zh,en] of [['design','设计','Design'],['personality','人格','Personality']])charts.append(el('p',l(zh,en)+'\n'+Object.entries(person.chart?.activations?.[key]||{}).map(([k,v])=>`${k} · ${v.gate}.${v.line}`).join(' · ')));
+        for(const group of groups.slice(1))charts.append(comparisonTable(group,options));
         pane.append(charts);
       }
       if(saved?.sections?.[selected]){const reading=el('div','',{class:'pair-manual-prose'});renderAssistantText(reading,saved.sections[selected]);pane.append(reading);}
@@ -285,7 +281,7 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
       panels[2].append(chartLayout);
       select('overview');content.append(root);
       const colors=Object.fromEntries(['head','ajna','throat','g','heart','sacral','splenic','solar-plexus','root'].map(k=>[`${k}-center`,'#718565']));
-      await createBodygraphRenderer({container:graph,templateUrl:new URL('../../assets/bodygraph-template.svg?v=442cca3a8776b2af',import.meta.url).href,centerColors:colors,label:l(`${person.nickname}的人类图`,`${person.nickname}’s Human Design`)})(data);
+      await createBodygraphRenderer({container:graph,templateUrl:new URL('../../assets/bodygraph-template.svg?v=a427f5f1edfeedfb',import.meta.url).href,centerColors:colors,label:l(`${person.nickname}的人类图`,`${person.nickname}’s Human Design`)})(data);
       if(!valid(ticket))return;
       content.append(button('聊聊我们的关系','Talk about us',()=>conversation(person),'journal-primary'));status.textContent='';
     }catch(error){if(valid(ticket)){preview.remove();status.textContent=errorMessage(error);}}
