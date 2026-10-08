@@ -1,6 +1,6 @@
-import { validateHumanDesignProfileSnapshot } from '../../shared/human-design-profile-contract.js?v=3ce1d8cf8282f43d';
-import { cleanPersonalContext } from './buer-personal-context.js?v=3ce1d8cf8282f43d';
-import { ageContext } from './buer-age.js?v=3ce1d8cf8282f43d';
+import { validateHumanDesignProfileSnapshot } from '../../shared/human-design-profile-contract.js?v=fd8d4277dad7b6ea';
+import { cleanPersonalContext } from './buer-personal-context.js?v=fd8d4277dad7b6ea';
+import { ageContext } from './buer-age.js?v=fd8d4277dad7b6ea';
 
 export const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 export const PERSON_SOURCES = ['self', 'permission', 'confirmed', 'guardian', 'entered'];
@@ -57,6 +57,11 @@ export function relationshipRepository(account) {
     if (error) throw error; return Array.isArray(data) ? data[0] : data;
   }
   return {
+    async order(owner) {
+      check(owner);const {data,error}=await client.from('buer_people_order').select('*').eq('user_id',owner).limit(1);
+      check(owner);if(error)throw error;return data[0]||null;
+    },
+    saveOrder(owner,revision,mutation,ids) {return rpc('buer_save_people_order',{expected_revision:revision,mutation,ordered_ids:ids},owner);},
     async personal(owner) {
       check(owner);const {data,error}=await client.from('buer_personal_context').select('*').eq('user_id',owner).limit(1);
       check(owner);if(error)throw error;return data[0]||null;
