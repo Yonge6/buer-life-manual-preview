@@ -19,7 +19,7 @@ button,a,input,textarea,select{-webkit-tap-highlight-color:transparent}
 .buer-rail .buer-mark,.buer-rail .rail-foot{display:none}
 .language-switch,.buer-mobile-language{border-radius:12px!important}
 .buer-home,body[data-conversation="empty"] .buer-home{display:block;margin:0 auto;padding:0 24px 56px;max-width:1600px;min-height:0}
-body[data-conversation="empty"] .buer-conversation-column{position:relative;min-height:560px;max-height:none;padding:56px 4% 40px;background:#e4e9da url('assets/brand-companion-hero.webp?v=b3dfb023c3928508') center/cover no-repeat;border-radius:32px;overflow:hidden}
+body[data-conversation="empty"] .buer-conversation-column{position:relative;min-height:560px;max-height:none;padding:56px 4% 40px;background:#e4e9da url('assets/brand-companion-hero.webp?v=69c74bfdb6c11b00') center/cover no-repeat;border-radius:32px;overflow:hidden}
 .buer-welcome{background:none;margin:0;padding:20px 0 34px!important;min-height:0;width:65%}
 .buer-welcome h1{font:600 clamp(32px,3.5vw,50px)/1.35 var(--editorial-serif);white-space:normal!important;text-wrap:balance;letter-spacing:0;color:#213a2d}
 .buer-welcome p{font-size:18px;letter-spacing:2px;line-height:1.7;margin-top:16px;color:#3d5746}
@@ -170,7 +170,7 @@ body[data-conversation="empty"] .buer-growth-context,body[data-conversation="emp
 }
 
 /* Smooth the illustration into the hero and keep auxiliary controls compact. */
-@media(min-width:761px){body[data-conversation="empty"] .buer-conversation-column{background-image:linear-gradient(90deg,#e4e9da 20%,transparent 45%),url("assets/brand-companion-hero.webp?v=b3dfb023c3928508")} .buer-welcome h1{font-size:clamp(36px,4.5vw,68px)}}
+@media(min-width:761px){body[data-conversation="empty"] .buer-conversation-column{background-image:linear-gradient(90deg,#e4e9da 20%,transparent 45%),url("assets/brand-companion-hero.webp?v=69c74bfdb6c11b00")} .buer-welcome h1{font-size:clamp(36px,4.5vw,68px)}}
 body[data-workspace="manual"] .buer-back-home{width:fit-content;margin-left:max(36px,calc((100vw - 1128px)/2));padding:0 14px}
 @media(max-width:760px){body[data-workspace="manual"] .buer-back-home{margin-left:20px}body[data-conversation="empty"] .buer-compose-zone:not(:has(#buerContextLabel:not([hidden]))) .buer-compose-meta{flex:1 1 auto}}
 
@@ -191,7 +191,7 @@ body dialog.buer-membership .ai-consent-actions .consent-secondary{background:tr
  body[data-conversation="empty"] .buer-conversation-column{background-size:auto 80%;background-position:right bottom}
  body[data-conversation="empty"] .buer-compose-zone{width:52%}
 }
-@media(min-width:761px) and (max-width:1100px){body[data-conversation="empty"] .buer-conversation-column{background-image:linear-gradient(0deg,transparent 94%,#e4e9da 100%),linear-gradient(90deg,#e4e9da 20%,transparent 45%),url("assets/brand-companion-hero.webp?v=b3dfb023c3928508")}}
+@media(min-width:761px) and (max-width:1100px){body[data-conversation="empty"] .buer-conversation-column{background-image:linear-gradient(0deg,transparent 94%,#e4e9da 100%),linear-gradient(90deg,#e4e9da 20%,transparent 45%),url("assets/brand-companion-hero.webp?v=69c74bfdb6c11b00")}}
 
 /* Shared control geometry: parent and children use the same sizing contract. */
 .topbar .language-switch{box-sizing:border-box;grid-template-columns:repeat(2,58px);gap:2px;width:auto;height:44px;padding:3px;align-items:center}
@@ -200,21 +200,21 @@ body dialog.buer-membership .ai-consent-actions .consent-secondary{background:tr
 #buerHome .buer-context-option input[type="checkbox"]{margin:0;align-self:center;flex:0 0 17px;vertical-align:middle}
 #buerHome .buer-context-option>span{line-height:20px;margin:0}
 /* Companion headers share structure, type and spacing across Growth and Me. */
-#buerGrowth .companion-section-hero,#appDrawer .companion-section-hero{position:relative;isolation:isolate;min-height:300px;padding:40px 34% 40px 40px;border:0;border-radius:28px;overflow:hidden;margin:0 0 28px;background:#e4e9da}
-#buerGrowth .companion-section-hero,#appDrawer .companion-section-hero{background:#e4e9da url('assets/companion-landscape.svg?v=b3dfb023c3928508') center/100% 100% no-repeat}
+:is(#buerGrowth,#buerPeople) .companion-section-hero,#appDrawer .companion-section-hero{position:relative;isolation:isolate;min-height:300px;padding:40px 34% 40px 40px;border:0;border-radius:28px;overflow:hidden;margin:0 0 28px;background:#e4e9da}
+:is(#buerGrowth,#buerPeople) .companion-section-hero,#appDrawer .companion-section-hero{background:#e4e9da url('assets/companion-landscape.svg?v=69c74bfdb6c11b00') center/100% 100% no-repeat}
 .companion-section-art{position:absolute;right:18px;bottom:6px;width:30%;height:calc(100% - 12px);object-fit:contain;pointer-events:none;user-select:none}
-#buerGrowth .companion-section-hero .growth-eyebrow,#appDrawer .companion-section-hero .drawer-kicker{font-size:11px;line-height:1.6;letter-spacing:2px;margin:0 0 20px;color:#5c6959}
-#buerGrowth .companion-section-hero h1,#appDrawer .companion-section-hero h3{font:500 clamp(30px,3vw,44px)/1.4 var(--editorial-serif);letter-spacing:0;text-wrap:balance;margin:0 0 18px;color:#263a30}
-#buerGrowth .companion-section-hero>p:last-of-type,#appDrawer .companion-section-hero>p{font-size:15px;font-weight:400;line-height:1.85;margin:0;color:#4e6152}
+:is(#buerGrowth,#buerPeople) .companion-section-hero .growth-eyebrow,#appDrawer .companion-section-hero .drawer-kicker{font-size:11px;line-height:1.6;letter-spacing:2px;margin:0 0 20px;color:#5c6959}
+:is(#buerGrowth,#buerPeople) .companion-section-hero h1,#appDrawer .companion-section-hero h3{font:500 clamp(30px,3vw,44px)/1.4 var(--editorial-serif);letter-spacing:0;text-wrap:balance;margin:0 0 18px;color:#263a30}
+:is(#buerGrowth,#buerPeople) .companion-section-hero>p:last-of-type,#appDrawer .companion-section-hero>p{font-size:15px;font-weight:400;line-height:1.85;margin:0;color:#4e6152}
 #appDrawer:has(#drawerHome:not([hidden])) .drawer-header{display:none;margin:0}
 @media(max-width:760px){
- #buerGrowth .companion-section-hero,#appDrawer .companion-section-hero{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:12px;min-height:0;padding:24px 20px;border-radius:22px;margin-bottom:22px}
- #buerGrowth .companion-section-hero .growth-eyebrow,#appDrawer .companion-section-hero .drawer-kicker{grid-column:1/-1;margin:0;font-size:10px;letter-spacing:1.3px}
- #buerGrowth .companion-section-hero h1,#appDrawer .companion-section-hero h3{grid-column:1/-1;margin:0;font-size:28px;line-height:1.4;text-wrap:pretty}
- #buerGrowth .companion-section-hero>p:last-of-type,#appDrawer .companion-section-hero>p{grid-column:1;grid-row:3;font-size:13px;line-height:1.8;align-self:center}
+ :is(#buerGrowth,#buerPeople) .companion-section-hero,#appDrawer .companion-section-hero{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:12px;min-height:0;padding:24px 20px;border-radius:22px;margin-bottom:22px}
+ :is(#buerGrowth,#buerPeople) .companion-section-hero .growth-eyebrow,#appDrawer .companion-section-hero .drawer-kicker{grid-column:1/-1;margin:0;font-size:10px;letter-spacing:1.3px}
+ :is(#buerGrowth,#buerPeople) .companion-section-hero h1,#appDrawer .companion-section-hero h3{grid-column:1/-1;margin:0;font-size:28px;line-height:1.4;text-wrap:pretty}
+ :is(#buerGrowth,#buerPeople) .companion-section-hero>p:last-of-type,#appDrawer .companion-section-hero>p{grid-column:1;grid-row:3;font-size:13px;line-height:1.8;align-self:center}
  .companion-section-art{position:static;grid-column:2;grid-row:3;width:132px;height:150px;margin:0 -6px;align-self:end;object-fit:contain}
 }
-#buerGrowth .companion-section-hero{width:100%;max-width:none;box-sizing:border-box}
+:is(#buerGrowth,#buerPeople) .companion-section-hero{width:100%;max-width:none;box-sizing:border-box}
 /* Keep mobile Safari's native picker, but render its value in one bounded shell. */
 .native-birth-icon{display:none}
 @media(max-width:760px){
@@ -232,16 +232,16 @@ body dialog.buer-membership .ai-consent-actions .consent-secondary{background:tr
 /* Shared typography and motion, anchored to the Home tab. */
 :root{--companion-heading-ink:#213a2d;--companion-copy-ink:#3d5746;--companion-meta-ink:#5c6959;--companion-body-font:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;--companion-enter-duration:.7s}
 #buerHome,#buerGrowth,#appDrawer{font-family:var(--companion-body-font)}
-.buer-welcome h1,#buerGrowth .companion-section-hero h1,#appDrawer .companion-section-hero h3{font-family:var(--editorial-serif);font-weight:600;line-height:1.35;letter-spacing:0;color:var(--companion-heading-ink);text-shadow:none}
-.buer-welcome p,#buerGrowth .companion-section-hero>p:last-of-type,#appDrawer .companion-section-hero>p{font-family:var(--companion-body-font);font-weight:400;color:var(--companion-copy-ink);font-size:18px;line-height:1.7;letter-spacing:2px}
-#buerGrowth .companion-section-hero .growth-eyebrow,#appDrawer .companion-section-hero .drawer-kicker{font-family:var(--companion-body-font);font-weight:600;color:var(--companion-meta-ink)!important}
+.buer-welcome h1,:is(#buerGrowth,#buerPeople) .companion-section-hero h1,#appDrawer .companion-section-hero h3{font-family:var(--editorial-serif);font-weight:600;line-height:1.35;letter-spacing:0;color:var(--companion-heading-ink);text-shadow:none}
+.buer-welcome p,:is(#buerGrowth,#buerPeople) .companion-section-hero>p:last-of-type,#appDrawer .companion-section-hero>p{font-family:var(--companion-body-font);font-weight:400;color:var(--companion-copy-ink);font-size:18px;line-height:1.7;letter-spacing:2px}
+:is(#buerGrowth,#buerPeople) .companion-section-hero .growth-eyebrow,#appDrawer .companion-section-hero .drawer-kicker{font-family:var(--companion-body-font);font-weight:600;color:var(--companion-meta-ink)!important}
 #appDrawer .companion-section-hero h3{color:var(--companion-heading-ink)!important}
 #appDrawer .companion-section-hero>p{color:var(--companion-copy-ink)!important}
 #buerGrowth :is(h2,h3),#appDrawer :is(h3,h4){font-family:var(--editorial-serif);color:var(--companion-heading-ink)}
-@media(max-width:760px){.buer-welcome h1,#buerGrowth .companion-section-hero h1,#appDrawer .companion-section-hero h3{font-size:29px}#buerHome .buer-welcome p,#buerGrowth .companion-section-hero>p:last-of-type,#appDrawer .companion-section-hero>p{font-size:14px;line-height:1.7;letter-spacing:0}html[lang="en"] #buerHome .buer-welcome h1,html[lang="en"] #buerGrowth .companion-section-hero h1,html[lang="en"] #appDrawer .companion-section-hero h3{font-size:24px;line-height:1.35}}
-@media(max-width:400px){.buer-welcome h1,#buerGrowth .companion-section-hero h1,#appDrawer .companion-section-hero h3{font-size:26px}}
-@media(prefers-reduced-motion:no-preference){.buer-welcome{animation:buer-enter var(--companion-enter-duration) ease both}#buerGrowth .companion-section-hero>:not(img),#appDrawer .companion-section-hero>:not(img){animation:buer-enter var(--companion-enter-duration) ease both}}
-@media(prefers-reduced-motion:reduce){.buer-welcome,#buerGrowth .companion-section-hero>:not(img),#appDrawer .companion-section-hero>:not(img){animation:none!important;transition:none!important}}
+@media(max-width:760px){.buer-welcome h1,:is(#buerGrowth,#buerPeople) .companion-section-hero h1,#appDrawer .companion-section-hero h3{font-size:29px}#buerHome .buer-welcome p,:is(#buerGrowth,#buerPeople) .companion-section-hero>p:last-of-type,#appDrawer .companion-section-hero>p{font-size:14px;line-height:1.7;letter-spacing:0}html[lang="en"] #buerHome .buer-welcome h1,html[lang="en"] :is(#buerGrowth,#buerPeople) .companion-section-hero h1,html[lang="en"] #appDrawer .companion-section-hero h3{font-size:24px;line-height:1.35}}
+@media(max-width:400px){.buer-welcome h1,:is(#buerGrowth,#buerPeople) .companion-section-hero h1,#appDrawer .companion-section-hero h3{font-size:26px}}
+@media(prefers-reduced-motion:no-preference){.buer-welcome{animation:buer-enter var(--companion-enter-duration) ease both}:is(#buerGrowth,#buerPeople) .companion-section-hero>:not(img),#appDrawer .companion-section-hero>:not(img){animation:buer-enter var(--companion-enter-duration) ease both}}
+@media(prefers-reduced-motion:reduce){.buer-welcome,:is(#buerGrowth,#buerPeople) .companion-section-hero>:not(img),#appDrawer .companion-section-hero>:not(img){animation:none!important;transition:none!important}}
 /* About and Contact use the same readable scale as the main workspace. */
 #appDrawer :is(#drawerAbout,#drawerContact){font-size:16px;line-height:1.85}
 #appDrawer :is(#drawerAbout,#drawerContact) p{font-size:16px;line-height:1.85;margin-top:16px}
@@ -260,15 +260,15 @@ body dialog.buer-membership .ai-consent-actions .consent-secondary{background:tr
 #buerChatForm .buer-compose-bottom{min-width:0;max-width:100%}
 #buerChatForm .buer-suggestions{display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;max-width:100%;min-width:0;padding-bottom:10px;scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:#92a483 transparent;overscroll-behavior-x:contain}
 #buerChatForm .buer-suggestions button{flex:0 0 auto;white-space:nowrap;scroll-snap-align:start;font-size:14px}
-@media(max-width:400px){body[data-conversation="empty"] .buer-conversation-column{background-image:linear-gradient(90deg,#e4e9da 10%,#e4e9dae8 38%,transparent 72%),url('assets/brand-companion-hero.webp?v=b3dfb023c3928508');background-size:100% 260px,auto 230px;background-position:left top,right 20px}.buer-welcome h1{font-size:26px}.buer-welcome p{font-size:12px;line-height:1.7}}
+@media(max-width:400px){body[data-conversation="empty"] .buer-conversation-column{background-image:linear-gradient(90deg,#e4e9da 10%,#e4e9dae8 38%,transparent 72%),url('assets/brand-companion-hero.webp?v=69c74bfdb6c11b00');background-size:100% 260px,auto 230px;background-position:left top,right 20px}.buer-welcome h1{font-size:26px}.buer-welcome p{font-size:12px;line-height:1.7}}
 /* Home keeps room for composing; information-page heroes stay compact. */
 :root{--buer-landing-height:640px}
-body[data-conversation="empty"] .buer-conversation-column,#buerGrowth .companion-section-hero,#appDrawer .companion-section-hero{box-sizing:border-box;min-height:var(--buer-landing-height);height:var(--buer-landing-height)}
-@media(min-width:761px){.companion-section-art{width:42%;height:85%;right:18px;bottom:12px}#buerGrowth .companion-section-hero,#appDrawer .companion-section-hero{padding:76px 43% 40px 40px}}
-@media(max-width:760px){:root{--buer-landing-height:600px}#buerGrowth .companion-section-hero,#appDrawer .companion-section-hero{grid-template-rows:auto auto 1fr;align-content:start}.companion-section-art{height:240px;width:150px}html[lang="en"] .buer-welcome{width:58%}html[lang="en"] .buer-welcome h1{font-size:24px;hyphens:auto;overflow-wrap:anywhere}}
-#buerGrowth .companion-section-hero,#appDrawer .companion-section-hero{height:360px;min-height:360px}
-@media(min-width:761px){#buerGrowth .companion-section-hero,#appDrawer .companion-section-hero{padding:48px 34% 36px 40px}.companion-section-art{width:30%;height:calc(100% - 24px)}}
-@media(max-width:760px){body[data-conversation="empty"] .buer-conversation-column{height:auto;min-height:0;padding-bottom:20px}#buerGrowth .companion-section-hero,#appDrawer .companion-section-hero{height:auto;min-height:0;grid-template-columns:minmax(0,1fr) 96px;grid-template-rows:auto auto auto;gap:10px;padding:20px}.companion-section-art{width:104px;height:104px;margin:0 -4px}#buerGrowth .companion-section-hero>p:last-of-type,#appDrawer .companion-section-hero>p{align-self:start}}
+body[data-conversation="empty"] .buer-conversation-column,:is(#buerGrowth,#buerPeople) .companion-section-hero,#appDrawer .companion-section-hero{box-sizing:border-box;min-height:var(--buer-landing-height);height:var(--buer-landing-height)}
+@media(min-width:761px){.companion-section-art{width:42%;height:85%;right:18px;bottom:12px}:is(#buerGrowth,#buerPeople) .companion-section-hero,#appDrawer .companion-section-hero{padding:76px 43% 40px 40px}}
+@media(max-width:760px){:root{--buer-landing-height:600px}:is(#buerGrowth,#buerPeople) .companion-section-hero,#appDrawer .companion-section-hero{grid-template-rows:auto auto 1fr;align-content:start}.companion-section-art{height:240px;width:150px}html[lang="en"] .buer-welcome{width:58%}html[lang="en"] .buer-welcome h1{font-size:24px;hyphens:auto;overflow-wrap:anywhere}}
+:is(#buerGrowth,#buerPeople) .companion-section-hero,#appDrawer .companion-section-hero{height:360px;min-height:360px}
+@media(min-width:761px){:is(#buerGrowth,#buerPeople) .companion-section-hero,#appDrawer .companion-section-hero{padding:48px 34% 36px 40px}.companion-section-art{width:30%;height:calc(100% - 24px)}}
+@media(max-width:760px){body[data-conversation="empty"] .buer-conversation-column{height:auto;min-height:0;padding-bottom:20px}:is(#buerGrowth,#buerPeople) .companion-section-hero,#appDrawer .companion-section-hero{height:auto;min-height:0;grid-template-columns:minmax(0,1fr) 96px;grid-template-rows:auto auto auto;gap:10px;padding:20px}.companion-section-art{width:104px;height:104px;margin:0 -4px}:is(#buerGrowth,#buerPeople) .companion-section-hero>p:last-of-type,#appDrawer .companion-section-hero>p{align-self:start}}
 #appDrawer:has(#drawerHome:not([hidden])) .drawer-header{padding-bottom:0}
 #appDrawer:has(#drawerHome:not([hidden])) .drawer-scroll{padding-top:0}
 
