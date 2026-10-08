@@ -1,18 +1,18 @@
-import { relationshipRepository, cleanPerson, relationshipMessages } from '../services/buer-relationships.js?v=ec37daf4b5f71f93';
-import { calculateHumanDesign, localToUtcCandidates } from '../../human-design-engine.js?v=ec37daf4b5f71f93';
-import { createHumanDesignProfileSnapshot } from '../engine/profile-snapshot.js?v=ec37daf4b5f71f93';
-import { readBuerEvents } from '../services/buer-conversation.js?v=ec37daf4b5f71f93';
-import { ensureAIConsent, chatAccess, showMembership } from './buer-membership.js?v=ec37daf4b5f71f93';
-import { renderAssistantText } from './buer-message-format.js?v=ec37daf4b5f71f93';
-import { cleanPersonalContext, SCOPE_KEYS, RELATION_TYPES, relationshipScopeDefaults } from '../services/buer-personal-context.js?v=ec37daf4b5f71f93';
-import { readGrowth, QUESTIONS } from '../services/buer-growth.js?v=ec37daf4b5f71f93';
-import { validChatHistory } from '../services/buer-conversation.js?v=ec37daf4b5f71f93';
-import { fetchPlaceCandidates, inferTimezoneFromAddress } from '../services/location-service.js?v=ec37daf4b5f71f93';
-import { personManualData } from '../services/buer-person-manual.js?v=ec37daf4b5f71f93';
-import { createBodygraphRenderer } from '../renderer/bodygraph-renderer.js?v=ec37daf4b5f71f93';
-import { orderedPeople, movePerson, relationshipGuidePrompt } from '../services/buer-people-tools.js?v=ec37daf4b5f71f93';
-import {PAIR_SECTIONS,makeGuideSource,cleanGuideSource,parsePairSections,pairManualStale,guideSourceEqual,pairManualPrompt} from '../services/buer-pair-manual.js?v=ec37daf4b5f71f93';
-import { loadingPreview } from './buer-loading.js?v=ec37daf4b5f71f93';
+import { relationshipRepository, cleanPerson, relationshipMessages } from '../services/buer-relationships.js?v=d931a3f408e834cd';
+import { calculateHumanDesign, localToUtcCandidates } from '../../human-design-engine.js?v=d931a3f408e834cd';
+import { createHumanDesignProfileSnapshot } from '../engine/profile-snapshot.js?v=d931a3f408e834cd';
+import { readBuerEvents } from '../services/buer-conversation.js?v=d931a3f408e834cd';
+import { ensureAIConsent, chatAccess, showMembership } from './buer-membership.js?v=d931a3f408e834cd';
+import { renderAssistantText } from './buer-message-format.js?v=d931a3f408e834cd';
+import { cleanPersonalContext, SCOPE_KEYS, RELATION_TYPES, relationshipScopeDefaults } from '../services/buer-personal-context.js?v=d931a3f408e834cd';
+import { readGrowth, QUESTIONS } from '../services/buer-growth.js?v=d931a3f408e834cd';
+import { validChatHistory } from '../services/buer-conversation.js?v=d931a3f408e834cd';
+import { fetchPlaceCandidates, inferTimezoneFromAddress } from '../services/location-service.js?v=d931a3f408e834cd';
+import { personManualData } from '../services/buer-person-manual.js?v=d931a3f408e834cd';
+import { createBodygraphRenderer } from '../renderer/bodygraph-renderer.js?v=d931a3f408e834cd';
+import { orderedPeople, movePerson, relationshipGuidePrompt } from '../services/buer-people-tools.js?v=d931a3f408e834cd';
+import {PAIR_SECTIONS,makeGuideSource,cleanGuideSource,parsePairSections,pairManualStale,guideSourceEqual,pairManualPrompt} from '../services/buer-pair-manual.js?v=d931a3f408e834cd';
+import { loadingPreview } from './buer-loading.js?v=d931a3f408e834cd';
 
 const el = (tag, text = '', attributes = {}) => {
   const node = document.createElement(tag); node.textContent = text;
@@ -291,7 +291,7 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
       panels[2].append(chartLayout);
       select('overview');content.append(root);
       const colors=Object.fromEntries(['head','ajna','throat','g','heart','sacral','splenic','solar-plexus','root'].map(k=>[`${k}-center`,'#718565']));
-      await createBodygraphRenderer({container:graph,templateUrl:new URL('../../assets/bodygraph-template.svg?v=ec37daf4b5f71f93',import.meta.url).href,centerColors:colors,label:l(`${person.nickname}的人类图`,`${person.nickname}’s Human Design`)})(data);
+      await createBodygraphRenderer({container:graph,templateUrl:new URL('../../assets/bodygraph-template.svg?v=d931a3f408e834cd',import.meta.url).href,centerColors:colors,label:l(`${person.nickname}的人类图`,`${person.nickname}’s Human Design`)})(data);
       if(!valid(ticket))return;
       content.append(button('聊聊我们的关系','Talk about us',()=>conversation(person),'journal-primary'));status.textContent='';
     }catch(error){if(valid(ticket)){preview.remove();status.textContent=errorMessage(error);}}
