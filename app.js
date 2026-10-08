@@ -1,28 +1,29 @@
-import { trackUsage } from './src/services/buer-analytics.js?v=49699368d261b591';
-import { initBuerManual } from './src/app/buer-manual.js?v=49699368d261b591';
-import { initBuerGrowth } from "./src/app/buer-growth.js?v=49699368d261b591";
-import { initBuerHome } from "./src/app/buer-home.js?v=49699368d261b591";
-import { initBuerJournal } from "./src/app/buer-journal.js?v=49699368d261b591";
-import { initBuerRelationships } from "./src/app/buer-relationships.js?v=49699368d261b591";
+import { trackUsage } from './src/services/buer-analytics.js?v=442cca3a8776b2af';
+import { initBuerManual } from './src/app/buer-manual.js?v=442cca3a8776b2af';
+import { initBuerGrowth } from "./src/app/buer-growth.js?v=442cca3a8776b2af";
+import { initBuerHome } from "./src/app/buer-home.js?v=442cca3a8776b2af";
+import { initBuerJournal } from "./src/app/buer-journal.js?v=442cca3a8776b2af";
+import { initBuerRelationships } from "./src/app/buer-relationships.js?v=442cca3a8776b2af";
+import { chineseCross } from "./src/services/buer-cross-labels.js?v=442cca3a8776b2af";
 import {
   calculateHumanDesign,
   localToUtcCandidates,
   preloadHumanDesignEngine,
-} from "./human-design-engine.js?v=49699368d261b591";
-import { fetchPlaceCandidates, inferTimezoneFromAddress } from "./src/services/location-service.js?v=49699368d261b591";
-import { createHumanDesignProfileSnapshot } from "./src/engine/profile-snapshot.js?v=49699368d261b591";
-import { DEFAULT_CONSENT, deleteCloudData, recordProductEvent, saveChartToCloud, updateConsent } from "./src/services/backend-service.js?v=49699368d261b591";
-import { canUseSystemShare, isEmbeddedBrowser, isMobileDevice, sharePageLink } from "./src/services/sharing-service.js?v=49699368d261b591";
-import { readStoredJson, writeStoredJson } from "./src/services/storage-service.js?v=49699368d261b591";
-import { createBodygraphRenderer } from "./src/renderer/bodygraph-renderer.js?v=49699368d261b591";
-import { renderPosterElement } from "./src/renderer/poster-renderer.js?v=49699368d261b591";
-import { validateBirthSelection } from "./src/app/form-validation.js?v=49699368d261b591";
-import { canUseRemoteServices, effectiveRemoteConsent, isCapacitorNativeRuntime } from "./src/app/runtime-security.js?v=49699368d261b591";
-import { getReleaseFeatureAvailability } from "./src/app/release-feature-availability.js?v=49699368d261b591";
-import { hasSupabaseConfig } from "./src/config/runtime-config.js?v=49699368d261b591";
-import { createDailyTipPayload, getDailyTip, latestSavedResult, formatDailyTipText } from "./src/app/daily-tip.js?v=49699368d261b591";
+} from "./human-design-engine.js?v=442cca3a8776b2af";
+import { fetchPlaceCandidates, inferTimezoneFromAddress } from "./src/services/location-service.js?v=442cca3a8776b2af";
+import { createHumanDesignProfileSnapshot } from "./src/engine/profile-snapshot.js?v=442cca3a8776b2af";
+import { DEFAULT_CONSENT, deleteCloudData, recordProductEvent, saveChartToCloud, updateConsent } from "./src/services/backend-service.js?v=442cca3a8776b2af";
+import { canUseSystemShare, isEmbeddedBrowser, isMobileDevice, sharePageLink } from "./src/services/sharing-service.js?v=442cca3a8776b2af";
+import { readStoredJson, writeStoredJson } from "./src/services/storage-service.js?v=442cca3a8776b2af";
+import { createBodygraphRenderer } from "./src/renderer/bodygraph-renderer.js?v=442cca3a8776b2af";
+import { renderPosterElement } from "./src/renderer/poster-renderer.js?v=442cca3a8776b2af";
+import { validateBirthSelection } from "./src/app/form-validation.js?v=442cca3a8776b2af";
+import { canUseRemoteServices, effectiveRemoteConsent, isCapacitorNativeRuntime } from "./src/app/runtime-security.js?v=442cca3a8776b2af";
+import { getReleaseFeatureAvailability } from "./src/app/release-feature-availability.js?v=442cca3a8776b2af";
+import { hasSupabaseConfig } from "./src/config/runtime-config.js?v=442cca3a8776b2af";
+import { createDailyTipPayload, getDailyTip, latestSavedResult, formatDailyTipText } from "./src/app/daily-tip.js?v=442cca3a8776b2af";
 
-import { createDailyTipPoster } from "./src/renderer/daily-tip-poster.js?v=49699368d261b591";
+import { createDailyTipPoster } from "./src/renderer/daily-tip-poster.js?v=442cca3a8776b2af";
 
 const publicAppUrl = "https://human-design.wonderelian.com/";
 preloadHumanDesignEngine().catch((error) => {
@@ -576,10 +577,7 @@ function translatedValue(key, value) {
     return value.replace(/(Investigator|Martyr|Opportunist|Hermit|Heretic|Role Model)/g, (role) => profileRoles[role]);
   }
   if (key === "Incarnation Cross") {
-    return value
-      .replace(/^Right Angle Cross of /, "右角度交叉 · ")
-      .replace(/^Left Angle Cross of /, "左角度交叉 · ")
-      .replace(/^Juxtaposition Cross of /, "并列交叉 · ");
+    return chineseCross(value);
   }
   return valueNames[value] || value;
 }
@@ -828,7 +826,7 @@ let pendingConfirmation = null;
 let pendingHistoryOptOut = null;
 const paintBodygraph = nativeRuntime ? async () => null : createBodygraphRenderer({
   container: graph,
-  templateUrl: "./assets/bodygraph-template.svg?v=49699368d261b591",
+  templateUrl: "./assets/bodygraph-template.svg?v=442cca3a8776b2af",
   centerColors,
   label: "Life Manual BodyGraph",
 });
@@ -2370,6 +2368,7 @@ initBuerHome({
 
 void initBuerJournal({ getLanguage: () => language }).then(journal =>
   initBuerRelationships({ getLanguage: () => language, account: journal.account,
+    translateValue: translatedValue,
     getGrowthReport: () => lastData || latestSavedResult(historyEntries, appSettings.keepHistory)?.data,
     getManualSections: data => [...detailedReadingSections(data),{title:language==='zh'?'相似基础配置的人物':'People with similar core configurations',text:getCelebrityMatches(data).map(person=>`${language==='zh'?person.nameZh:person.name}\n${celebrityDetailedReason(data.Properties,person)}`).join('\n\n')}],
     getReadings: () => historyEntries.map((entry,index)=>({id:entry.id||String(index),label:entry.input?.name||`说明书 ${index+1}`,properties:entry.data?.Properties})),
