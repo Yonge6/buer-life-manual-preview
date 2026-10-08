@@ -1,8 +1,8 @@
-import {GROWTH_KEY,DOMAINS,QUESTIONS,readGrowth,saveGrowth,cleanGrowth,setGrowthAnswer,answeredCount,assessmentContext} from '../services/buer-growth.js?v=a8bdcfd92951b755';
-import {readBuerEvents} from '../services/buer-conversation.js?v=a8bdcfd92951b755';
-import {ensureAIConsent,chatAccess,showMembership} from './buer-membership.js?v=a8bdcfd92951b755';
-import {trackUsage} from '../services/buer-analytics.js?v=a8bdcfd92951b755';
-import {renderAssistantText} from './buer-message-format.js?v=a8bdcfd92951b755';
+import {GROWTH_KEY,DOMAINS,QUESTIONS,readGrowth,saveGrowth,cleanGrowth,setGrowthAnswer,answeredCount,assessmentContext} from '../services/buer-growth.js?v=ec37daf4b5f71f93';
+import {readBuerEvents} from '../services/buer-conversation.js?v=ec37daf4b5f71f93';
+import {ensureAIConsent,chatAccess,showMembership} from './buer-membership.js?v=ec37daf4b5f71f93';
+import {trackUsage} from '../services/buer-analytics.js?v=ec37daf4b5f71f93';
+import {renderAssistantText} from './buer-message-format.js?v=ec37daf4b5f71f93';
 
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function renderGrowthReport(element,content){
