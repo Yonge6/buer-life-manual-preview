@@ -1,5 +1,6 @@
-import { createAccount } from '../services/buer-account.js?v=1257efab113373b0';
-import { createJournalStore, indexedJournalCache, journalRepository, localDate } from '../services/buer-journal.js?v=1257efab113373b0';
+import { createAccount } from '../services/buer-account.js?v=a8bdcfd92951b755';
+import { loadingPreview } from './buer-loading.js?v=a8bdcfd92951b755';
+import { createJournalStore, indexedJournalCache, journalRepository, localDate } from '../services/buer-journal.js?v=a8bdcfd92951b755';
 
 const copy = {
   zh: { journal: '见己日记', hint: '记录生活，慢慢认识自己', account: '我的账号', accountHint: 'H5 与 App，同一个你',
@@ -253,7 +254,7 @@ export async function initBuerJournal({ getLanguage, accountFactory = createAcco
     if (editing && signedIn() && mode === 'journal') return;
     content.replaceChildren();
     if (!signedIn()) renderLogin();
-    else if (state.status === 'loading') content.append(element('p', {}, t('loading')));
+    else if (state.status === 'loading') content.append(loadingPreview(t('loading'),[t('journal'),t('hint')]));
     else if (mode === 'account') renderAccount(); else renderList();
   }
   async function languageChanged() {

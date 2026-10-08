@@ -1,4 +1,4 @@
-import { formatDailyTipText } from "../app/daily-tip.js?v=1257efab113373b0";
+import { formatDailyTipText } from "../app/daily-tip.js?v=a8bdcfd92951b755";
 // A standalone text poster: no birth data, chart, or remote render service.
 function loadImage(url) {
   return new Promise((resolve, reject) => {
@@ -36,8 +36,8 @@ export async function createDailyTipPoster({ tip, language, date = new Date() })
   if (!tip) throw new Error('A saved result is required.');
   const [qr, hero, orb] = await Promise.all([
     loadImage(new URL(globalThis.PLUTO_CONFIG?.buerShareQrPath || '../../assets/chart-qr.png', import.meta.url).href),
-    loadImage(new URL('../../assets/companion-growth.webp?v=1257efab113373b0', import.meta.url).href).catch(() => null),
-    loadImage(new URL("../../assets/buer-companion-logo.png?v=1257efab113373b0", import.meta.url).href),
+    loadImage(new URL('../../assets/companion-growth.webp?v=a8bdcfd92951b755', import.meta.url).href).catch(() => null),
+    loadImage(new URL("../../assets/buer-companion-logo.png?v=a8bdcfd92951b755", import.meta.url).href),
     document.fonts.ready,
   ]);
   const chinese = language === 'zh';
@@ -68,7 +68,6 @@ export async function createDailyTipPoster({ tip, language, date = new Date() })
   ctx.fillStyle = '#263a30';
   lines.forEach((line, index) => ctx.fillText(line, 80, 350 + index * size * 1.5));
   ctx.font = '22px sans-serif'; ctx.fillStyle = '#5c6959';
-  ctx.fillText(chinese ? '来自我最近一次的人生说明书' : 'From my latest Life Manual', 80, 817);
   if (hero) ctx.drawImage(hero, 680, 790, 330, 330);
   ctx.fillStyle = '#526649'; ctx.font = '26px Georgia, "Songti SC", serif';
   ctx.fillText(chinese ? '一点点，回到自己。' : 'A little closer to yourself.', 80, 1015);

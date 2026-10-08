@@ -1,28 +1,28 @@
-import { trackUsage } from './src/services/buer-analytics.js?v=1257efab113373b0';
-import { initBuerManual } from './src/app/buer-manual.js?v=1257efab113373b0';
-import { initBuerGrowth } from "./src/app/buer-growth.js?v=1257efab113373b0";
-import { initBuerHome } from "./src/app/buer-home.js?v=1257efab113373b0";
-import { initBuerJournal } from "./src/app/buer-journal.js?v=1257efab113373b0";
-import { initBuerRelationships } from "./src/app/buer-relationships.js?v=1257efab113373b0";
+import { trackUsage } from './src/services/buer-analytics.js?v=a8bdcfd92951b755';
+import { initBuerManual } from './src/app/buer-manual.js?v=a8bdcfd92951b755';
+import { initBuerGrowth } from "./src/app/buer-growth.js?v=a8bdcfd92951b755";
+import { initBuerHome } from "./src/app/buer-home.js?v=a8bdcfd92951b755";
+import { initBuerJournal } from "./src/app/buer-journal.js?v=a8bdcfd92951b755";
+import { initBuerRelationships } from "./src/app/buer-relationships.js?v=a8bdcfd92951b755";
 import {
   calculateHumanDesign,
   localToUtcCandidates,
   preloadHumanDesignEngine,
-} from "./human-design-engine.js?v=1257efab113373b0";
-import { fetchPlaceCandidates, inferTimezoneFromAddress } from "./src/services/location-service.js?v=1257efab113373b0";
-import { createHumanDesignProfileSnapshot } from "./src/engine/profile-snapshot.js?v=1257efab113373b0";
-import { DEFAULT_CONSENT, deleteCloudData, recordProductEvent, saveChartToCloud, updateConsent } from "./src/services/backend-service.js?v=1257efab113373b0";
-import { canUseSystemShare, isEmbeddedBrowser, isMobileDevice, sharePageLink } from "./src/services/sharing-service.js?v=1257efab113373b0";
-import { readStoredJson, writeStoredJson } from "./src/services/storage-service.js?v=1257efab113373b0";
-import { createBodygraphRenderer } from "./src/renderer/bodygraph-renderer.js?v=1257efab113373b0";
-import { renderPosterElement } from "./src/renderer/poster-renderer.js?v=1257efab113373b0";
-import { validateBirthSelection } from "./src/app/form-validation.js?v=1257efab113373b0";
-import { canUseRemoteServices, effectiveRemoteConsent, isCapacitorNativeRuntime } from "./src/app/runtime-security.js?v=1257efab113373b0";
-import { getReleaseFeatureAvailability } from "./src/app/release-feature-availability.js?v=1257efab113373b0";
-import { hasSupabaseConfig } from "./src/config/runtime-config.js?v=1257efab113373b0";
-import { createDailyTipPayload, getDailyTip, latestSavedResult, formatDailyTipText } from "./src/app/daily-tip.js?v=1257efab113373b0";
+} from "./human-design-engine.js?v=a8bdcfd92951b755";
+import { fetchPlaceCandidates, inferTimezoneFromAddress } from "./src/services/location-service.js?v=a8bdcfd92951b755";
+import { createHumanDesignProfileSnapshot } from "./src/engine/profile-snapshot.js?v=a8bdcfd92951b755";
+import { DEFAULT_CONSENT, deleteCloudData, recordProductEvent, saveChartToCloud, updateConsent } from "./src/services/backend-service.js?v=a8bdcfd92951b755";
+import { canUseSystemShare, isEmbeddedBrowser, isMobileDevice, sharePageLink } from "./src/services/sharing-service.js?v=a8bdcfd92951b755";
+import { readStoredJson, writeStoredJson } from "./src/services/storage-service.js?v=a8bdcfd92951b755";
+import { createBodygraphRenderer } from "./src/renderer/bodygraph-renderer.js?v=a8bdcfd92951b755";
+import { renderPosterElement } from "./src/renderer/poster-renderer.js?v=a8bdcfd92951b755";
+import { validateBirthSelection } from "./src/app/form-validation.js?v=a8bdcfd92951b755";
+import { canUseRemoteServices, effectiveRemoteConsent, isCapacitorNativeRuntime } from "./src/app/runtime-security.js?v=a8bdcfd92951b755";
+import { getReleaseFeatureAvailability } from "./src/app/release-feature-availability.js?v=a8bdcfd92951b755";
+import { hasSupabaseConfig } from "./src/config/runtime-config.js?v=a8bdcfd92951b755";
+import { createDailyTipPayload, getDailyTip, latestSavedResult, formatDailyTipText } from "./src/app/daily-tip.js?v=a8bdcfd92951b755";
 
-import { createDailyTipPoster } from "./src/renderer/daily-tip-poster.js?v=1257efab113373b0";
+import { createDailyTipPoster } from "./src/renderer/daily-tip-poster.js?v=a8bdcfd92951b755";
 
 const publicAppUrl = "https://human-design.wonderelian.com/";
 preloadHumanDesignEngine().catch((error) => {
@@ -828,7 +828,7 @@ let pendingConfirmation = null;
 let pendingHistoryOptOut = null;
 const paintBodygraph = nativeRuntime ? async () => null : createBodygraphRenderer({
   container: graph,
-  templateUrl: "./assets/bodygraph-template.svg?v=1257efab113373b0",
+  templateUrl: "./assets/bodygraph-template.svg?v=a8bdcfd92951b755",
   centerColors,
   label: "Life Manual BodyGraph",
 });
@@ -862,9 +862,6 @@ function refreshDailyTip() {
   document.querySelector("#dailyTipText").textContent = (tip ? formatDailyTipText(tip, language) : tip) || (language === "zh"
     ? "先听见自己，\n再决定下一步。"
     : "Listen to yourself.\nThen take the next step.");
-  document.querySelector("#dailyTipSource").textContent = tip
-    ? (language === "zh" ? "来自你最近一次的解读" : "From your latest Life Manual")
-    : (language === "zh" ? "给自己一点从容。" : "Leave a little room for yourself.");
   document.querySelector("#dailyTipAction").textContent = tip
     ? (language === "zh" ? "查看我的解读" : "Read my Life Manual")
     : (language === "zh" ? "开始认识自己" : "Get to know yourself");
@@ -2228,6 +2225,8 @@ function clearDailyShare() {
   dailyShareBlob = undefined;
   dailyShareUrl = undefined;
   document.querySelector('#dailySharePreview').removeAttribute('src');
+  document.querySelector('#dailySharePreview').hidden=true;
+  document.querySelector('#dailyShareTextPreview').hidden=true;
 }
 dailyShareDialog.addEventListener('close', clearDailyShare);
 document.querySelector('#closeDailyShare').addEventListener('click', () => dailyShareDialog.close());
@@ -2252,6 +2251,7 @@ document.querySelector('#shareDailyTip').addEventListener('click', async event =
   document.querySelector('#saveDailyImage').disabled = true;
   document.querySelector('#sendDailyImage').disabled = true;
   dailyShareDialog.showModal();
+  const textPreview=document.querySelector('#dailyShareTextPreview');textPreview.hidden=false;textPreview.querySelector('p').textContent=formatDailyTipText(tip,language);
   try {
     const blob = await createDailyTipPoster({ tip, language, date });
     // A real PNG data URL keeps the preview available to embedded-browser image menus.
@@ -2263,6 +2263,9 @@ document.querySelector('#shareDailyTip').addEventListener('click', async event =
     const preview = document.querySelector('#dailySharePreview');
     preview.alt = dailyShareText(`${tip} 右下角二维码可打开 不二见己首页。`, `${tip} The QR code opens Buer Within.`);
     preview.src = dailyShareUrl;
+    await preview.decode();
+    if (!dailyShareDialog.open || generation !== dailyShareGeneration) return;
+    preview.hidden=false;textPreview.hidden=true;
     if (dailyImageNeedsLongPress()) {
       document.querySelector('#saveDailyImage').textContent = dailyShareText('长按保存图片', 'Save with a long press');
       document.querySelector('#sendDailyImage').textContent = dailyShareText('长按发送图片', 'Send with a long press');
@@ -2272,6 +2275,7 @@ document.querySelector('#shareDailyTip').addEventListener('click', async event =
     document.querySelector('#saveDailyImage').disabled = false;
     document.querySelector('#sendDailyImage').disabled = false;
   } catch (error) {
+    if (!dailyShareDialog.open || generation !== dailyShareGeneration) return;
     status.textContent = dailyShareText('图片生成失败，请关闭后重试。', 'Image creation failed. Close and try again.');
     console.warn('Daily share image failed', error);
   } finally { button.disabled = false; }
@@ -2366,6 +2370,7 @@ initBuerHome({
 
 void initBuerJournal({ getLanguage: () => language }).then(journal =>
   initBuerRelationships({ getLanguage: () => language, account: journal.account,
+    getGrowthReport: () => lastData || latestSavedResult(historyEntries, appSettings.keepHistory)?.data,
     getManualSections: data => [...detailedReadingSections(data),{title:language==='zh'?'相似基础配置的人物':'People with similar core configurations',text:getCelebrityMatches(data).map(person=>`${language==='zh'?person.nameZh:person.name}\n${celebrityDetailedReason(data.Properties,person)}`).join('\n\n')}],
     getReadings: () => historyEntries.map((entry,index)=>({id:entry.id||String(index),label:entry.input?.name||`说明书 ${index+1}`,properties:entry.data?.Properties})),
     openAccount: () => journal.open('account') }));

@@ -1,10 +1,10 @@
-import {chatAccess,showMembership,initMembership,ensureAIConsent} from './buer-membership.js?v=1257efab113373b0';
-import {renderAssistantText} from './buer-message-format.js?v=1257efab113373b0';
-import {readGrowth,growthContext,answeredCount} from '../services/buer-growth.js?v=1257efab113373b0';
-import {nextQuestionBatch} from './buer-suggestions.js?v=1257efab113373b0';
-import {welcomeForVisit} from './buer-welcome.js?v=1257efab113373b0';
-import {initUsage,trackUsage} from '../services/buer-analytics.js?v=1257efab113373b0';
-import {readBuerEvents,anonymousReport,validChatHistory} from '../services/buer-conversation.js?v=1257efab113373b0';
+import {chatAccess,showMembership,initMembership,ensureAIConsent} from './buer-membership.js?v=a8bdcfd92951b755';
+import {renderAssistantText} from './buer-message-format.js?v=a8bdcfd92951b755';
+import {readGrowth,growthContext,answeredCount} from '../services/buer-growth.js?v=a8bdcfd92951b755';
+import {nextQuestionBatch} from './buer-suggestions.js?v=a8bdcfd92951b755';
+import {welcomeForVisit} from './buer-welcome.js?v=a8bdcfd92951b755';
+import {initUsage,trackUsage} from '../services/buer-analytics.js?v=a8bdcfd92951b755';
+import {readBuerEvents,anonymousReport,validChatHistory} from '../services/buer-conversation.js?v=a8bdcfd92951b755';
 
 const copy={
   zh:{growthHeadline:'建立我的成长档案',growthSteps:'01 认识自己　02 明确行动　03 补充经历',myGrowth:'成长档案',myGrowthHint:'认识 · 行动 · 复盘',nextGrowth:'下一步：HUMAN 3.0 成长访谈',useGrowth:'结合成长档案',growthContextHint:'仅参考你允许的内容',dailyLimit:'今天的 3 条免费对话已用完。明天再聊，或开通会员继续。',followupLabel:'继续聊聊你的想法…',decisionQuestion:'做决定时，怎样听见自己？',energyQuestion:'总觉得累，该怎样找回能量？',strengthQuestion:'怎样发现自己的优势？',boundaryQuestion:'如何温柔地建立边界？',profile:'我的',manualHistory:'说明书历史',chatHistoryHint:'继续上次的探索',tagline:'与真实的自己 · 温柔相遇',home:'见己',manual:'成长档案',history:'对话记录',railFoot:'更认识\n更自在',headline:'今天，想从哪里聊起？',intro:'你的AI成长伙伴豆豆龙',questionLabel:'今天，想从哪里聊起？',workQuestion:'我适合怎样的工作节奏？',relationshipQuestion:'为什么我总在关系里内耗？',aiLabel:'AI 陪你探索',useReport:'结合我的说明书',newChat:'新对话',dataNote:'提问发送至 第三方 AI 服务 处理；对话记录仅保存在本机。',myManual:'我的成长路线',manualIntro:'从人类图开始认识自己，用四领域访谈找到方向，把经历与行动积累成自己的成长档案。',contextFoot:'不是找到一个标准答案，\n而是更清楚地，做自己。',localHistory:'只保存在当前设备，不会同步到其他设备。',clearChats:'清空本机对话',clearConfirm:'清空后无法恢复这些对话。确定清空吗？',cancel:'取消',confirmClear:'确认清空',backHome:'返回对话',backPrevious:'返回上一页',welcome:'先不用急着改变自己。\n从一件最近让你在意的小事开始，我们一起慢慢想明白。',connecting:'正在认真读你的问题…',streaming:'不二见己正在回应…',stopped:'已停止。你可以继续提问，或重新回答。',failed:'连接暂时中断，请稍后重试。',unconfigured:'AI 服务暂未就绪，输入的内容已保留。',rate:'提问有点频繁，稍等一分钟再试。',retry:'重新回答',copy:'复制',copied:'已复制回应',noHistory:'还没有对话。从首页的第一个问题开始。',send:'发送问题',stop:'停止回答',closeHistory:'关闭对话记录',contextHint:'仅参考类型、策略、权威与人生角色，不发送姓名或出生信息。',noStorage:'本机存储不可用，本次对话仅在当前页面保留。'},
@@ -60,11 +60,8 @@ export function initBuerHome({getLanguage,setLanguage,openManual,getReport}) {
   let current={id:crypto.randomUUID(),date:Date.now(),messages:[]},controller=null,activeStatus='',reportOverride=null,reportPreference=null;
   const currentReport=()=>reportOverride||anonymousReport(getReport());
   function syncReportSelection(){
-    const available=Boolean(currentReport());
-    $('#buerContextLabel').hidden=!available;
-    $('#buerUseReport').checked=available && reportPreference!==false;
+    $('#buerUseGrowth').title=getLanguage()==='zh'?'包含我的说明书及已允许参考的成长记录':'Includes my Life Manual and enabled growth records';
   }
-  $('#buerUseReport').addEventListener('change',()=>{reportPreference=$('#buerUseReport').checked;});
   const endpoint=()=>`${(globalThis.PLUTO_CONFIG?.apiBaseUrl||'').replace(/\/$/,'')}/v1/chat`;
   function setStatus(key){activeStatus=key;status.textContent=key?t(key):'';}
   function persist(){
@@ -107,7 +104,7 @@ export function initBuerHome({getLanguage,setLanguage,openManual,getReport}) {
     document.querySelectorAll('[data-buer]').forEach(el=>{el.textContent=t(el.dataset.buer);});
     $('[data-buer="headline"]').textContent=visitWelcome[getLanguage()==='en'?'en':'zh'];
     input.placeholder=t('questionLabel');$('#buerSend').ariaLabel=t('send');$('#buerStop').ariaLabel=t('stop');$('#buerCloseHistory').ariaLabel=t('closeHistory');
-    syncReportSelection();$('#buerContextLabel').title=t('contextHint');
+    syncReportSelection();
     const date=new Date();$('#dailyTipDate').textContent=`${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')}`;
     $('#dailyTipDateSecondary').textContent=new Intl.DateTimeFormat(getLanguage()==='zh'?'zh-CN':'en',{weekday:'long'}).format(date);
     const growth=readGrowth(localStorage),count=answeredCount(growth),hasManual=Boolean(getReport()),action=growth.actions.find(x=>!x.done),isZh=getLanguage()==='zh';
@@ -137,7 +134,7 @@ export function initBuerHome({getLanguage,setLanguage,openManual,getReport}) {
   input.addEventListener('focus',syncReportSelection);
   input.addEventListener('keydown',event=>{if(event.key==='Enter' && !event.shiftKey && !event.isComposing){event.preventDefault();form.requestSubmit();}});
   input.addEventListener('input',()=>{input.style.height='auto';input.style.height=`${Math.min(input.scrollHeight,160)}px`;});
-  function setBusy(busy){$('#buerSend').hidden=busy;$('#buerStop').hidden=!busy;$('#buerNewChat').disabled=busy;input.disabled=busy;document.querySelectorAll('[data-question]').forEach(b=>b.disabled=busy);$('#buerUseReport').disabled=busy;$('#buerUseGrowth').disabled=busy;}
+  function setBusy(busy){$('#buerSend').hidden=busy;$('#buerStop').hidden=!busy;$('#buerNewChat').disabled=busy;input.disabled=busy;document.querySelectorAll('[data-question]').forEach(b=>b.disabled=busy);$('#buerUseGrowth').disabled=busy;}
   async function ask(question,retry=false){
     if(controller)return;
     if(!await ensureAIConsent())return;
@@ -152,7 +149,7 @@ export function initBuerHome({getLanguage,setLanguage,openManual,getReport}) {
     const started=performance.now();trackUsage('chat_request');
     try {
       if(globalThis.PLUTO_CONFIG?.buerChatEnabled===false)throw new Error('AI_NOT_CONFIGURED');
-      const report=$('#buerUseReport').checked?currentReport():null;
+      const report=$('#buerUseGrowth').checked?currentReport():null;
       const response=await fetch(endpoint(),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history,...(report?{report}:{}),...($('#buerUseGrowth').checked?{growth:growthContext(readGrowth(localStorage),value)}:{}),...await chatAccess()}),signal:active.signal});
       if(!response.ok){const data=await response.json().catch(()=>({}));throw new Error(data.error || 'AI_UNAVAILABLE');}
       if(!response.body)throw new Error('AI_UNAVAILABLE');
