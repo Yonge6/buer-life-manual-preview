@@ -1,23 +1,23 @@
-import {workspaceStorage} from '../services/buer-workspace.js?v=fc2ad42d2a2c83e4';
-import {compositeGuidance,sectionFoundation,guideV2,guideText,stampGuide} from '../services/buer-pair-guidance.js?v=fc2ad42d2a2c83e4';
-import { relationshipRepository, cleanPerson, relationshipMessages } from '../services/buer-relationships.js?v=fc2ad42d2a2c83e4';
-import { calculateHumanDesign, localToUtcCandidates } from '../../human-design-engine.js?v=fc2ad42d2a2c83e4';
-import { createHumanDesignProfileSnapshot } from '../engine/profile-snapshot.js?v=fc2ad42d2a2c83e4';
-import { readBuerEvents } from '../services/buer-conversation.js?v=fc2ad42d2a2c83e4';
-import { ensureAIConsent, chatAccess, showMembership } from './buer-membership.js?v=fc2ad42d2a2c83e4';
-import { renderAssistantText, renderReadingText } from './buer-message-format.js?v=fc2ad42d2a2c83e4';
-import { cleanPersonalContext, SCOPE_KEYS, RELATION_TYPES, relationshipScopeDefaults } from '../services/buer-personal-context.js?v=fc2ad42d2a2c83e4';
-import { readGrowth, QUESTIONS } from '../services/buer-growth.js?v=fc2ad42d2a2c83e4';
-import { validChatHistory } from '../services/buer-conversation.js?v=fc2ad42d2a2c83e4';
-import { fetchPlaceCandidates, inferTimezoneFromAddress } from '../services/location-service.js?v=fc2ad42d2a2c83e4';
-import { personManualData } from '../services/buer-person-manual.js?v=fc2ad42d2a2c83e4';
-import { createBodygraphRenderer } from '../renderer/bodygraph-renderer.js?v=fc2ad42d2a2c83e4';
-import { orderedPeople, movePerson, relationshipGuidePrompt } from '../services/buer-people-tools.js?v=fc2ad42d2a2c83e4';
-import {PAIR_SECTIONS,makeGuideSource,cleanGuideSource,parsePairSections,pairManualRoleWarning,pairManualStale,guideSourceEqual,pairManualPrompt} from '../services/buer-pair-manual.js?v=fc2ad42d2a2c83e4';
-import { loadingPreview } from './buer-loading.js?v=fc2ad42d2a2c83e4';
-import { pairComparisonGroups, comparisonTable } from './buer-pair-comparison.js?v=fc2ad42d2a2c83e4';
-import { createReadingCache } from '../services/buer-reading-cache.js?v=fc2ad42d2a2c83e4';
-import { pairComposite, compositeSummaryLines } from '../services/buer-pair-composite.js?v=fc2ad42d2a2c83e4';
+import {workspaceStorage} from '../services/buer-workspace.js?v=240b8d03b0581c59';
+import {compositeGuidance,sectionFoundation,guideV2,guideText,stampGuide} from '../services/buer-pair-guidance.js?v=240b8d03b0581c59';
+import { relationshipRepository, cleanPerson, relationshipMessages } from '../services/buer-relationships.js?v=240b8d03b0581c59';
+import { calculateHumanDesign, localToUtcCandidates } from '../../human-design-engine.js?v=240b8d03b0581c59';
+import { createHumanDesignProfileSnapshot } from '../engine/profile-snapshot.js?v=240b8d03b0581c59';
+import { readBuerEvents } from '../services/buer-conversation.js?v=240b8d03b0581c59';
+import { ensureAIConsent, chatAccess, showMembership } from './buer-membership.js?v=240b8d03b0581c59';
+import { renderAssistantText, renderReadingText } from './buer-message-format.js?v=240b8d03b0581c59';
+import { cleanPersonalContext, SCOPE_KEYS, RELATION_TYPES, relationshipScopeDefaults } from '../services/buer-personal-context.js?v=240b8d03b0581c59';
+import { readGrowth, QUESTIONS } from '../services/buer-growth.js?v=240b8d03b0581c59';
+import { validChatHistory } from '../services/buer-conversation.js?v=240b8d03b0581c59';
+import { fetchPlaceCandidates, inferTimezoneFromAddress } from '../services/location-service.js?v=240b8d03b0581c59';
+import { personManualData } from '../services/buer-person-manual.js?v=240b8d03b0581c59';
+import { createBodygraphRenderer } from '../renderer/bodygraph-renderer.js?v=240b8d03b0581c59';
+import { orderedPeople, movePerson, relationshipGuidePrompt } from '../services/buer-people-tools.js?v=240b8d03b0581c59';
+import {PAIR_SECTIONS,readingSections,makeGuideSource,cleanGuideSource,parsePairSections,pairManualRoleWarning,pairManualStale,guideSourceEqual,pairManualPrompt} from '../services/buer-pair-manual.js?v=240b8d03b0581c59';
+import { loadingPreview } from './buer-loading.js?v=240b8d03b0581c59';
+import { pairComparisonGroups, comparisonTable } from './buer-pair-comparison.js?v=240b8d03b0581c59';
+import { createReadingCache } from '../services/buer-reading-cache.js?v=240b8d03b0581c59';
+import { pairComposite, compositeSummaryLines } from '../services/buer-pair-composite.js?v=240b8d03b0581c59';
 
 const el = (tag, text = '', attributes = {}) => {
   const node = document.createElement(tag); node.textContent = text;
@@ -172,11 +172,12 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
     const localSource=()=>makeGuideSource(getGrowthReport(),readGrowth(workspaceStorage()));
     function draw(){
       content.replaceChildren();
+      const sections=readingSections(saved?.sections),legacy=Boolean(saved&&!guideV2(saved.sections));
       const actions=el('div','',{class:'pair-reading-actions'});actions.append(button('← 人物列表','← People',list),button('聊聊我们的关系','Talk about us',()=>conversation(person),'journal-primary'));content.append(actions);
       const local=localSource(),snapshot=source?cleanGuideSource(source.payload):local;
       const roleWarning=pairManualRoleWarning(person,saved?.sections);
       const changed=pairManualStale(saved,source,person)||Boolean(source&&!guideSourceEqual(local,source.payload));
-      const note=roleWarning?l(`称谓需核对：对方是你的${roleWarning}，请更新旧解读。`,`Check the old reading: this person is your ${roleWarning==='母亲'?'mother':'father'}.`):changed?l('资料有变化，原解读仍可阅读。','Sources changed. Your saved reading remains available.'):saved&&!guideV2(saved.sections)?l('可更新为新版，原解读已保留。','A new format is available; your previous reading is kept.'):saved?l('已保存 · 随时阅读','Saved · Read any time'):l('先阅读基础建议，需要时再生成解读。','Read the basics, then generate a personal reading when ready.');
+      const note=roleWarning?l(`称谓需核对：对方是你的${roleWarning}，请更新旧解读。`,`Check the old reading: this person is your ${roleWarning==='母亲'?'mother':'father'}.`):changed?l('资料有变化，原解读仍可阅读。','Sources changed. Your saved reading remains available.'):saved?l('已保存 · 随时阅读','Saved · Read any time'):l('先阅读基础建议，需要时再生成解读。','Read the basics, then generate a personal reading when ready.');
       const meta=el('div','',{class:'pair-reading-meta'}),more=el('details','',{class:'pair-reading-more'});
       meta.append(el('p',note,{class:'pair-reading-note',role:'status'}));
       more.append(el('summary',l('更多','More')));
@@ -185,27 +186,35 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
       more.append(el('p',l('已保存的解读可直接阅读。人类图仅作观察参考。','Saved readings open directly. Human Design is a reflection tool.')),button('从账号刷新','Refresh from account',()=>pairManual(person,true)));
       meta.append(more);content.append(meta,el('div','',{class:'pair-reading-anchor','aria-hidden':'true'}));
       const nav=el('div','',{class:'relationship-manual-tabs pair-manual-tabs',role:'tablist','aria-label':l('相处说明书分类','Reading categories')});
-      for(const [key,zh,en] of PAIR_SECTIONS){
-        const labels=tabLabels[key],b=button(labels[0],labels[1],()=>selectSection(key));
+      for(const [key,zh,en] of sections){
+        const labels=legacy&&key==='friction'?['互补','Support']:legacy&&key==='practice'?['日常','Daily']:tabLabels[key],b=button(labels[0],labels[1],()=>selectSection(key));
         for(const [attr,value] of Object.entries({role:'tab',id:`pair-tab-${key}`,'aria-selected':String(selected===key),'aria-controls':'pair-reading-panel',tabindex:selected===key?'0':'-1',title:l(zh,en)}))b.setAttribute(attr,value);
-        b.onkeydown=e=>{const keys=PAIR_SECTIONS.map(s=>s[0]),i=keys.indexOf(key);const next=e.key==='ArrowRight'?(i+1)%keys.length:e.key==='ArrowLeft'?(i+keys.length-1)%keys.length:e.key==='Home'?0:e.key==='End'?keys.length-1:null;if(next!==null){e.preventDefault();if(!busy)selectSection(keys[next]);}};
+        b.onkeydown=e=>{const keys=sections.map(s=>s[0]),i=keys.indexOf(key);const next=e.key==='ArrowRight'?(i+1)%keys.length:e.key==='ArrowLeft'?(i+keys.length-1)%keys.length:e.key==='Home'?0:e.key==='End'?keys.length-1:null;if(next!==null){e.preventDefault();if(!busy)selectSection(keys[next]);}};
         nav.append(b);
       }content.append(nav);
       const pane=el('section','',{class:'pair-manual-reading',id:'pair-reading-panel',role:'tabpanel',tabindex:'0','aria-labelledby':`pair-tab-${selected}`});content.append(pane);
       const composite=pairComposite(snapshot.chart,person.chart);
+      const options={language:getLanguage(),otherName:person.nickname};
+      const groups=pairComparisonGroups(snapshot.chart,person.chart,{...options,otherProperties,translate:(key,value)=>chartText(translateValue(key,value))});
+      if(selected==='overview')pane.append(comparisonTable({...groups[0],title:l('双方简览','You both at a glance'),rows:[groups[0].rows[0],groups[0].rows[2],groups[0].rows[3]]},options));
+      if(saved?.sections?.[selected]){
+        const reading=el('div','',{class:'pair-manual-prose pair-personal-reading'}),text=guideText(saved.sections[selected]);
+        if(guideV2(saved.sections)){
+          const parts=text.split(/\*\*(?:为什么这样建议|Why this suggestion|Why these suggestions)[:：]?\*\*\s*[:：]?/i);renderReadingText(reading,parts[0]);pane.append(reading);
+          if(parts.length>1){const why=el('details');why.append(el('summary',l('解读依据','Reading sources')));const body=el('div','',{class:'pair-manual-prose'});renderReadingText(body,parts.slice(1).join('\n\n'));why.append(body);pane.append(why);}
+        }else{renderReadingText(reading,text);pane.append(reading);}
+      }
       const card=(item)=>{
         const block=el('article','',{class:'pair-guidance-card'});block.append(el('h4',item.title),el('p',item.question),el('p',item.action));
         const evidence=el('details');evidence.append(el('summary',l('为什么这样建议','Why this suggestion')),el('p',item.basis));block.append(evidence);return block;
       };
       const foundation=sectionFoundation(selected,{core:{...snapshot.chart?.core,'Inner Authority':chartText(translateValue('Inner Authority',snapshot.chart?.core?.['Inner Authority']||''))}},{...otherProperties,'Inner Authority':chartText(translateValue('Inner Authority',otherProperties?.['Inner Authority']||person.chart?.core?.authority||''))},getLanguage());
-      pane.append(card(foundation));
+      if(!saved?.sections?.[selected])pane.append(card(foundation));
       const ideas=compositeGuidance(composite,getLanguage());
       const relevant=selected==='overview'?ideas.slice(0,3):ideas.filter(c=>c.section===selected||(selected==='repair'&&c.kind.startsWith('compromise'))||(selected==='practice'&&c.kind==='electromagnetic')).slice(0,2);
-      for(const idea of relevant)pane.append(card(idea));
-      if(!composite.available)pane.append(el('p',l('双方完整闸门资料尚未齐备，暂不解读合盘连接；上面仍可阅读通用练习。','Complete gates are not yet available. Connection interpretation is withheld; general practices remain available.')));
+      if(!saved?.sections?.[selected]){const seen=new Set();for(const idea of relevant){if(seen.has(idea.title))continue;seen.add(idea.title);if(seen.size>1)break;pane.append(card(idea));}pane.append(el('p',l('以上为基础参考；生成后可直接阅读你们的个性化解读。','These are basic reflections. Generate a personal reading when ready.'),{class:'relationship-chat-note'}));}
+      if(!composite.available)pane.append(el('p',l('双方完整闸门资料尚未齐备，暂不解读合盘连接；可先阅读已有内容。','Complete gates are not yet available. Connection interpretation is withheld; saved content remains readable.')));
       if(selected==='overview'){
-        const options={language:getLanguage(),otherName:person.nickname};
-        const groups=pairComparisonGroups(snapshot.chart,person.chart,{...options,otherProperties,translate:(key,value)=>chartText(translateValue(key,value))});
         if(chartError)pane.append(el('p',l('TA 的完整图谱暂未加载，请重新读取；下方缺失项不代表没有出生资料。','Their full chart could not load. Retry; missing fields do not mean missing birth details.')) ,button('重新读取图谱','Retry chart',()=>pairManual(person)));
         const charts=el('details');charts.append(el('summary',l('查看合盘资料 · 双方基础信息、中心、通道与行星','View chart evidence · core information, centers, channels & planets')));
         charts.append(comparisonTable(groups[0],options));
@@ -216,14 +225,6 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
         const summary=el('div');renderReadingText(summary,compositeSummaryLines(pairComposite(snapshot.chart,person.chart),getLanguage()).join('\n\n'));connection.append(summary);
         charts.append(connection);
       }
-      if(saved?.sections?.[selected]){
-        const reading=el('div','',{class:'pair-manual-prose'}),text=guideText(saved.sections[selected]);
-        if(guideV2(saved.sections)){
-          const parts=text.split(/\*\*(?:为什么这样建议|Why this suggestion|Why these suggestions)[:：]?\*\*\s*[:：]?/i);renderReadingText(reading,parts[0]);pane.append(reading);
-          if(parts.length>1){const why=el('details');why.append(el('summary',l('为什么这样建议 · 个性化解读依据','Why these suggestions · personalized sources')));const body=el('div','',{class:'pair-manual-prose'});renderReadingText(body,parts.slice(1).join('\n\n'));why.append(body);pane.append(why);}
-        }else{const legacy=el('details');legacy.append(el('summary',l('阅读保留的旧版解读','Read the preserved previous version')));renderReadingText(reading,text);legacy.append(reading);pane.append(legacy);}
-      }
-      else pane.append(el('p',l('这一分类的个性化解读尚未生成。生成一次后，即可随时回来阅读。','This personalized section has not been generated. Generate once, then return to read any time.')));
       pane.querySelectorAll('details').forEach((d,i)=>{d.open=expanded.get(selected)?.[i]||false;});
       const generateActions=el('div','',{class:'journal-actions pair-manual-generate'});
       if(pending)generateActions.append(button('重试保存解读（不重新生成）','Retry saving (no regeneration)',b=>generate(false,true,b),'journal-primary'));
@@ -337,7 +338,7 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
       panels[2].append(chartLayout);
       select('overview');content.append(root);
       const colors=Object.fromEntries(['head','ajna','throat','g','heart','sacral','splenic','solar-plexus','root'].map(k=>[`${k}-center`,'#718565']));
-      await createBodygraphRenderer({container:graph,templateUrl:new URL('../../assets/bodygraph-template.svg?v=fc2ad42d2a2c83e4',import.meta.url).href,centerColors:colors,label:l(`${person.nickname}的人类图`,`${person.nickname}’s Human Design`)})(data);
+      await createBodygraphRenderer({container:graph,templateUrl:new URL('../../assets/bodygraph-template.svg?v=240b8d03b0581c59',import.meta.url).href,centerColors:colors,label:l(`${person.nickname}的人类图`,`${person.nickname}’s Human Design`)})(data);
       if(!valid(ticket))return;
       content.append(button('聊聊我们的关系','Talk about us',()=>conversation(person),'journal-primary'));status.textContent='';
     }catch(error){if(valid(ticket)){preview.remove();status.textContent=errorMessage(error);}}
