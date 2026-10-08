@@ -1,19 +1,19 @@
-import { relationshipRepository, cleanPerson, relationshipMessages } from '../services/buer-relationships.js?v=69c74bfdb6c11b00';
-import { calculateHumanDesign, localToUtcCandidates } from '../../human-design-engine.js?v=69c74bfdb6c11b00';
-import { createHumanDesignProfileSnapshot } from '../engine/profile-snapshot.js?v=69c74bfdb6c11b00';
-import { readBuerEvents } from '../services/buer-conversation.js?v=69c74bfdb6c11b00';
-import { ensureAIConsent, chatAccess, showMembership } from './buer-membership.js?v=69c74bfdb6c11b00';
-import { renderAssistantText, renderReadingText } from './buer-message-format.js?v=69c74bfdb6c11b00';
-import { cleanPersonalContext, SCOPE_KEYS, RELATION_TYPES, relationshipScopeDefaults } from '../services/buer-personal-context.js?v=69c74bfdb6c11b00';
-import { readGrowth, QUESTIONS } from '../services/buer-growth.js?v=69c74bfdb6c11b00';
-import { validChatHistory } from '../services/buer-conversation.js?v=69c74bfdb6c11b00';
-import { fetchPlaceCandidates, inferTimezoneFromAddress } from '../services/location-service.js?v=69c74bfdb6c11b00';
-import { personManualData } from '../services/buer-person-manual.js?v=69c74bfdb6c11b00';
-import { createBodygraphRenderer } from '../renderer/bodygraph-renderer.js?v=69c74bfdb6c11b00';
-import { orderedPeople, movePerson, relationshipGuidePrompt } from '../services/buer-people-tools.js?v=69c74bfdb6c11b00';
-import {PAIR_SECTIONS,makeGuideSource,cleanGuideSource,parsePairSections,pairManualStale,guideSourceEqual,pairManualPrompt} from '../services/buer-pair-manual.js?v=69c74bfdb6c11b00';
-import { loadingPreview } from './buer-loading.js?v=69c74bfdb6c11b00';
-import { pairComparisonGroups, comparisonTable } from './buer-pair-comparison.js?v=69c74bfdb6c11b00';
+import { relationshipRepository, cleanPerson, relationshipMessages } from '../services/buer-relationships.js?v=10fd74dc96f798cb';
+import { calculateHumanDesign, localToUtcCandidates } from '../../human-design-engine.js?v=10fd74dc96f798cb';
+import { createHumanDesignProfileSnapshot } from '../engine/profile-snapshot.js?v=10fd74dc96f798cb';
+import { readBuerEvents } from '../services/buer-conversation.js?v=10fd74dc96f798cb';
+import { ensureAIConsent, chatAccess, showMembership } from './buer-membership.js?v=10fd74dc96f798cb';
+import { renderAssistantText, renderReadingText } from './buer-message-format.js?v=10fd74dc96f798cb';
+import { cleanPersonalContext, SCOPE_KEYS, RELATION_TYPES, relationshipScopeDefaults } from '../services/buer-personal-context.js?v=10fd74dc96f798cb';
+import { readGrowth, QUESTIONS } from '../services/buer-growth.js?v=10fd74dc96f798cb';
+import { validChatHistory } from '../services/buer-conversation.js?v=10fd74dc96f798cb';
+import { fetchPlaceCandidates, inferTimezoneFromAddress } from '../services/location-service.js?v=10fd74dc96f798cb';
+import { personManualData } from '../services/buer-person-manual.js?v=10fd74dc96f798cb';
+import { createBodygraphRenderer } from '../renderer/bodygraph-renderer.js?v=10fd74dc96f798cb';
+import { orderedPeople, movePerson, relationshipGuidePrompt } from '../services/buer-people-tools.js?v=10fd74dc96f798cb';
+import {PAIR_SECTIONS,makeGuideSource,cleanGuideSource,parsePairSections,pairManualStale,guideSourceEqual,pairManualPrompt} from '../services/buer-pair-manual.js?v=10fd74dc96f798cb';
+import { loadingPreview } from './buer-loading.js?v=10fd74dc96f798cb';
+import { pairComparisonGroups, comparisonTable } from './buer-pair-comparison.js?v=10fd74dc96f798cb';
 
 const el = (tag, text = '', attributes = {}) => {
   const node = document.createElement(tag); node.textContent = text;
@@ -129,8 +129,7 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
   function drawList() {
     const content=listContent;content.replaceChildren();
     const actions = el('div', '', { class: 'journal-actions' });
-    actions.append(button('＋ 添加身边的人', '＋ Add someone', () => edit(null, false), 'journal-primary'),button('我的参考资料与授权','My context & permissions',settings),button('调整顺序','Adjust order',sortPeople),button('刷新', 'Refresh', list)); content.append(actions);
-    content.append(el('p',personal?l('自己的资料沿用已有记录，无需重复建档。可在「我的参考资料与授权」更新同步。','Your existing personal information is reused. Update it in My context & permissions.'):l('只需添加对方。聊之前可授权使用你已有的资料，无需再建立自己的档案。','Just add the other person. Authorize your existing information before chatting; no duplicate self profile.'),{class:'people-note'}));
+    actions.append(button('＋ 添加身边的人', '＋ Add someone', () => edit(null, false), 'journal-primary'),button('调整顺序','Adjust order',sortPeople),button('刷新', 'Refresh', list)); content.append(actions);
     const filters=el('div','',{class:'people-filters',role:'group','aria-label':l('按关系筛选','Filter relationships')});
     for(const [zh,en] of [['',''],...RELATION_TYPES]){const b=button(zh||'全部',en||'All',()=>{filter=zh;drawList();});b.setAttribute('aria-pressed',String(filter===zh));filters.append(b);}content.append(filters);
     const cards = el('div', '', { class: 'journal-list relationship-people' });
@@ -287,7 +286,7 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
       panels[2].append(chartLayout);
       select('overview');content.append(root);
       const colors=Object.fromEntries(['head','ajna','throat','g','heart','sacral','splenic','solar-plexus','root'].map(k=>[`${k}-center`,'#718565']));
-      await createBodygraphRenderer({container:graph,templateUrl:new URL('../../assets/bodygraph-template.svg?v=69c74bfdb6c11b00',import.meta.url).href,centerColors:colors,label:l(`${person.nickname}的人类图`,`${person.nickname}’s Human Design`)})(data);
+      await createBodygraphRenderer({container:graph,templateUrl:new URL('../../assets/bodygraph-template.svg?v=10fd74dc96f798cb',import.meta.url).href,centerColors:colors,label:l(`${person.nickname}的人类图`,`${person.nickname}’s Human Design`)})(data);
       if(!valid(ticket))return;
       content.append(button('聊聊我们的关系','Talk about us',()=>conversation(person),'journal-primary'));status.textContent='';
     }catch(error){if(valid(ticket)){preview.remove();status.textContent=errorMessage(error);}}

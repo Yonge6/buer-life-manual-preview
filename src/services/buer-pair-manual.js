@@ -1,4 +1,4 @@
-import { cleanGrowth } from './buer-growth.js?v=69c74bfdb6c11b00';
+import { cleanGrowth } from './buer-growth.js?v=10fd74dc96f798cb';
 
 export const PAIR_SECTIONS = [
  ['overview','双方概览','At a glance'],['communication','沟通与决策','Communication & decisions'],
