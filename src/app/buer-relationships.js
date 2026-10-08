@@ -1,16 +1,16 @@
-import { relationshipRepository, cleanPerson, relationshipMessages } from '../services/buer-relationships.js?v=fd8d4277dad7b6ea';
-import { calculateHumanDesign, localToUtcCandidates } from '../../human-design-engine.js?v=fd8d4277dad7b6ea';
-import { createHumanDesignProfileSnapshot } from '../engine/profile-snapshot.js?v=fd8d4277dad7b6ea';
-import { readBuerEvents } from '../services/buer-conversation.js?v=fd8d4277dad7b6ea';
-import { ensureAIConsent, chatAccess, showMembership } from './buer-membership.js?v=fd8d4277dad7b6ea';
-import { renderAssistantText } from './buer-message-format.js?v=fd8d4277dad7b6ea';
-import { cleanPersonalContext, SCOPE_KEYS, RELATION_TYPES, relationshipScopeDefaults } from '../services/buer-personal-context.js?v=fd8d4277dad7b6ea';
-import { readGrowth, QUESTIONS } from '../services/buer-growth.js?v=fd8d4277dad7b6ea';
-import { validChatHistory } from '../services/buer-conversation.js?v=fd8d4277dad7b6ea';
-import { fetchPlaceCandidates, inferTimezoneFromAddress } from '../services/location-service.js?v=fd8d4277dad7b6ea';
-import { personManualData } from '../services/buer-person-manual.js?v=fd8d4277dad7b6ea';
-import { createBodygraphRenderer } from '../renderer/bodygraph-renderer.js?v=fd8d4277dad7b6ea';
-import { orderedPeople, movePerson, relationshipGuidePrompt } from '../services/buer-people-tools.js?v=fd8d4277dad7b6ea';
+import { relationshipRepository, cleanPerson, relationshipMessages } from '../services/buer-relationships.js?v=1257efab113373b0';
+import { calculateHumanDesign, localToUtcCandidates } from '../../human-design-engine.js?v=1257efab113373b0';
+import { createHumanDesignProfileSnapshot } from '../engine/profile-snapshot.js?v=1257efab113373b0';
+import { readBuerEvents } from '../services/buer-conversation.js?v=1257efab113373b0';
+import { ensureAIConsent, chatAccess, showMembership } from './buer-membership.js?v=1257efab113373b0';
+import { renderAssistantText } from './buer-message-format.js?v=1257efab113373b0';
+import { cleanPersonalContext, SCOPE_KEYS, RELATION_TYPES, relationshipScopeDefaults } from '../services/buer-personal-context.js?v=1257efab113373b0';
+import { readGrowth, QUESTIONS } from '../services/buer-growth.js?v=1257efab113373b0';
+import { validChatHistory } from '../services/buer-conversation.js?v=1257efab113373b0';
+import { fetchPlaceCandidates, inferTimezoneFromAddress } from '../services/location-service.js?v=1257efab113373b0';
+import { personManualData } from '../services/buer-person-manual.js?v=1257efab113373b0';
+import { createBodygraphRenderer } from '../renderer/bodygraph-renderer.js?v=1257efab113373b0';
+import { orderedPeople, movePerson, relationshipGuidePrompt } from '../services/buer-people-tools.js?v=1257efab113373b0';
 
 const el = (tag, text = '', attributes = {}) => {
   const node = document.createElement(tag); node.textContent = text;
@@ -204,7 +204,7 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
       panels[2].append(chartLayout);
       select('overview');content.append(root);
       const colors=Object.fromEntries(['head','ajna','throat','g','heart','sacral','splenic','solar-plexus','root'].map(k=>[`${k}-center`,'#718565']));
-      await createBodygraphRenderer({container:graph,templateUrl:new URL('../../assets/bodygraph-template.svg?v=fd8d4277dad7b6ea',import.meta.url).href,centerColors:colors,label:l(`${person.nickname}的人类图`,`${person.nickname}’s Human Design`)})(data);
+      await createBodygraphRenderer({container:graph,templateUrl:new URL('../../assets/bodygraph-template.svg?v=1257efab113373b0',import.meta.url).href,centerColors:colors,label:l(`${person.nickname}的人类图`,`${person.nickname}’s Human Design`)})(data);
       if(!valid(ticket))return;
       content.append(button('聊聊我们的关系','Talk about us',()=>conversation(person),'journal-primary'));status.textContent='';
     }catch(error){if(valid(ticket))status.textContent=errorMessage(error);}

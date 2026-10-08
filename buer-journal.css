@@ -105,7 +105,7 @@
 #buerPeople{display:none;max-width:1200px;margin:0 auto;padding:32px 36px 100px;color:var(--ui-ink)}
 body[data-workspace="people"] #buerPeople{display:block}
 body[data-workspace="people"] #buerHome,body[data-workspace="people"] .shell,body[data-workspace="people"] #appDrawer,body[data-workspace="people"] .buer-back-home{display:none!important}
-.people-hero{position:relative;display:block;overflow:hidden;min-height:240px;padding:36px 32% 36px 40px;border-radius:28px;background:#e4e9da url('assets/companion-landscape.svg?v=fd8d4277dad7b6ea') center/cover}
+.people-hero{position:relative;display:block;overflow:hidden;min-height:240px;padding:36px 32% 36px 40px;border-radius:28px;background:#e4e9da url('assets/companion-landscape.svg?v=1257efab113373b0') center/cover}
 .people-hero h1{font:600 clamp(28px,3vw,42px)/1.4 var(--editorial-serif,Georgia,serif);color:#213a2d;margin:20px 0}
 .people-hero>p{color:#3d5746;line-height:1.8;font-size:15px}
 .people-hero .companion-section-art{position:absolute;right:24px;bottom:8px;width:240px;height:240px;object-fit:contain}
