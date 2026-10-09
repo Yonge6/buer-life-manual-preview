@@ -1,23 +1,23 @@
-import {workspaceStorage} from '../services/buer-workspace.js?v=e8b5915acf62147e';
-import {channelGuidance,compositeGuidance,sectionFoundation,guideV2,guideCurrent,guideText,stampGuide} from '../services/buer-pair-guidance.js?v=e8b5915acf62147e';
-import { relationshipRepository, cleanPerson, relationshipMessages } from '../services/buer-relationships.js?v=e8b5915acf62147e';
-import { calculateHumanDesign, localToUtcCandidates } from '../../human-design-engine.js?v=e8b5915acf62147e';
-import { createHumanDesignProfileSnapshot } from '../engine/profile-snapshot.js?v=e8b5915acf62147e';
-import { readBuerEvents } from '../services/buer-conversation.js?v=e8b5915acf62147e';
-import { ensureAIConsent, chatAccess, showMembership } from './buer-membership.js?v=e8b5915acf62147e';
-import { renderAssistantText, renderReadingText } from './buer-message-format.js?v=e8b5915acf62147e';
-import { cleanPersonalContext, SCOPE_KEYS, RELATION_TYPES, relationshipScopeDefaults } from '../services/buer-personal-context.js?v=e8b5915acf62147e';
-import { readGrowth, QUESTIONS } from '../services/buer-growth.js?v=e8b5915acf62147e';
-import { validChatHistory } from '../services/buer-conversation.js?v=e8b5915acf62147e';
-import { fetchPlaceCandidates, inferTimezoneFromAddress } from '../services/location-service.js?v=e8b5915acf62147e';
-import { personManualData } from '../services/buer-person-manual.js?v=e8b5915acf62147e';
-import { createBodygraphRenderer } from '../renderer/bodygraph-renderer.js?v=e8b5915acf62147e';
-import { orderedPeople, movePerson, relationshipGuidePrompt } from '../services/buer-people-tools.js?v=e8b5915acf62147e';
-import {PAIR_SECTIONS,readingSections,makeGuideSource,cleanGuideSource,parsePairSections,pairManualRoleWarning,pairManualStale,guideSourceEqual,pairManualPrompt} from '../services/buer-pair-manual.js?v=e8b5915acf62147e';
-import { loadingPreview } from './buer-loading.js?v=e8b5915acf62147e';
-import { pairComparisonGroups, comparisonTable } from './buer-pair-comparison.js?v=e8b5915acf62147e';
-import { createReadingCache } from '../services/buer-reading-cache.js?v=e8b5915acf62147e';
-import { pairComposite, compositeSummaryLines } from '../services/buer-pair-composite.js?v=e8b5915acf62147e';
+import {workspaceStorage} from '../services/buer-workspace.js?v=066b8da5d8e8d5b6';
+import {channelGuidance,compositeGuidance,sectionFoundation,guideV2,guideCurrent,guideText,stampGuide} from '../services/buer-pair-guidance.js?v=066b8da5d8e8d5b6';
+import { relationshipRepository, cleanPerson, relationshipMessages } from '../services/buer-relationships.js?v=066b8da5d8e8d5b6';
+import { calculateHumanDesign, localToUtcCandidates } from '../../human-design-engine.js?v=066b8da5d8e8d5b6';
+import { createHumanDesignProfileSnapshot } from '../engine/profile-snapshot.js?v=066b8da5d8e8d5b6';
+import { readBuerEvents } from '../services/buer-conversation.js?v=066b8da5d8e8d5b6';
+import { ensureAIConsent, chatAccess, showMembership } from './buer-membership.js?v=066b8da5d8e8d5b6';
+import { renderAssistantText, renderReadingText } from './buer-message-format.js?v=066b8da5d8e8d5b6';
+import { cleanPersonalContext, SCOPE_KEYS, RELATION_TYPES, relationshipScopeDefaults } from '../services/buer-personal-context.js?v=066b8da5d8e8d5b6';
+import { readGrowth, QUESTIONS } from '../services/buer-growth.js?v=066b8da5d8e8d5b6';
+import { validChatHistory } from '../services/buer-conversation.js?v=066b8da5d8e8d5b6';
+import { fetchPlaceCandidates, inferTimezoneFromAddress } from '../services/location-service.js?v=066b8da5d8e8d5b6';
+import { personManualData } from '../services/buer-person-manual.js?v=066b8da5d8e8d5b6';
+import { createBodygraphRenderer } from '../renderer/bodygraph-renderer.js?v=066b8da5d8e8d5b6';
+import { orderedPeople, movePerson, relationshipGuidePrompt } from '../services/buer-people-tools.js?v=066b8da5d8e8d5b6';
+import {PAIR_SECTIONS,readingSections,makeGuideSource,cleanGuideSource,parsePairSections,pairManualRoleWarning,pairManualStale,guideSourceEqual,pairManualPrompt} from '../services/buer-pair-manual.js?v=066b8da5d8e8d5b6';
+import { loadingPreview } from './buer-loading.js?v=066b8da5d8e8d5b6';
+import { pairComparisonGroups, comparisonTable } from './buer-pair-comparison.js?v=066b8da5d8e8d5b6';
+import { createReadingCache } from '../services/buer-reading-cache.js?v=066b8da5d8e8d5b6';
+import { pairComposite, compositeSummaryLines } from '../services/buer-pair-composite.js?v=066b8da5d8e8d5b6';
 
 const el = (tag, text = '', attributes = {}) => {
   const node = document.createElement(tag); node.textContent = text;
@@ -39,6 +39,11 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
   let personal=null,filter='',peopleOrder=null;
   let readingStorage=null;try{readingStorage=window.localStorage;}catch{}
   const readingCache=createReadingCache({storage:readingStorage});
+  const peopleCacheKey=id=>`buer:people-preview:v1:${id}`;
+  let hasPeopleSnapshot=false;
+  function restorePeople(){try{const saved=JSON.parse(readingStorage?.getItem(peopleCacheKey(owner))||'null');if(saved?.owner===owner&&Array.isArray(saved.people)){people=saved.people;peopleOrder=saved.order;hasPeopleSnapshot=true;}}catch{}}
+  function savePeople(){try{readingStorage?.setItem(peopleCacheKey(owner),JSON.stringify({owner,people,order:peopleOrder}));}catch{}}
+  function boundedRead(request){let timer;return Promise.race([request,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('PEOPLE_READ_TIMEOUT')),15000);})]).finally(()=>clearTimeout(timer));}
   const root=el('section','',{id:'buerPeople','aria-label':'People in your life'});
   const hero=el('header','',{class:'people-hero companion-section-hero'}),listContent=el('div','',{class:'people-content'});
   root.append(hero,listContent);document.querySelector('#buerHome').after(root);
@@ -107,12 +112,26 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
     invalidate(); const ticket = epoch;
     dialog.close();listContent.replaceChildren();
     if (!owner) { login(); return; }
-    busy = true;
-    if(people.length)drawList();
-    const loading=loadingPreview(l('正在读取身边的人…','Loading people…'),people.length?[]:[l('人物档案','People'),l('相处指南','Relationship guides')]);listContent.prepend(loading);
-    try { const [rows,context,order] = await Promise.all([repo.people(owner),repo.personal(owner),repo.order(owner)]); if (!valid(ticket)) return; people = rows;personal=context;peopleOrder=order;drawList(); }
-    catch (error) { if (valid(ticket)) { loading.remove();listContent.prepend(el('p',errorMessage(error)),button('重新读取', 'Retry', list)); } }
-    finally { if (ticket === epoch) busy = false; }
+    if(!hasPeopleSnapshot)restorePeople();
+    if(hasPeopleSnapshot)drawList();
+    else {
+      const skeleton=el('div','',{class:'journal-list relationship-people people-loading', 'aria-busy':'true'});
+      for(let i=0;i<2;i++){const card=el('article','',{class:'relationship-person'});card.append(el('small',l('人物档案','Profile')),el('h3',l('正在读取…','Loading…')),el('div','',{class:'loading-color-block','aria-hidden':'true'}));skeleton.append(card);}
+      listContent.append(skeleton);
+    }
+    // Profile cards do not depend on the context or ordering requests.
+    const supplemental=Promise.allSettled([boundedRead(repo.personal(owner)),boundedRead(repo.order(owner))]);
+    try {
+      const rows=await boundedRead(repo.people(owner));if(!valid(ticket))return;
+      people=rows;hasPeopleSnapshot=true;savePeople();drawList();
+      const [context,order]=await supplemental;if(!valid(ticket))return;
+      if(context.status==='fulfilled')personal=context.value;
+      if(order.status==='fulfilled'){peopleOrder=order.value;savePeople();if(!dialog.open)drawList();}
+    } catch(error){if(valid(ticket)){
+      if(!hasPeopleSnapshot)listContent.replaceChildren();
+      const notice=el('div','',{class:'people-load-notice',role:'status'});
+      notice.append(el('span',l(hasPeopleSnapshot?'网络较慢，当前显示上次保存的人物。':'暂时无法读取人物，请重试。',hasPeopleSnapshot?'Showing saved people while offline.':'Could not load people. Please retry.')),button('重试','Retry',list));listContent.append(notice);
+    }}
   }
   async function open() { if(dialog.open&&(busy||!await mayLeave()))return;trigger=document.activeElement;document.body.dataset.workspace='people';window.scrollTo({top:0,behavior:'instant'});await list(); }
   function sources(value) { return ({ entered: l('手动填写', 'Manually entered'), self: l('本人资料', 'My profile'), permission: l('经本人允许', 'With permission'), confirmed: l('本人确认', 'Confirmed by them'), guardian: l('监护人管理', 'Managed by guardian') })[value] || ''; }
@@ -341,7 +360,7 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
       panels[2].append(chartLayout);
       select('overview');content.append(root);
       const colors=Object.fromEntries(['head','ajna','throat','g','heart','sacral','splenic','solar-plexus','root'].map(k=>[`${k}-center`,'#718565']));
-      await createBodygraphRenderer({container:graph,templateUrl:new URL('../../assets/bodygraph-template.svg?v=e8b5915acf62147e',import.meta.url).href,centerColors:colors,label:l(`${person.nickname}的人类图`,`${person.nickname}’s Human Design`)})(data);
+      await createBodygraphRenderer({container:graph,templateUrl:new URL('../../assets/bodygraph-template.svg?v=066b8da5d8e8d5b6',import.meta.url).href,centerColors:colors,label:l(`${person.nickname}的人类图`,`${person.nickname}’s Human Design`)})(data);
       if(!valid(ticket))return;
       content.append(button('聊聊我们的关系','Talk about us',()=>conversation(person),'journal-primary'));status.textContent='';
     }catch(error){if(valid(ticket)){preview.remove();status.textContent=errorMessage(error);}}
@@ -539,7 +558,7 @@ export function initBuerRelationships({ getLanguage, account, openAccount, getRe
     if(document.body.dataset.workspace==='people'&&!dialog.open&&!busy)void list(); }
   document.addEventListener('buer:language', language); language();
   document.addEventListener('buer:relationships', () => void open());
-  account?.subscribe(user => { const next = user?.id || null; if (owner === next) return; if(owner)readingCache.clear();invalidate(); owner = next; people = [];personal=null;peopleOrder=null; content.replaceChildren();listContent.replaceChildren(); status.textContent = '';dialog.close(); if (document.body.dataset.workspace==='people') void list(); });
+  account?.subscribe(user => { const next = user?.id || null; if (owner === next) return; if(owner){readingCache.clear();try{readingStorage?.removeItem(peopleCacheKey(owner));}catch{}}invalidate(); owner = next; people = [];hasPeopleSnapshot=false;personal=null;peopleOrder=null; content.replaceChildren();listContent.replaceChildren(); status.textContent = '';dialog.close(); if (document.body.dataset.workspace==='people') void list(); });
   window.addEventListener('beforeunload', event => { if (dirty || busy) { event.preventDefault(); event.returnValue = ''; } });
   const viewport = () => { const v = window.visualViewport, follow = v && matchMedia('(max-width:760px)').matches && Math.abs(v.scale-1)<.01; dialog.style.setProperty('--journal-viewport-height', follow ? `${v.height}px` : '100dvh'); dialog.style.setProperty('--journal-viewport-top', follow ? `${v.offsetTop}px` : '0px'); };
   window.visualViewport?.addEventListener('resize', viewport); window.visualViewport?.addEventListener('scroll', viewport); viewport();
