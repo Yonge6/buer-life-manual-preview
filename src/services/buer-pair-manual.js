@@ -1,5 +1,5 @@
-import {compositeGuidance,guideV2} from './buer-pair-guidance.js?v=aa45c478c4a5be09';
-import { cleanGrowth } from './buer-growth.js?v=aa45c478c4a5be09';
+import {compositeGuidance,guideV2} from './buer-pair-guidance.js?v=04e8b084cf412e1a';
+import { cleanGrowth } from './buer-growth.js?v=04e8b084cf412e1a';
 
 export const PAIR_SECTIONS = [
  ['overview','我们怎样相处','How we relate'],['communication','怎样说，彼此听得见','Hear each other'],
