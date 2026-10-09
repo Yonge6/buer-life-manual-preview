@@ -1,4 +1,4 @@
-import {CHANNELS} from '../engine/human-design-engine.js?v=55880281d8ea2de3';
+import {CHANNELS} from '../engine/human-design-engine.js?v=e8b5915acf62147e';
 
 const PLANETS=['sun','earth','northnode','southnode','moon','mercury','venus','mars','jupiter','saturn','uranus','neptune','pluto'];
 const readGates=chart=>{
