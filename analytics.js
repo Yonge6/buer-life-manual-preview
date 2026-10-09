@@ -19,7 +19,7 @@
   window.addEventListener('buer:usage-consent',()=>{usageGeneration++;usagePending.length=0;});
   window.addEventListener('buer:usage',async event=>{
     const generation=usageGeneration;
-    const {usageEvent}=await import('./shared/buer-analytics-contract.js?v=1090ba4511e72657');
+    const {usageEvent}=await import('./shared/buer-analytics-contract.js?v=55880281d8ea2de3');
     const detail=event.detail;
     if(generation!==usageGeneration||!detail?.name?.startsWith('buer_v1_')||!usageAllowed())return;
     const {schema_version,surface,...fields}=detail.parameters||{};
