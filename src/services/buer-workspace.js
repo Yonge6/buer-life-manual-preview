@@ -1,6 +1,6 @@
-import {createWorkspaceSync,workspaceRepository} from './buer-workspace-sync.js?v=04e8b084cf412e1a';
-import {stableJson} from './buer-workspace-json.js?v=04e8b084cf412e1a';
-import {LEGACY_WORKSPACE_KEYS,LEGACY_OWNER_KEY,workspaceRecords,workspaceValues,migrateLegacyWorkspace} from './buer-workspace-data.js?v=04e8b084cf412e1a';
+import {createWorkspaceSync,workspaceRepository} from './buer-workspace-sync.js?v=9338758580da9552';
+import {stableJson} from './buer-workspace-json.js?v=9338758580da9552';
+import {LEGACY_WORKSPACE_KEYS,LEGACY_OWNER_KEY,workspaceRecords,workspaceValues,migrateLegacyWorkspace} from './buer-workspace-data.js?v=9338758580da9552';
 
 const names=['chats','growth','manuals'];
 const keyOf=r=>JSON.stringify([r.kind,r.id]);

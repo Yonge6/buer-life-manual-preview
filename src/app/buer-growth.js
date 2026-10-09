@@ -1,9 +1,9 @@
-import {GROWTH_KEY,DOMAINS,QUESTIONS,readGrowth,saveGrowth,cleanGrowth,setGrowthAnswer,answeredCount,assessmentContext} from '../services/buer-growth.js?v=04e8b084cf412e1a';
-import {readBuerEvents} from '../services/buer-conversation.js?v=04e8b084cf412e1a';
-import {ensureAIConsent,chatAccess,showMembership} from './buer-membership.js?v=04e8b084cf412e1a';
-import {trackUsage} from '../services/buer-analytics.js?v=04e8b084cf412e1a';
-import {renderAssistantText} from './buer-message-format.js?v=04e8b084cf412e1a';
-import {workspace,workspaceStorage,onWorkspaceChange} from '../services/buer-workspace.js?v=04e8b084cf412e1a';
+import {GROWTH_KEY,DOMAINS,QUESTIONS,readGrowth,saveGrowth,cleanGrowth,setGrowthAnswer,answeredCount,assessmentContext} from '../services/buer-growth.js?v=9338758580da9552';
+import {readBuerEvents} from '../services/buer-conversation.js?v=9338758580da9552';
+import {ensureAIConsent,chatAccess,showMembership} from './buer-membership.js?v=9338758580da9552';
+import {trackUsage} from '../services/buer-analytics.js?v=9338758580da9552';
+import {renderAssistantText} from './buer-message-format.js?v=9338758580da9552';
+import {workspace,workspaceStorage,onWorkspaceChange} from '../services/buer-workspace.js?v=9338758580da9552';
 
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function renderGrowthReport(element,content){
