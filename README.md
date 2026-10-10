@@ -2,7 +2,7 @@
 
 直接体验：https://buer.wonderelian.com/
 
-源码与许可证：https://github.com/Yonge6/human-design-chart/tree/0d142d42fb809fe2b9d689caef0d84fdf0359dee
+源码与许可证：https://github.com/Yonge6/human-design-chart/tree/99c187aa6faa1a55f304c0f023ad4d82cb9a1a4a
 
 这是独立体验站，不覆盖原网站。包含 AI 成长伙伴豆豆龙、HUMAN 3.0 四领域访谈、个人经历、行动复盘、人类图说明书和每日提示。AI 对话由独立服务端连接 DeepSeek，密钥不会进入网页。
 

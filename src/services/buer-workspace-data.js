@@ -1,4 +1,4 @@
-import {validateWorkspaceValue} from './buer-workspace-sync.js?v=9338758580da9552';
+import {validateWorkspaceValue} from './buer-workspace-sync.js?v=c7b980258d235f83';
 
 export const LEGACY_WORKSPACE_KEYS=['buer-conversations-v1','buer-growth-profile-v1','pluto-chart-history-v1'];
 export const LEGACY_OWNER_KEY='buer:workspace:legacy-owner:v1';

@@ -1,5 +1,5 @@
 // Content-only sync foundation. UI integration is gated separately.
-import {stableJson} from './buer-workspace-json.js?v=9338758580da9552';
+import {stableJson} from './buer-workspace-json.js?v=c7b980258d235f83';
 export const WORKSPACE_KINDS=['chat','manual','answer','story','action','growth_meta','conflict'];
 const keyOf=(kind,id)=>JSON.stringify([kind,id]);
 const clone=value=>structuredClone(value);
