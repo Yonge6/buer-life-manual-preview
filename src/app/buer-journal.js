@@ -1,7 +1,7 @@
-import { createAccount } from '../services/buer-account.js?v=a634bb6207454650';
-import {workspace,onWorkspaceChange} from '../services/buer-workspace.js?v=a634bb6207454650';
-import { loadingPreview } from './buer-loading.js?v=a634bb6207454650';
-import { createJournalStore, indexedJournalCache, journalRepository, localDate } from '../services/buer-journal.js?v=a634bb6207454650';
+import { createAccount } from '../services/buer-account.js?v=1e026c70127e5edb';
+import {workspace,onWorkspaceChange} from '../services/buer-workspace.js?v=1e026c70127e5edb';
+import { loadingPreview } from './buer-loading.js?v=1e026c70127e5edb';
+import { createJournalStore, indexedJournalCache, journalRepository, localDate } from '../services/buer-journal.js?v=1e026c70127e5edb';
 
 const copy = {
   zh: { journal: '见己日记', hint: '记录生活，慢慢认识自己', account: '我的账号', accountHint: 'H5 与 App，同一个你',
@@ -268,8 +268,25 @@ export async function initBuerJournal({ getLanguage, accountFactory = createAcco
     if (!inlineHost) actions.append(button(t('account'), () => open('account')), button(t('retry'), flush));
     content.append(actions);
     const search = field(t('search'), 'search', filterQuery, { autocomplete: 'off' });
+    search.wrapper.classList.add('journal-search-field');
+    search.wrapper.hidden = !filterQuery;
+    const searchToggle = button('', () => {
+      const expanded = search.wrapper.hidden;
+      search.wrapper.hidden = !expanded;
+      searchToggle.setAttribute('aria-expanded', String(expanded));
+      if (expanded) search.input.focus();
+      else { search.input.value = ''; draw(); }
+    }, 'journal-search-toggle');
+    searchToggle.setAttribute('aria-label', t('search'));
+    searchToggle.setAttribute('title', t('search'));
+    searchToggle.setAttribute('aria-expanded', String(!search.wrapper.hidden));
+    searchToggle.append(element('i', { className: 'ph ph-magnifying-glass', 'aria-hidden': 'true' }));
     const date = field(t('filterDate'), 'date', filterDate);
-    const filters = element('div', { className: 'journal-filters' }); filters.append(search.wrapper, date.wrapper, button(t('clearFilter'), () => { date.input.value = ''; search.input.value = ''; draw(); }));
+    const clearFilter = button(t('clearFilter'), () => {
+      date.input.value = ''; search.input.value = ''; search.wrapper.hidden = true;
+      searchToggle.setAttribute('aria-expanded', 'false'); draw();
+    });
+    const filters = element('div', { className: 'journal-filters' }); filters.append(searchToggle, search.wrapper, date.wrapper, clearFilter);
     const list = element('div', { className: 'journal-list' });
     const draw = () => {
       filterQuery = search.input.value; filterDate = date.input.value;
