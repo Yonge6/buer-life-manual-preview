@@ -1,7 +1,7 @@
-import { createAccount } from '../services/buer-account.js?v=c7b980258d235f83';
-import {workspace,onWorkspaceChange} from '../services/buer-workspace.js?v=c7b980258d235f83';
-import { loadingPreview } from './buer-loading.js?v=c7b980258d235f83';
-import { createJournalStore, indexedJournalCache, journalRepository, localDate } from '../services/buer-journal.js?v=c7b980258d235f83';
+import { createAccount } from '../services/buer-account.js?v=a634bb6207454650';
+import {workspace,onWorkspaceChange} from '../services/buer-workspace.js?v=a634bb6207454650';
+import { loadingPreview } from './buer-loading.js?v=a634bb6207454650';
+import { createJournalStore, indexedJournalCache, journalRepository, localDate } from '../services/buer-journal.js?v=a634bb6207454650';
 
 const copy = {
   zh: { journal: '见己日记', hint: '记录生活，慢慢认识自己', account: '我的账号', accountHint: 'H5 与 App，同一个你',
@@ -264,7 +264,8 @@ export async function initBuerJournal({ getLanguage, accountFactory = createAcco
     if (!inlineHost) content.append(element('span', { className: 'journal-kicker' }, t('kicker')), element('h3', {}, t('title')),
       element('p', { className: 'journal-description' }, t('subtitle')));
     const actions = element('div', { className: 'journal-actions' });
-    actions.append(button(`＋ ${t('new')}`, () => startEntry(), 'journal-primary'), button(t('account'), () => open('account')), button(t('retry'), flush));
+    actions.append(button(`＋ ${t('new')}`, () => startEntry(), 'journal-primary'));
+    if (!inlineHost) actions.append(button(t('account'), () => open('account')), button(t('retry'), flush));
     content.append(actions);
     const search = field(t('search'), 'search', filterQuery, { autocomplete: 'off' });
     const date = field(t('filterDate'), 'date', filterDate);

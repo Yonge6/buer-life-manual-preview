@@ -1,4 +1,4 @@
-import {trackUsage} from '../services/buer-analytics.js?v=c7b980258d235f83';
+import {trackUsage} from '../services/buer-analytics.js?v=a634bb6207454650';
 const zh=()=>document.documentElement.lang.startsWith('zh');
 const native=()=>globalThis.Capacitor?.isNativePlatform?.();
 const plugin=()=>globalThis.Capacitor?.Plugins?.PlutoNative||globalThis.Capacitor?.registerPlugin?.('PlutoNative');
