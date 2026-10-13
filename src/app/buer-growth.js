@@ -1,9 +1,9 @@
-import {DOMAINS,QUESTIONS,readGrowth,saveGrowth,setGrowthAnswer,answeredCount,assessmentContext} from '../services/buer-growth.js?v=1e026c70127e5edb';
-import {readBuerEvents} from '../services/buer-conversation.js?v=1e026c70127e5edb';
-import {ensureAIConsent,chatAccess,showMembership} from './buer-membership.js?v=1e026c70127e5edb';
-import {trackUsage} from '../services/buer-analytics.js?v=1e026c70127e5edb';
-import {renderAssistantText} from './buer-message-format.js?v=1e026c70127e5edb';
-import {workspace,workspaceStorage,onWorkspaceChange} from '../services/buer-workspace.js?v=1e026c70127e5edb';
+import {DOMAINS,QUESTIONS,readGrowth,saveGrowth,setGrowthAnswer,answeredCount,assessmentContext} from '../services/buer-growth.js?v=1729d897b483d3a2';
+import {readBuerEvents} from '../services/buer-conversation.js?v=1729d897b483d3a2';
+import {ensureAIConsent,chatAccess,showMembership} from './buer-membership.js?v=1729d897b483d3a2';
+import {trackUsage} from '../services/buer-analytics.js?v=1729d897b483d3a2';
+import {renderAssistantText} from './buer-message-format.js?v=1729d897b483d3a2';
+import {workspace,workspaceStorage,onWorkspaceChange} from '../services/buer-workspace.js?v=1729d897b483d3a2';
 
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function renderGrowthReport(element,content){
@@ -39,7 +39,7 @@ export function initBuerGrowth({getLanguage,openHumanDesign,getReport}){
  const button=(id,cn,en,primary=false)=>`<button type="button" ${id?`id="${id}"`:""} class="growth-button${primary?' primary':''}">${l(cn,en)}</button>`;
  function render(){
  document.dispatchEvent(new CustomEvent('buer:journal-inline-unmount'));
- root.innerHTML=`<header class="growth-header companion-section-hero"><p class="growth-eyebrow">BUER WITHIN / ${l('成长档案','GROWTH PROFILE')}</p><h1 tabindex="-1">${view==='assessment'?l('从四个领域，看见当下。','See your life from four angles.'):view==='stories'?l('你的来时路，值得被记住。','Your story matters.'):l('认识自己，走好下一步。','Know yourself. Take your next step.')}</h1><p>${l('理解你的节奏、看清眼前的事，让每一次行动都有回响。','Understand your rhythms, work through what matters and learn from each step.')}</p><img class="companion-section-art" src="assets/companion-growth.webp" alt="" aria-hidden="true" width="320" height="320"></header>${view==='overview'?'':`<nav class="growth-subpage-nav" aria-label="${l('二级页面导航','Secondary page navigation')}">${button('growthBack','← 返回成长档案','← Back to growth profile')}</nav>`}<p id="growthStatus" role="status">${escape(notice)}</p><div id="growthContent"></div>`;
+ root.innerHTML=`<header class="growth-header companion-section-hero"><p class="growth-eyebrow">BUER WITHIN / ${l('成长档案','GROWTH PROFILE')}</p><h1 tabindex="-1">${view==='assessment'?l('从四个领域，看见当下。','See your life from four angles.'):view==='stories'?l('你的来时路，值得被记住。','Your story matters.'):l('认识自己，走好下一步。','Know yourself. Take your next step.')}</h1><p>${l('理解你的节奏、看清眼前的事，让每一次行动都有回响。','Understand your rhythms, work through what matters and learn from each step.')}</p><img class="companion-section-art" src="assets/doudoulong-blue-notebook.png" alt="" aria-hidden="true" width="320" height="320"></header>${view==='overview'?'':`<nav class="growth-subpage-nav" aria-label="${l('二级页面导航','Secondary page navigation')}">${button('growthBack','← 返回成长档案','← Back to growth profile')}</nav>`}<p id="growthStatus" role="status">${escape(notice)}</p><div id="growthContent"></div>`;
  root.querySelector('#growthBack')?.addEventListener('click',()=>{if(!busy)open('overview');});
  const content=root.querySelector('#growthContent');
  if(view==='overview')renderOverview(content);if(view==='assessment')renderAssessment(content);if(view==='stories')renderStories(content);
