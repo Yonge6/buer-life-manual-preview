@@ -1,4 +1,4 @@
-import { PROFILE_ENGINE_VERSION, PROFILE_SCHEMA_VERSION } from "./human-design-profile-contract.js?v=dbe62e57ead3d8df";
+import { PROFILE_ENGINE_VERSION, PROFILE_SCHEMA_VERSION } from "./human-design-profile-contract.js?v=62821141ee066676";
 
 export const PRODUCT_EVENT_NAMES = Object.freeze([
   "app_open", "form_started", "chart_generate_started", "chart_generate_succeeded",

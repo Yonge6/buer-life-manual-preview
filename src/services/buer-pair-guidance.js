@@ -1,4 +1,4 @@
-import {CHANNELS} from '../engine/human-design-engine.js?v=dbe62e57ead3d8df';
+import {CHANNELS} from '../engine/human-design-engine.js?v=62821141ee066676';
 
 export const GUIDE_VERSION='[BUER_GUIDE_V3]';
 export const guideV2=sections=>Object.values(sections||{}).length===6&&Object.values(sections).every(v=>/^\[BUER_GUIDE_V[23]\]/.test(v));
