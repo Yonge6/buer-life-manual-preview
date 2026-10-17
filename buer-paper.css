@@ -1,5 +1,5 @@
 /* Selected Paper Manual direction. Shared App/H5 content; UIKit owns App chrome. */
-@font-face { font-family:"Buer Serif"; src:url("assets/fonts/buer-serif-ui.woff2?v=62821141ee066676") format("woff2"); font-style:normal; font-weight:200 900; font-display:swap; }
+@font-face { font-family:"Buer Serif"; src:url("assets/fonts/buer-serif-ui.woff2?v=0c090ac8adc64c75") format("woff2"); font-style:normal; font-weight:200 900; font-display:swap; }
 :root {
   --ui-paper:#f7f4ec; --ui-surface:#fcfaf5; --ui-ink:#23333d;
   --ui-muted:#63747e; --ui-accent:#367e8c; --ui-line:#d6dad7;

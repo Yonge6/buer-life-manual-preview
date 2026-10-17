@@ -1,9 +1,9 @@
-import {DOMAINS,QUESTIONS,readGrowth,saveGrowth,setGrowthAnswer,answeredCount,assessmentContext} from '../services/buer-growth.js?v=62821141ee066676';
-import {readBuerEvents} from '../services/buer-conversation.js?v=62821141ee066676';
-import {ensureAIConsent,chatAccess,showMembership} from './buer-membership.js?v=62821141ee066676';
-import {trackUsage} from '../services/buer-analytics.js?v=62821141ee066676';
-import {renderAssistantText} from './buer-message-format.js?v=62821141ee066676';
-import {workspace,workspaceStorage,onWorkspaceChange} from '../services/buer-workspace.js?v=62821141ee066676';
+import {DOMAINS,QUESTIONS,readGrowth,saveGrowth,setGrowthAnswer,answeredCount,assessmentContext} from '../services/buer-growth.js?v=0c090ac8adc64c75';
+import {readBuerEvents} from '../services/buer-conversation.js?v=0c090ac8adc64c75';
+import {ensureAIConsent,chatAccess,showMembership} from './buer-membership.js?v=0c090ac8adc64c75';
+import {trackUsage} from '../services/buer-analytics.js?v=0c090ac8adc64c75';
+import {renderAssistantText} from './buer-message-format.js?v=0c090ac8adc64c75';
+import {workspace,workspaceStorage,onWorkspaceChange} from '../services/buer-workspace.js?v=0c090ac8adc64c75';
 
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function renderGrowthReport(element,content){

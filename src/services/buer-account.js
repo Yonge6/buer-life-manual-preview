@@ -31,7 +31,7 @@ export function accountConfig(config = globalThis.PLUTO_CONFIG || {}) {
 }
 
 export async function createAccount({ config = accountConfig(), native = globalThis.Capacitor?.isNativePlatform?.(),
-  plugin = globalThis.Capacitor?.Plugins?.PlutoNative, loadSDK = () => import('../../vendor/supabase/client.js?v=62821141ee066676'), fetchImpl = globalThis.fetch } = {}) {
+  plugin = globalThis.Capacitor?.Plugins?.PlutoNative, loadSDK = () => import('../../vendor/supabase/client.js?v=0c090ac8adc64c75'), fetchImpl = globalThis.fetch } = {}) {
   if (!config) return null;
   if (globalThis.isSecureContext === false && !native) return null;
   const { createClient } = await loadSDK();
